@@ -1,39 +1,51 @@
-import Home from "../pages/Home.vue";
+import Login from "../pages/Login.vue";
+import BusTime from "../components/BusTime.vue";
+import TermTime from "../components/TermTime.vue";
+import Edit from "../components/Edit.vue"
 import Layout from "../pages/Layout.vue";
-import Layout2 from "../pages/Layout2.vue";
-import Layout3 from "../pages/Layout3.vue";
-import Layout4 from "../pages/Layout4.vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
   {
     path: "/",
-    redirect: "/home"
+    redirect: "/Login"
   },
   {
-    path: "/home",
-    name: "home",
-    component: Home
+    path: "/Login",
+    name: "Login",
+    component: Login
   },
   {
     path: "/Layout",
     name: "Layout",
-    component: Layout
+    components: {
+      'default': Layout,
+      'right': BusTime,
+    }
   },
   {
-    path: "/Layout2",
-    name: "Layout2",
-    component: Layout2
+    path: "/Layout",
+    name: "BusTime",
+    components: {
+      'default': Layout,
+      'right': BusTime,
+    }
   },
   {
-    path: "/Layout3",
-    name: "Layout3",
-    component: Layout3
+    path: "/Layout",
+    name: "TermTime",
+    components: {
+      'default': Layout,
+      'right': TermTime,
+    }
   },
   {
-    path: "/Layout4",
-    name: "Layout4",
-    component: Layout4
+    path: "/Layout",
+    name: "Edit",
+    components: {
+      'default': Layout,
+      'right': Edit,
+    }
   },
 ]
 
