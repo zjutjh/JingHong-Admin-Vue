@@ -20,7 +20,7 @@ const onClick1 = async () => {
   });
 
   console.log(res);
-  if (res.data.code === "200") {
+  if (res.data.code === 200) {
     console.log("登录成功");
     isLoginSuccess.value = true;
     router.push("Layout");
