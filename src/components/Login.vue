@@ -9,7 +9,6 @@ import loginAPI from "../apis/login";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
-const isLoginSuccess = ref(false);
 const username = ref("");
 const password = ref("");
 
@@ -20,10 +19,9 @@ const onClick1 = async () => {
   });
 
   console.log(res);
-  if (res.data.code === 200) {
+  if (res.data.code === 1) {
     console.log("登录成功");
-    isLoginSuccess.value = true;
-    router.push("Layout");
+    router.push("/");
   } else {
     console.log("登录失败");
   }
