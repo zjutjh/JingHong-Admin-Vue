@@ -4,54 +4,49 @@ import TermTime from "../components/TermTime.vue";
 import Edit from "../components/Edit.vue"
 import Layout from "../pages/Layout.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import { canUserAccess } from "../utils/canUserAccess";
 
 const routes = [
   {
-    path: "/",
-    redirect: "/Login"
-  },
-  {
-    path: "/Login",
+    path: "/login",
     name: "Login",
     component: Login
   },
   {
-    path: "/Layout",
+    path: "/",
     name: "Layout",
-    components: {
-      'default': Layout,
-      'right': BusTime,
-    }
-  },
-  {
-    path: "/Layout",
-    name: "BusTime",
-    components: {
-      'default': Layout,
-      'right': BusTime,
-    }
-  },
-  {
-    path: "/Layout",
-    name: "TermTime",
-    components: {
-      'default': Layout,
-      'right': TermTime,
-    }
-  },
-  {
-    path: "/Layout",
-    name: "Edit",
-    components: {
-      'default': Layout,
-      'right': Edit,
-    }
+    component: Layout,
+    children: [
+      {
+        path: "bustime",
+        name: "BusTime",
+        component: BusTime
+      },
+      {
+        path: "termtime",
+        name: "TermTime",
+        component: TermTime
+      },
+      {
+        path: "edit",
+        name: "Edit",
+        component: Edit
+      }
+    ]
   },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach(async (to) => {
+  if (to.name !== "Login") {
+    const res = await canUserAccess();
+    console.log(res);
+    if (!res) return "/login"
+  }
 })
 
 export default router;

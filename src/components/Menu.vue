@@ -1,11 +1,11 @@
 <template>
-  <n-menu :options="menuOptions"/>
+  <n-menu :options="menuOptions" default-value="school-bus-time"/>
 </template>
 
 <script setup lang="ts">
 
 import { h, Component } from 'vue'
-import { NMenu,NIcon} from 'naive-ui'
+import { NMenu, NIcon } from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
 import {
   PencilOutline as PencilIcon,
@@ -17,59 +17,35 @@ import {
 import { RouterLink } from 'vue-router'
 
 
-function renderIcon (icon: Component) {
+function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
 const menuOptions: MenuOption[] = [
   {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: 'BusTime',
-            params: {
-              lang: 'zh-CN'
-            }
-          }
-        },
-        { default: () => '校车时间维护' }
-      ),
+    label: () => h(
+      RouterLink,
+      { to: { name: 'BusTime', } },
+      { default: () => '校车时间维护' }
+    ),
     key: 'school-bus-time',
     icon: renderIcon(AlarmIcon),
   },
   {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: 'TermTime',
-            params: {
-              lang: 'zh-CN'
-            }
-          }
-        },
-        { default: () => '学期时间修改' }
-      ),
+    label: () => h(
+      RouterLink,
+      { to: { name: 'TermTime', } },
+      { default: () => '学期时间修改' }
+    ),
     key: 'school-term-time',
     icon: renderIcon(AlarmIcon),
   },
   {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: 'Edit',
-            params: {
-              lang: 'zh-CN'
-            }
-          }
-        },
-        { default: () => '编辑通知' }
-      ),
+    label: () => h(
+      RouterLink,
+      { to: { name: 'Edit', } },
+      { default: () => '编辑通知' }
+    ),
     key: 'edit',
     icon: renderIcon(PencilIcon),
   },
@@ -107,12 +83,5 @@ const menuOptions: MenuOption[] = [
 </script>
 
 <style scoped>
-.n-menu{
-  background-color: white;
-    height:100%;
-    position: fixed;
-    width:12%;
-    left: 0%;
-    top:80px;
-}
+
 </style>

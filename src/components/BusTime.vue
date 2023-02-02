@@ -1,24 +1,10 @@
 <script setup lang="ts">
-  import { NSpace,NLayout} from 'naive-ui'
+import { NSpace, NLayout } from 'naive-ui'
 </script>
 
 <template>
-<n-space>
-  <n-layout>
-   <h1 id="BusTime">校车时间编辑</h1>
-   <p>这是内容1</p>
-  </n-layout>
-</n-space>
+  <template v-for="i in 10">
+  <h1>校车时间编辑</h1>
+  <p>这是内容1</p>
+  </template>
 </template>
-
-<style scoped>
-.n-layout{
-height:100%;
-width: auto;
-top: 80px;
-position: absolute;
-left: 12%;
-right: 0px;
-background-color: white;
-}
-</style>
