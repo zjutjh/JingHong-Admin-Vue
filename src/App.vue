@@ -3,5 +3,8 @@
 </script>
 
 <template>
+ <router-view name="right"></router-view>
  <RouterView></RouterView>
 </template>
+
+
