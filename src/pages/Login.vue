@@ -1,5 +1,21 @@
 <script setup lang="ts">
-import Login from '../components/Login.vue';
+import Login from "../components/Login.vue";
+import { onMounted } from "vue";
+import { canUserAccess } from "../utils/canUserAccess";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+onMounted(async () => {
+  const isLogin = localStorage.getItem("isLogin");
+  if (isLogin === "true") {
+    const state = await canUserAccess();
+    if (state === true) router.push({
+      path: "/"
+    })
+  }
+})
+
 </script>
 
 <template>

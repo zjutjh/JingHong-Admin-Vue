@@ -1,35 +1,41 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { NInput,NIcon,NButton} from 'naive-ui';
+import { NInput, NIcon, NButton } from "naive-ui";
 import { 
     KeyOutline as KeyIcon,
     PersonOutline as PersonIcon
-} from '@vicons/ionicons5';
-import loginAPI from "../apis/login";
+} from "@vicons/ionicons5";
+import loginAPI from "../apis/UserAPI/login";
 import { useRouter } from "vue-router";
+import { useLoginStore } from "../store/index";
+import pinia from "../store/store"
 
 const router = useRouter();
 const username = ref("");
 const password = ref("");
 
-const onClick1 = async () => {
-  const res = await loginAPI({
-    username: username.value,
-    password: password.value
-  });
+const store = useLoginStore(pinia);
 
-  console.log(res);
-  if (res.data.code === 1) {
-    console.log("登录成功");
-    router.push("/");
-  } else {
-    console.log("登录失败");
+const handleLogin = async () => {
+  try {
+    const res = await loginAPI({
+      username: username.value,
+      password: password.value
+    });
+    if (res.code === 1) {
+      localStorage.setItem("isLogin", "true");
+      router.push("/");
+    } else {
+      throw new Error(res.msg);
+    }
+  } catch (e: any) {
+    console.log(e);
   }
 }
 
-const onClick2 = () =>{
-    username.value = "";
-    password.value = "";
+const handleReset = () =>{
+  username.value = "";
+  password.value = "";
 } 
 
 </script>
@@ -54,10 +60,10 @@ const onClick2 = () =>{
      type="text" class="password"/>
     </div>
     <div>
-     <n-button class="button1" @click="onClick1">登录</n-button>
+     <n-button class="button1" @click="handleLogin" type="success">登录</n-button>
     </div>
     <div>
-     <n-button class="button2" @click="onClick2">清空</n-button>
+     <n-button class="button2" @click="handleReset" type="error">清空</n-button>
     </div>
 
 </template>

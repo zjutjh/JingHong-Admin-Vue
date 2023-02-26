@@ -11,8 +11,6 @@ import {
   PencilOutline as PencilIcon,
   Help as HelpIcon,
   AlarmOutline as AlarmIcon,
-  HomeOutline as HomeIcon,
-  ExitOutline as ExitIcon
 } from '@vicons/ionicons5'
 import { RouterLink } from 'vue-router'
 
@@ -49,23 +47,6 @@ const menuOptions: MenuOption[] = [
     key: 'edit',
     icon: renderIcon(PencilIcon),
   },
-  // {
-  //   label: () =>
-  //     h(
-  //       RouterLink,
-  //       {
-  //         to: {
-  //           name: 'Login',
-  //           params: {
-  //             lang: 'zh-CN'
-  //           }
-  //         }
-  //       },
-  //       { default: () => '注销' }
-  //     ),
-  //   key: 'Login',
-  //   icon: renderIcon(ExitIcon),
-  // },
   {
     label: '待定',
     key: 'undefined',

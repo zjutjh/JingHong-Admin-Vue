@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { NButton, NIcon } from 'naive-ui';
+import { NButton, NIcon } from "naive-ui";
 import {
   PersonOutline as PersonIcon,
   LogInOutline as LogInIcon
-} from '@vicons/ionicons5';
+} from "@vicons/ionicons5";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const handleLogout = () => {
+  window.localStorage.setItem("isLogin", "false");
+  router.push("/login");
+}
 
 </script>
   
@@ -17,7 +25,11 @@ import {
     </div>
     <div class="user-info">
       <span>用户名</span>
-      <n-button type="default" round>
+      <n-button 
+        @click="handleLogout"
+        type="default"
+        round
+      >
         <template #icon>
           <n-icon><log-in-icon /></n-icon>
         </template>
