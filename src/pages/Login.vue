@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import Login from '../components/Login.vue';
-import { NButton } from 'naive-ui';
+import Login from "../components/Login.vue";
+import { onMounted } from "vue";
+import { canUserAccess } from "../utils/canUserAccess";
+import { useRouter } from "vue-router";
 
-const clear1 = () =>{
-    localStorage.clear();
-    console.log(localStorage.token);
-} 
+const router = useRouter();
+
+onMounted(async () => {
+  const isLogin = localStorage.getItem("isLogin");
+  if (isLogin === "true") {
+    const state = await canUserAccess();
+    if (state === true) router.push({
+      path: "/"
+    })
+  }
+})
 
 </script>
 
@@ -15,9 +24,6 @@ const clear1 = () =>{
       <img src="../assets/JH.png" class="logo" alt="JH logo" />
     </a>
   </div>
-  <n-button type="error" @click="clear1" round>
-          点击清除缓存(测试用，点击后登录数据删除)
-  </n-button>
   <Login></Login>
 </template>
 

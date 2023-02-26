@@ -2,8 +2,8 @@
 </script>
 
 <template>
-  <h1 id="TermTime">学期时间编辑</h1>
-  <p>这是内容2</p>
+  <h1 id="Edit">编辑通知</h1>
+  <p>这是内容3</p>
 </template>
 
 <style scoped>
