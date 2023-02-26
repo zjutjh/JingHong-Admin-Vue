@@ -1,45 +1,52 @@
-import Home from "../pages/Home.vue";
+import Login from "../pages/Login.vue";
+import BusTime from "../components/BusTime.vue";
+import TermTime from "../components/TermTime.vue";
+import Edit from "../components/Edit.vue"
 import Layout from "../pages/Layout.vue";
-import Layout2 from "../pages/Layout2.vue";
-import Layout3 from "../pages/Layout3.vue";
-import Layout4 from "../pages/Layout4.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import { canUserAccess } from "../utils/canUserAccess";
 
 const routes = [
   {
+    path: "/login",
+    name: "Login",
+    component: Login
+  },
+  {
     path: "/",
-    redirect: "/home"
-  },
-  {
-    path: "/home",
-    name: "home",
-    component: Home
-  },
-  {
-    path: "/Layout",
     name: "Layout",
-    component: Layout
-  },
-  {
-    path: "/Layout2",
-    name: "Layout2",
-    component: Layout2
-  },
-  {
-    path: "/Layout3",
-    name: "Layout3",
-    component: Layout3
-  },
-  {
-    path: "/Layout4",
-    name: "Layout4",
-    component: Layout4
+    component: Layout,
+    children: [
+      {
+        path: "bustime",
+        name: "BusTime",
+        component: BusTime
+      },
+      {
+        path: "termtime",
+        name: "TermTime",
+        component: TermTime
+      },
+      {
+        path: "edit",
+        name: "Edit",
+        component: Edit
+      }
+    ]
   },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach(async (to) => {
+  if (to.name !== "Login") {
+    const res = await canUserAccess();
+    console.log(res);
+    if (!res) return "/login"
+  }
 })
 
 export default router;

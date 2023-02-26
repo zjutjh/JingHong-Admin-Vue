@@ -1,12 +1,11 @@
 import request from "./request";
 
-const loginAPI = (data?: any) => {
+const getUserInfoAPI = () => {
   return request({
     method: "post",
-    url: "/api/user/login",
-    data: data,
+    url: "/api/user/info",
     withCredentials: true
   })
 }
 
-export default loginAPI;
+export default getUserInfoAPI;
