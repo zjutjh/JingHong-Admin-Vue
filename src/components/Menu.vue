@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+
 import { h, Component } from 'vue'
 import { NMenu,NIcon} from 'naive-ui'
 import type { MenuOption } from 'naive-ui'
@@ -10,9 +11,11 @@ import {
   PencilOutline as PencilIcon,
   Help as HelpIcon,
   AlarmOutline as AlarmIcon,
-  HomeOutline as HomeIcon
+  HomeOutline as HomeIcon,
+  ExitOutline as ExitIcon
 } from '@vicons/ionicons5'
 import { RouterLink } from 'vue-router'
+
 
 function renderIcon (icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -25,7 +28,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: 'Layout2',
+            name: 'SchoolBus',
             params: {
               lang: 'zh-CN'
             }
@@ -42,7 +45,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: 'Layout3',
+            name: 'TermTime',
             params: {
               lang: 'zh-CN'
             }
@@ -59,7 +62,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: 'Layout4',
+            name: 'Announcement',
             params: {
               lang: 'zh-CN'
             }
@@ -67,25 +70,8 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => '编辑通知' }
       ),
-    key: 'edit',
+    key: 'Announcement',
     icon: renderIcon(PencilIcon),
-  },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: 'home',
-            params: {
-              lang: 'zh-CN'
-            }
-          }
-        },
-        { default: () => '退出登录' }
-      ),
-    key: 'Home',
-    icon: renderIcon(HomeIcon),
   },
   {
     label: '待定',

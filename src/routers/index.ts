@@ -1,39 +1,86 @@
-import Home from "../pages/Home.vue";
+import Login from "../pages/Login.vue";
+import SchoolBus from "../components/SchoolBus.vue";
+import TermTime from "../components/TermTime.vue";
+import Announcement from "../components/Announcement.vue"
 import Layout from "../pages/Layout.vue";
-import Layout2 from "../pages/Layout2.vue";
-import Layout3 from "../pages/Layout3.vue";
-import Layout4 from "../pages/Layout4.vue";
+import SchoolBusChange from "../components/SchoolBusChange.vue";
 import { createRouter, createWebHistory } from "vue-router";
+import {useLoginStore} from "../store/index"
+import pinia from "../store/store"
+
+const store = useLoginStore(pinia);
+let is_login:boolean=store.is_login;
 
 const routes = [
   {
     path: "/",
-    redirect: "/home"
+    meta: {
+      requestAuth: false,
+    },
+    redirect: "/Login",
   },
   {
-    path: "/home",
-    name: "home",
-    component: Home
+    path: "/Login",
+    name: "Login",
+    meta: {
+      requestAuth: false,
+    },
+    component: Login,
   },
   {
-    path: "/Layout",
-    name: "Layout",
-    component: Layout
+    path: "/SchoolBus",
+    name: "SchoolBus",
+    meta: {
+      requestAuth: true,
+    },
+    components: {
+      'default': Layout,
+      'right': SchoolBus,
+    },
   },
   {
-    path: "/Layout2",
-    name: "Layout2",
-    component: Layout2
+    path: "/TermTime",
+    name: "TermTime",
+    meta: {
+      requestAuth: true,
+    },
+    components: {
+      'default': Layout,
+      'right': TermTime,
+    },
   },
   {
-    path: "/Layout3",
-    name: "Layout3",
-    component: Layout3
+    path: "/Announcement",
+    name: "Announcement",
+    meta: {
+      requestAuth: true,
+    },
+    components: {
+      'default': Layout,
+      'right': Announcement,
+    },
   },
   {
-    path: "/Layout4",
-    name: "Layout4",
-    component: Layout4
+    path: "/SchoolBusChange",
+    name: "SchoolBusChange",
+    meta: {
+      requestAuth: true,
+    },
+    components: {
+      'default': Layout,
+      'right': SchoolBusChange,
+    },
+  },
+  {
+    path: "/SchoolBusAdd",
+    name: "SchoolBusAdd",
+    meta: {
+      requestAuth: true,
+    },
+    components: {
+      'default': Layout,
+      'right': SchoolBus,
+    },
   },
 ]
 
@@ -41,5 +88,24 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  is_login=store.is_login;
+  if (to.meta.requestAuth && localStorage.token!="success") {
+    next({name: "Login"});
+    console.log(is_login);
+  } else {
+    next();
+  }
+})
+
+// router.beforeEach((to, from) => {
+//   if (to.meta.requiresAuth && !auth.isLoggedIn()) {
+//     return {
+//       path: '/login',
+//       query: { redirect: to.fullPath },
+//     }
+//   }
+// })
 
 export default router;

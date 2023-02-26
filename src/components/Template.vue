@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { NSpace,NLayout} from 'naive-ui'
+  import { NSpace,NLayout,NCard} from 'naive-ui'
 </script>
 
 <template>
 <n-space>
   <n-layout>
-   <h1 id="BusTime">校车时间编辑</h1>
-   <p>这是内容1</p>
+   <h1 >Welcome</h1>
+   <n-card></n-card>?
   </n-layout>
 </n-space>
 </template>
@@ -19,6 +19,6 @@ top: 80px;
 position: absolute;
 left: 12%;
 right: 0px;
-background-color: white;
+background-color:white;
 }
 </style>
