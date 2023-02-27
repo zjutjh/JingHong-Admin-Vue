@@ -1,7 +1,7 @@
 import Login from "../pages/Login.vue";
 import BusTime from "../components/BusTime.vue";
 import TermTime from "../components/TermTime.vue";
-import Edit from "../components/Edit.vue";
+import Announcement from "../components/Announcement.vue";
 import Layout from "../pages/Layout.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { canUserAccess } from "../utils/canUserAccess";
@@ -28,9 +28,9 @@ const routes = [
         component: TermTime,
       },
       {
-        path: "edit",
-        name: "Edit",
-        component: Edit,
+        path: "announcement",
+        name: "Announcement",
+        component: Announcement,
       },
     ],
   },
