@@ -1,94 +1,106 @@
 <script setup lang="ts">
-  import { ref } from "vue";
-  import { NSpace,NLayout,NCard,NSelect,NButton} from "naive-ui";
-  import setAPI from "../apis/TermTimeAPI/TerminfoSet";
-  const yearValue=ref("");
-  const termValue=ref("");
-  const termStartDate=ref("");
-  const optionsYear = [
-  {label:"2021" ,value:"2021"},
-  {label:"2022" ,value:"2022"},
-  {label:"2023" ,value:"2023"},
-  {label:"2024" ,value:"2024"},
-  ];
+import { onMounted, ref } from "vue";
+import {
+  NSelect,
+  NButton,
+  NForm,
+  NFormItem,
+  NAlert,
+  NSpace,
+  NDatePicker,
+  useDialog,
+} from "naive-ui";
+import getSystemInfo from "../apis/SystemInfoAPI/getSystemInfo";
+import setTermInfoAPI from "../apis/TermTimeAPI/setTermInfo";
 
-  const optionsTerm =[
-  {label:"上" , value:"上"},
-  {label:"下" , value:"下"},
-  {label:"短" , value:"短"},
-  ];
+const initialValue = ref({
+  termYear: new Date().getFullYear().toString(),
+  term: "上",
+  termStartDate: "1970-01-01"
+});
 
-  const optionsTermStartDate =[
-  {label:"2021-09-05" , value:"2021-09-05"},
-  {label:"2022-09-05" , value:"2022-09-05"},
-  {label:"2023-02-10" , value:"2023-02-10"},
-  {label:"2024-02-10" , value:"2024-02-10"},
-  ];
+const termYearValue = ref(initialValue.value.termYear);
+const termValue = ref(initialValue.value.term);
+const termStartDateValue = ref(initialValue.value.termStartDate);
+const dialog = useDialog();
 
-  const onClickClear =()=>{
-    yearValue.value="",
-    termValue.value="",
-    termStartDate.value=""
+onMounted(async () => {
+  try {
+    const { code, data, msg } = await getSystemInfo();
+    if (code !== 1) throw new Error(msg);
+    const { term, termStartDate, termYear } = data;
+    termYearValue.value = termYear;
+    termValue.value = term;
+    termStartDateValue.value = termStartDate;
+    initialValue.value = data;
+  } catch (e) {
+    console.log(e);
   }
+})
 
-  const onClickUpdate = async()=>{
-    if(yearValue.value!==""&&termValue.value!==""&&termStartDate.value!==""){   
-    const res = await setAPI({
-    yearValue:yearValue.value,
-    termValue:termValue.value,
-    termStartDate:termStartDate.value
-    });
-    console.log(res);
-    alert("上传成功")}
-    else alert("选项不能为空")
-  }
-  
+const optionsTerm = [
+  { label: "上", value: "上" },
+  { label: "下", value: "下" },
+  { label: "短", value: "短" },
+];
 
-  const setTermInfo = async()=>{
-    const res = await setAPI();
-    yearValue.value=res.data.date.yearValue;
-    termValue.value=res.data.data.termTime;
-    termStartDate.value=res.data.data.termStartDate;
-    console.log("学期时间初始化成功")
-    console.log(res);
-  } //后端传值接口
- 
+const handleReset = () => {
+  termYearValue.value = initialValue.value.termYear,
+    termValue.value = initialValue.value.term,
+    termStartDateValue.value = initialValue.value.termStartDate
+}
 
+const handleSubmit = async () => {
+  dialog.warning({
+    title: "警告",
+    content: `确认修改学期信息为: ${termYearValue.value}学年${termValue.value}学期 / ${termStartDateValue.value}`,
+    positiveText: "确定",
+    negativeText: "回去改一下",
+    onPositiveClick: async () => {
+      try {
+        const res = await setTermInfoAPI({
+          yearValue: termYearValue.value,
+          termValue: termValue.value,
+          termStartDateValue: termStartDateValue.value
+        });
+        const { code, msg } = res;
+        if (code !== 1) throw new Error(msg);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  })
+}
 </script>
 
 <template>
-   <h1 id="termTime">学期时间编辑</h1>
-   <n-card id="card">
-      <n-space vertical>
-        学年选择：
-      <n-select  v-model:value="yearValue" :options="optionsYear" clearable/>
-      学期选择：
-      <n-select  v-model:value="termValue"  :options="optionsTerm" clearable/>
-      学期开始时间选择：
-      <n-select  v-model:value="termStartDate"  :options="optionsTermStartDate" clearable/>
+  <h1 id="termTime">学期时间编辑</h1>
+  <n-form style="width: 400px">
+    <n-form-item>
+      <n-alert type="info" style="width: 400px">
+        表单的初始值为当前系统的数据
+      </n-alert>
+    </n-form-item>
+    <n-form-item label="学年选择">
+      <n-date-picker v-model:formatted-value="termYearValue" value-format="yyyy" type="year" style="width: 400px" />
+    </n-form-item>
+    <n-form-item label="学期选择">
+      <n-select v-model:value="termValue" :options="optionsTerm" clearable />
+    </n-form-item>
+    <n-form-item label="学期开始时间选择：">
+      <n-date-picker v-model:formatted-value="termStartDateValue" value-format="yyyy-MM-dd" type="date"
+        style="width: 400px" />
+    </n-form-item>
+
+    <n-form-item>
+      <n-space>
+        <n-button id="update" type="success" @click="handleSubmit">
+          提交修改
+        </n-button>
+        <n-button secondary type="error" id="clear" @click="handleReset">
+          重置表单
+        </n-button>
       </n-space>
-      <n-button id="update" type="success" @click="onClickUpdate()">上交</n-button> <n-button type="warning" id="clear" @click="onClickClear()">清空</n-button>
-    </n-card>
+    </n-form-item>
+  </n-form>
 </template>
-
-<style scoped>
-#card{
-width: 50%;
-}
-
-#clear{
-  position: relative;
-  left: 10px;
-  top: 8px;
-}
-
-#update{
-  position: relative;
-  top: 8px;
-}
-
-#termTime{
-position: relative;
-left: 1%;
-}
-</style>

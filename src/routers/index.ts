@@ -1,5 +1,5 @@
 import Login from "../pages/Login.vue";
-import BusTime from "../components/BusTime.vue";
+import SchoolBus from "../components/SchoolBus.vue";
 import TermTime from "../components/TermTime.vue";
 import Announcement from "../components/Announcement.vue";
 import Layout from "../pages/Layout.vue";
@@ -18,9 +18,9 @@ const routes = [
     component: Layout,
     children: [
       {
-        path: "bustime",
-        name: "BusTime",
-        component: BusTime,
+        path: "schoolbus",
+        name: "SchoolBus",
+        component: SchoolBus,
       },
       {
         path: "termtime",
