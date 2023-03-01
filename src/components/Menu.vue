@@ -22,7 +22,7 @@ const menuOptions: MenuOption[] = [
   {
     label: () => h(
       RouterLink,
-      { to: { name: "BusTime", } },
+      { to: { name: "SchoolBus", } },
       { default: () => "校车时间维护" }
     ),
     key: "school-bus-time",
