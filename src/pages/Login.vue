@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import Login from "../components/Login.vue";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { canUserAccess } from "../utils/canUserAccess";
+import { NInput, NH1, NSpace, NButton, NForm, NFormItem } from "naive-ui";
+import loginAPI from "../apis/UserAPI/login";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -16,30 +17,76 @@ onMounted(async () => {
   }
 })
 
+const username = ref("");
+const password = ref("");
+
+const handleLogin = async () => {
+  try {
+    const res = await loginAPI({
+      username: username.value,
+      password: password.value
+    });
+    if (res.code === 1) {
+      localStorage.setItem("isLogin", "true");
+      router.push("/");
+    } else {
+      throw new Error(res.msg);
+    }
+  } catch (e: any) {
+    console.log(e);
+  }
+}
+
+const handleReset = () => {
+  username.value = "";
+  password.value = "";
+}
+
 </script>
 
 <template>
-  <div id="photo">
-    <a href="https://github.com/zjutjh" target="_blank">
-      <img src="../assets/JH.png" class="logo" alt="JH logo" />
-    </a>
-  </div>
-  <Login></Login>
+  <main class="page-container">
+    <section style="justify-content: flex-end;">
+      <a href="https://github.com/zjutjh" target="_blank">
+        <img src="../assets/JH.png" style="width: 400px" alt="-logo" />
+      </a>
+    </section>
+
+    <section>
+      <n-space vertical style="flex: auto">
+        <n-h1>微精弘管理系统</n-h1>
+        <n-form style="max-width: 400px; min-width: 300px;">
+          <n-form-item label="账号" size="large">
+            <n-input placeholder="精弘通行证账号" v-model:value="username" />
+          </n-form-item>
+          <n-form-item label="密码" size="large">
+            <n-input placeholder="密码" v-model:value="password" type="password" />
+          </n-form-item>
+          <n-space>
+            <n-button round @click="handleLogin" type="success">登录</n-button>
+            <n-button round @click="handleReset" type="error">清空</n-button>
+          </n-space>
+        </n-form>
+      </n-space>
+    </section>
+  </main>
 </template>
 
+<style lang="scss" scoped>
+.page-container {
+  height: 100vh;
+  display: flex;
 
-<style scoped>
-.logo{ height: 20em;
+  a {
+    display: block;
+  }
+
+  section {
+    flex: 0 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 48px;
+  }
 }
-#photo{ text-align: center;
-    background-color: #fff;
-    border-radius: 20px;
-    width: 300px;
-    height: 300px;
-    margin: auto;
-    position: absolute;
-    top: 15%;
-    left: 0;
-    right: 70%;
-    bottom: 30%;}
 </style>

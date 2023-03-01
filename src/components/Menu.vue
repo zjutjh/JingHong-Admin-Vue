@@ -4,15 +4,14 @@
 
 <script setup lang="ts">
 
-import { h, Component } from 'vue'
-import { NMenu, NIcon } from 'naive-ui'
-import type { MenuOption } from 'naive-ui'
+import { h, Component } from "vue"
+import { NMenu, NIcon } from "naive-ui"
+import type { MenuOption } from "naive-ui"
 import {
   PencilOutline as PencilIcon,
-  Help as HelpIcon,
   AlarmOutline as AlarmIcon,
-} from '@vicons/ionicons5'
-import { RouterLink } from 'vue-router'
+} from "@vicons/ionicons5"
+import { RouterLink } from "vue-router"
 
 
 function renderIcon(icon: Component) {
@@ -23,46 +22,30 @@ const menuOptions: MenuOption[] = [
   {
     label: () => h(
       RouterLink,
-      { to: { name: 'BusTime', } },
-      { default: () => '校车时间维护' }
+      { to: { name: "BusTime", } },
+      { default: () => "校车时间维护" }
     ),
-    key: 'school-bus-time',
+    key: "school-bus-time",
     icon: renderIcon(AlarmIcon),
   },
   {
     label: () => h(
       RouterLink,
-      { to: { name: 'TermTime', } },
-      { default: () => '学期时间修改' }
+      { to: { name: "TermTime", } },
+      { default: () => "学期时间修改" }
     ),
-    key: 'school-term-time',
+    key: "school-term-time",
     icon: renderIcon(AlarmIcon),
   },
   {
     label: () => h(
       RouterLink,
-      { to: { name: 'Edit', } },
-      { default: () => '编辑通知' }
+      { to: { name: "Announcement", } },
+      { default: () => "编辑通知" }
     ),
-    key: 'edit',
+    key: "edit",
     icon: renderIcon(PencilIcon),
   },
-  {
-    label: '待定',
-    key: 'undefined',
-    icon: renderIcon(HelpIcon),
-    disabled: true,
-  },
-  {
-    label: '待定',
-    key: 'undefined',
-    disabled: true,
-    icon: renderIcon(HelpIcon),
-  }
 ]
 
 </script>
-
-<style scoped>
-
-</style>
