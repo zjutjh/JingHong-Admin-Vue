@@ -1,7 +1,7 @@
 import Login from "../pages/Login.vue";
-import SchoolBus from "../components/SchoolBus.vue";
+import SchoolBus from "../pages/SchoolBus.vue";
 import TermTime from "../components/TermTime.vue";
-import Announcement from "../components/Announcement.vue";
+import Announcement from "../pages/Announcement.vue";
 import Layout from "../pages/Layout.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { canUserAccess } from "../utils/canUserAccess";
@@ -17,6 +17,11 @@ const routes = [
     name: "Layout",
     component: Layout,
     children: [
+      {
+        path: "schoolbus",
+        name: "SchoolBus",
+        component: SchoolBus,
+      },
       {
         path: "schoolbus",
         name: "SchoolBus",
