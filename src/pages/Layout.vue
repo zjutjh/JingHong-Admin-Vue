@@ -1,21 +1,24 @@
 <script setup lang="ts">
-import Top from '../components/Top.vue';
-import Menu from '../components/Menu.vue';
-import { RouterView } from 'vue-router';
+import Top from "../components/Top.vue";
+import Menu from "../components/Menu.vue";
+import { RouterView } from "vue-router";
+import { NDialogProvider } from "naive-ui";
 
 </script>
 
 <template>
-  <Top />
-  <section class="section">
-    <aside class="sider">
-      <Menu />
-      <footer class="footer">精弘网络 @ {{ new Date().getFullYear() }}</footer>
-    </aside>
-    <main class="main">
+  <n-dialog-provider>
+    <Top />
+    <section class="section">
+      <aside class="sider">
+        <Menu />
+        <footer class="footer">精弘网络 @ {{ new Date().getFullYear() }}</footer>
+      </aside>
+      <main class="main">
         <RouterView />
       </main>
-  </section>
+    </section>
+  </n-dialog-provider>
 </template>
 
 <style lang="scss" scoped>
