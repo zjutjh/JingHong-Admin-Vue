@@ -1,8 +1,10 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { createPinia } from "pinia";
+import useUserStore from "./useUserStore";
 
-export const useLoginStore = defineStore("login", () => {
-  const isLogin = ref(false);
+const pinia = createPinia();
 
-  return { isLogin };
-});
+export default pinia;
+
+export {
+  useUserStore
+}

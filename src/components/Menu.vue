@@ -1,5 +1,5 @@
 <template>
-  <n-menu :options="menuOptions" default-value="school-bus-time"/>
+  <n-menu :options="menuOptions"/>
 </template>
 
 <script setup lang="ts">
@@ -14,7 +14,7 @@ import {
 import { RouterLink } from "vue-router"
 
 
-function renderIcon(icon: Component) {
+function renderIcon (icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 

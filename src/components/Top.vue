@@ -5,11 +5,13 @@ import {
   LogInOutline as LogInIcon
 } from "@vicons/ionicons5";
 import { useRouter } from "vue-router";
+import { useUserStore } from "../store";
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const handleLogout = () => {
-  window.localStorage.setItem("isLogin", "false");
+  userStore.logout();
   router.push("/login");
 }
 
