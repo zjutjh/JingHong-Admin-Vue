@@ -17,7 +17,7 @@ const {
   loading 
 } = useRequest(BusServices.getCurrentLinesAPI, {
   onSuccess: (data) => {
-    if (data.code !== 200)
+    if (data.code !== 1)
       throw new Error(data.msg);
   },
   onError: (e) => {

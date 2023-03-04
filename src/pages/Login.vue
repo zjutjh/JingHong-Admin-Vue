@@ -1,19 +1,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { canUserAccess } from "../utils/canUserAccess";
 import { NInput, NH1, NSpace, NButton, NForm, NFormItem } from "naive-ui";
 import loginAPI from "../apis/UserAPI/login";
+import { useUserStore } from "../store";
 import { useRouter } from "vue-router";
 
+const userStore = useUserStore();
 const router = useRouter();
 
-onMounted(async () => {
-  const isLogin = localStorage.getItem("isLogin");
-  if (isLogin === "true") {
-    const state = await canUserAccess();
-    if (state === true) router.push({
-      path: "/"
-    })
+onMounted(() => {
+  if (localStorage.getItem("passTime")) {
+    router.push("/");
   }
 })
 
@@ -27,7 +24,7 @@ const handleLogin = async () => {
       password: password.value
     });
     if (res.code === 1) {
-      localStorage.setItem("isLogin", "true");
+      userStore.login(res.data.user);
       router.push("/");
     } else {
       throw new Error(res.msg);
