@@ -43,9 +43,9 @@ const handleReset = () => {
 
 <template>
   <main class="page-container">
-    <section style="justify-content: flex-end;">
-      <a href="https://github.com/zjutjh" target="_blank">
-        <img src="../assets/JH.png" style="width: 400px" alt="-logo" />
+    <section class="logo-wrapper" style="justify-content: flex-end;">
+      <a class="gh-link" href="https://github.com/zjutjh" target="_blank">
+        <img src="../assets/jh-logo.png" class="logo" />
       </a>
     </section>
 
@@ -70,12 +70,38 @@ const handleReset = () => {
 </template>
 
 <style lang="scss" scoped>
+@media screen and (max-width: 600px) {
+  .page-container {
+    flex-direction: column;
+  }
+
+  .logo-wrapper {
+    flex: 0 20% !important;
+    flex-direction: column;
+  }
+
+  .gh-link {
+    text-align: center;
+    .logo {
+      width: 50% !important;
+    }
+  }
+
+  section {
+    padding: 0 32px !important;
+  }
+}
+
 .page-container {
   height: 100vh;
   display: flex;
 
-  a {
+  .gh-link {
     display: block;
+
+    .logo {
+      width: 320px;
+    }
   }
 
   section {

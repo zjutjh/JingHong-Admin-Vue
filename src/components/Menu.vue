@@ -1,5 +1,5 @@
 <template>
-  <n-menu :options="menuOptions"/>
+  <n-menu :options="menuOptions" />
 </template>
 
 <script setup lang="ts">
@@ -10,6 +10,7 @@ import type { MenuOption } from "naive-ui"
 import {
   PencilOutline as PencilIcon,
   AlarmOutline as AlarmIcon,
+  BusOutline as BusIcon
 } from "@vicons/ionicons5"
 import { RouterLink } from "vue-router"
 
@@ -26,7 +27,7 @@ const menuOptions: MenuOption[] = [
       { default: () => "校车时间维护" }
     ),
     key: "school-bus-time",
-    icon: renderIcon(AlarmIcon),
+    icon: renderIcon(BusIcon),
   },
   {
     label: () => h(

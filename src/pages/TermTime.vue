@@ -12,6 +12,7 @@ import {
 } from "naive-ui";
 import getSystemInfo from "../apis/SystemInfoAPI/getSystemInfo";
 import setTermInfoAPI from "../apis/TermTimeAPI/setTermInfo";
+import PageTitle from "../components/PageTitle.vue";
 
 const initialValue = ref({
   termYear: new Date().getFullYear().toString(),
@@ -74,8 +75,10 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <h1 id="termTime">学期时间编辑</h1>
-  <n-form style="width: 400px">
+  <page-title>学期时间编辑</page-title>
+  <n-space>
+
+  <n-form style="max-width: 400px">
     <n-form-item>
       <n-alert type="info" style="width: 400px">
         表单的初始值为当前系统的数据
@@ -103,4 +106,5 @@ const handleSubmit = async () => {
       </n-space>
     </n-form-item>
   </n-form>
+  </n-space>
 </template>

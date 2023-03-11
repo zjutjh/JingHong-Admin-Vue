@@ -2,34 +2,49 @@
 import { NButton, NIcon } from "naive-ui";
 import {
   PersonOutline as PersonIcon,
-  LogInOutline as LogInIcon
+  LogInOutline as LogInIcon,
+  Menu as MenuIcon
 } from "@vicons/ionicons5";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../store";
 
 const router = useRouter();
 const userStore = useUserStore();
+const emit = defineEmits(["expandMenu"]);
+
+const { userInfo } = userStore;
 
 const handleLogout = () => {
   userStore.logout();
   router.push("/login");
 }
 
+const handleShowMenu = () => {
+  emit("expandMenu");
+}
+
 </script>
   
 <template>
-  <header>
+  <header class="header">
+    <div class="expand">
+      <n-button quaternary circle @click="handleShowMenu">
+        <n-icon size="22">
+          <menu-icon />
+        </n-icon>
+      </n-button>
+    </div>
     <div class="brand">
-      <n-icon size="24">
+      <n-icon size="22">
         <person-icon />
       </n-icon>
-      <h1>精弘管理员页面</h1>
+      <span>精弘管理员页面</span>
     </div>
     <div class="user-info">
-      <span>用户名</span>
+      <span class="name">{{ userInfo?.username }} </span>
       <n-button 
         @click="handleLogout"
-        type="default"
+        secondary
         round
       >
         <template #icon>
@@ -42,7 +57,8 @@ const handleLogout = () => {
 </template>
   
 <style lang="scss" scoped>
-header {
+.header {
+  font-size: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,14 +68,43 @@ header {
   box-sizing: border-box;
 }
 
+.expand {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+
+  .header {
+    font-size: 14px;
+  }
+  .expand {
+    display: block;
+  }
+
+  .user-info {
+    .name {
+      display: none;
+    }
+  }
+}
+
 .brand {
+  transition: .3s;
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
 
-  h1 {
-    font-size: 1.2rem;
+  span {
+    font-size: 1.1em;
+    font-weight: 600;
   }
+}
+
+.brand:active {
+  background-color: rgba(0, 0, 0, .06);
 }
 
 .user-info {

@@ -3,27 +3,63 @@ import Top from "../components/Top.vue";
 import Menu from "../components/Menu.vue";
 import { RouterView } from "vue-router";
 import { NDialogProvider, NMessageProvider } from "naive-ui";
+import { ref } from "vue";
+
+const isMenuExpand = ref(false);
+
+const handleExpandMenu = () => {
+  isMenuExpand.value = !isMenuExpand.value;
+}
 
 </script>
 
 <template>
   <n-dialog-provider>
     <n-message-provider>
-      <Top />
-      <section class="section">
-        <aside class="sider">
-          <Menu />
-          <footer class="footer">精弘网络 @ {{ new Date().getFullYear() }}</footer>
-        </aside>
-        <main class="main">
-          <RouterView />
-        </main>
+      <Top @expandMenu = "handleExpandMenu" />
+      <section :class="['body', !isMenuExpand ? 'collapse' : undefined]">
+        <section class="section">
+          <aside class="sider" >
+            <Menu />
+            <footer class="footer">精弘网络 @ {{ new Date().getFullYear() }}</footer>
+          </aside>
+          <main class="main">
+            <RouterView />
+          </main>
+        </section>
       </section>
     </n-message-provider>
   </n-dialog-provider>
 </template>
 
 <style lang="scss" scoped>
+
+@media screen and (max-width: 600px) {
+  .main {
+    width: 100vw;
+  } 
+
+  .section {
+    width: calc(240px + 100vw);
+  }
+
+  .collapse {
+    .sider {
+      display: none !important;
+    }
+    
+    .section {
+      width: 100vw;
+    }
+  }
+
+}
+
+.body {
+  width: 100vw;
+  overflow-x: hidden;
+}
+
 .sider {
   width: 240px;
   border-right: 1px solid rgba(0, 0, 0, .06);

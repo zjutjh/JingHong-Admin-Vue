@@ -20,7 +20,6 @@ const formData = ref<Partial<AnnouncementAPI.Announcement>>({
   ...initialValue.value
 })
 
-
 const handleSubmit = () => {
   emit("finish", { value: formData.value });
 }
@@ -36,7 +35,7 @@ const handleReset = () => {
 <template>
   <n-h2>编辑通知</n-h2>
   <main class="container">
-    <n-form style="flex: 0 50%">
+    <n-form class="form">
       <n-form-item label="标题">
         <n-input v-model:value="formData.title" />
       </n-form-item>
@@ -65,6 +64,20 @@ const handleReset = () => {
 </template>
 
 <style lang="scss" scoped>
+@media screen and (max-width: 600px) {
+  .preview {
+    display: none;
+  }
+
+  .form {
+    flex: auto !important;
+  }
+}
+
+.form {
+  flex: 0 50%
+}
+
 .container {
   display: flex;
   gap: 24px;

@@ -1,6 +1,6 @@
 import Login from "../pages/Login.vue";
 import SchoolBus from "../pages/SchoolBus.vue";
-import TermTime from "../components/TermTime.vue";
+import TermTime from "../pages/TermTime.vue";
 import Announcement from "../pages/Announcement.vue";
 import Layout from "../pages/Layout.vue";
 import { createRouter, createWebHistory } from "vue-router";

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NSpin, NText, NSpace } from "naive-ui";
+import { NSpin, NSpace } from "naive-ui";
 
 const props = defineProps<{
   isLoadingData?: boolean

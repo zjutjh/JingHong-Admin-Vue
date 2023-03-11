@@ -99,14 +99,16 @@ const handleFinish = async (e: {
 
 /** 表格列元数据 */
 const columns: DataTableColumns<SchoolBusAPI.Line> = [
-  { title: "ID", key: "id" },
-  { title: "路线", key: "line" },
-  { title: "出发地", key: "departure" },
-  { title: "目的地", key: "destination" },
-  { title: "出发时间", key: "startTime" },
+  { title: "ID", key: "id", width: 60 },
+  { title: "路线", key: "line", width: 200 },
+  { title: "出发地", key: "departure", width: 100 },
+  { title: "目的地", key: "destination", width: 100 },
+  { title: "出发时间", key: "startTime", width: 100 },
   {
     title: "操作",
     key: "action",
+    width: 60,
+    fixed: "right",
     render(row) {
       return h(
         NSpace, () => [
@@ -137,11 +139,21 @@ const columns: DataTableColumns<SchoolBusAPI.Line> = [
   <n-space vertical size="large">
     <n-space vertical size="small">
       <n-h3 prefix="bar">工作日校车</n-h3>
-      <n-data-table :columns="columns" :data="weekdayLines" />
+      <n-data-table 
+       :columns="columns" 
+       :data="weekdayLines" 
+       scrollX="1000"
+       :loading="loading"
+      />
     </n-space>
     <n-space vertical size="small">
       <n-h3 prefix="bar">周末校车</n-h3>
-      <n-data-table :columns="columns" :data="weekendLines" />
+      <n-data-table 
+       :columns="columns" 
+       :data="weekendLines" 
+       scrollX="1000"
+       :loading="loading"
+      />
     </n-space>
   </n-space>
   <n-modal 

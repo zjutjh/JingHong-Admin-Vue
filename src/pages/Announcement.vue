@@ -42,7 +42,6 @@ const columns: DataTableColumns<AnnouncementAPI.Announcement> = [
     title: "ID", 
     key: "id", 
     width: 60, 
-    fixed: "left",
     ellipsis: {
       tooltip: true
     } 
@@ -153,7 +152,8 @@ const handleFinish = async (e: {
   <n-data-table 
     :columns="columns" 
     :data="announcementList"
-    scroll-x="1000"
+    scroll-x="600"
+    :loading="loading"
   />
   <n-modal v-model:show="showModal" preset="card" style="width: 840px">
     <announcement-form :record="toEditData" @finish="handleFinish"/>

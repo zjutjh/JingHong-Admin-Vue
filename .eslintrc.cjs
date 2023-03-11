@@ -20,6 +20,7 @@ module.exports = {
     "vue"
   ],
   rules: {
-    quotes: ["warn", "double"]
+    quotes: ["warn", "double"],
+    "vue/multi-word-component-names": "off"
   }
 }
