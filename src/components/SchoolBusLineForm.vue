@@ -12,6 +12,11 @@ const addressOptions = SchoolBusAddress.map(item => (
   { label: item, value: item }
 ))
 
+const weekendOption = [
+  { label: "周末", value: 1 },
+  { label: "工作日", value: 0 }
+]
+
 const initalValue = ref(props.record);
 const formData = ref<Partial<SchoolBusAPI.Line>>({
   ...initalValue.value
@@ -53,10 +58,18 @@ const handleReset = () => {
     </n-form-item>
 
     <n-form-item label="出发时间">
-      <n-time-picker
-      v-model:formatted-value="formData.startTime"
-      format="HH:mm:ss"
-      />
+      <n-space>
+        <n-time-picker
+          v-model:formatted-value="formData.startTime"
+          format="HH:mm:ss"
+        />
+        <n-select
+          style="width: 140px"
+          placeholder="发车时间类型"
+          v-model:value="formData.type"
+          :options="weekendOption"
+        />
+      </n-space>
     </n-form-item>
 
     <n-form-item>
