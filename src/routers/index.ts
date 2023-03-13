@@ -2,6 +2,7 @@ import Login from "../pages/Login.vue";
 import SchoolBus from "../pages/SchoolBus.vue";
 import TermTime from "../pages/TermTime.vue";
 import Announcement from "../pages/Announcement.vue";
+import LostfoundPage from "../pages/LostfoundPage/index.vue";
 import Layout from "../pages/Layout.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store";
@@ -48,14 +49,22 @@ const routes = [
         },
         component: Announcement,
       },
+      {
+        path: "lostfound",
+        name: "Lostfound",
+        meta: {
+          requestAuth: true,
+        },
+        component: LostfoundPage,
+      },
     ]
   },
-]
+];
 
 const router = createRouter({
   history: createWebHistory(),
   routes
-})
+});
 
 router.beforeEach(async (to) => {
   if (to.meta.requestAuth) {
@@ -66,7 +75,7 @@ router.beforeEach(async (to) => {
         // 先检查是否超过7日未登陆
         const lastLoginTime = Number.parseInt(localStorage.getItem("passTime") || "0");
         if (new Date().getTime() - lastLoginTime > 1000 * 60 * 60 * 24 * 7) {
-          throw new Error("登陆过期")
+          throw new Error("登陆过期");
         }
 
         // 请求并写入用户信息
@@ -75,12 +84,12 @@ router.beforeEach(async (to) => {
           userStore.login(data.user);
         } else throw new Error(msg);
       } catch (e: any) {
-        console.log(`自动登陆状态失败, ${e.message || "未知错误"}`)
+        console.log(`自动登陆状态失败, ${e.message || "未知错误"}`);
         userStore.logout();
         return "/login";
       }
     }
   }
-})
+});
 
 export default router;
