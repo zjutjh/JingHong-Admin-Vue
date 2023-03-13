@@ -9,7 +9,7 @@ const isMenuExpand = ref(false);
 
 const handleExpandMenu = () => {
   isMenuExpand.value = !isMenuExpand.value;
-}
+};
 
 </script>
 
@@ -37,7 +37,7 @@ const handleExpandMenu = () => {
 @media screen and (max-width: 600px) {
   .main {
     width: 100vw;
-  } 
+  }
 
   .section {
     width: calc(240px + 100vw);
@@ -47,7 +47,7 @@ const handleExpandMenu = () => {
     .sider {
       display: none !important;
     }
-    
+
     .section {
       width: 100vw;
     }
@@ -76,9 +76,9 @@ const handleExpandMenu = () => {
 .main {
   flex: 1;
   overflow-y: auto;
-  padding: 0 24px;
   max-height: calc(100vh - 64px);
   box-sizing: border-box;
+  position: relative;
 }
 
 .footer {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { NDataTable, NButton, NSpace, NH3, NModal, useMessage } from "naive-ui"
+import { NDataTable, NButton, NSpace, NH3, NModal, useMessage } from "naive-ui";
 import PageTitle from "../components/PageTitle.vue";
-import type { DataTableColumns } from "naive-ui"
-import { computed, h, ref } from "vue"
+import type { DataTableColumns } from "naive-ui";
+import { computed, h, ref } from "vue";
 import { useRequest } from "vue-request";
 import SchoolBusLineForm from "../components/SchoolBusLineForm.vue";
 import * as BusServices from "../apis/SchoolBusAPI";
@@ -11,17 +11,17 @@ const showModal = ref(false);
 const toEditData = ref<SchoolBusAPI.Line>();
 const message = useMessage();
 
-const { 
-  data: lineData, 
-  run: getCurrentLines, 
-  loading 
+const {
+  data: lineData,
+  run: getCurrentLines,
+  loading
 } = useRequest(BusServices.getCurrentLinesAPI, {
   onSuccess: (data) => {
     if (data.code !== 1)
       throw new Error(data.msg);
   },
   onError: (e) => {
-    message.error(`请求数据失败${e.message}`)
+    message.error(`请求数据失败${e.message}`);
   }
 });
 
@@ -29,20 +29,20 @@ const weekdayLines = computed(() => {
   if (lineData.value) {
     return lineData.value.data.filter(item => item.type === 0);
   } else return [];
-})
+});
 
 const weekendLines = computed(() => {
   if (lineData.value) {
     return lineData.value.data.filter(item => item.type === 1);
   } else return [];
-})
+});
 
 const handleCreate = () => {
   toEditData.value = undefined;
   showModal.value = true;
-}
+};
 
-/** 
+/**
  * 处理点击编辑
  * 打开编辑表单
  * @param record 线路实例
@@ -50,7 +50,7 @@ const handleCreate = () => {
 const handleUpdate = (record: SchoolBusAPI.Line) => {
   toEditData.value = record;
   showModal.value = true;
-}
+};
 
 /**
  * 处理点击删除
@@ -65,7 +65,7 @@ const handleRemove = async (id: number) => {
     message.error(`删除失败, ${msg}`);
   }
   getCurrentLines();
-}
+};
 
 /**
  * 处理表单完成编辑
@@ -75,7 +75,7 @@ const handleFinish = async (e: {
   value: SchoolBusAPI.Line
 }) => {
   showModal.value = false;
-  
+
   if (!toEditData.value) {
     // 若表单缓存为 `undefined` 则请求新建接口
     const { code, msg }= await BusServices.createSchoolBusAPI(e.value);
@@ -95,7 +95,7 @@ const handleFinish = async (e: {
   }
   toEditData.value = undefined;
   getCurrentLines();
-}
+};
 
 /** 表格列元数据 */
 const columns: DataTableColumns<SchoolBusAPI.Line> = [
@@ -124,45 +124,45 @@ const columns: DataTableColumns<SchoolBusAPI.Line> = [
             type: "error",
             onClick: () => handleRemove(row.id),
           }, () => "删除")
-        ])
+        ]);
     }
   }
 ];
 </script>
 
 <template>
-  <n-space align="center" justify="space-between">
+  <n-space align="center" justify="space-between" style="padding-right: 24px">
     <page-title :isLoadingData="loading">校车时间编辑</page-title>
     <n-button type="success" @click="handleCreate">添加线路</n-button>
   </n-space>
 
-  <n-space vertical size="large">
+  <n-space vertical size="large" style="padding: 0 24px">
     <n-space vertical size="small">
       <n-h3 prefix="bar">工作日校车</n-h3>
-      <n-data-table 
-       :columns="columns" 
-       :data="weekdayLines" 
+      <n-data-table
+       :columns="columns"
+       :data="weekdayLines"
        scrollX="1000"
        :loading="loading"
       />
     </n-space>
     <n-space vertical size="small">
       <n-h3 prefix="bar">周末校车</n-h3>
-      <n-data-table 
-       :columns="columns" 
-       :data="weekendLines" 
+      <n-data-table
+       :columns="columns"
+       :data="weekendLines"
        scrollX="1000"
        :loading="loading"
       />
     </n-space>
   </n-space>
-  <n-modal 
-    v-model:show="showModal" 
+  <n-modal
+    v-model:show="showModal"
     preset="card"
     style="width: 600px"
   >
-    <SchoolBusLineForm 
-      :record="toEditData" 
+    <SchoolBusLineForm
+      :record="toEditData"
       @finish="handleFinish"
     />
   </n-modal>
