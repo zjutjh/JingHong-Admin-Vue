@@ -2,7 +2,6 @@
 import Top from "../components/Top.vue";
 import Menu from "../components/Menu.vue";
 import { RouterView } from "vue-router";
-import { NDialogProvider, NMessageProvider } from "naive-ui";
 import { ref } from "vue";
 
 const isMenuExpand = ref(false);
@@ -14,22 +13,18 @@ const handleExpandMenu = () => {
 </script>
 
 <template>
-  <n-dialog-provider>
-    <n-message-provider>
-      <Top @expandMenu = "handleExpandMenu" />
-      <section :class="['body', !isMenuExpand ? 'collapse' : undefined]">
-        <section class="section">
-          <aside class="sider" >
-            <Menu />
-            <footer class="footer">精弘网络 @ {{ new Date().getFullYear() }}</footer>
-          </aside>
-          <main class="main">
-            <RouterView />
-          </main>
-        </section>
-      </section>
-    </n-message-provider>
-  </n-dialog-provider>
+  <Top @expandMenu = "handleExpandMenu" />
+  <section :class="['body', !isMenuExpand ? 'collapse' : undefined]">
+    <section class="section">
+      <aside class="sider" >
+        <Menu />
+        <footer class="footer">精弘网络 @ {{ new Date().getFullYear() }}</footer>
+      </aside>
+      <main class="main">
+        <RouterView />
+      </main>
+    </section>
+  </section>
 </template>
 
 <style lang="scss" scoped>
