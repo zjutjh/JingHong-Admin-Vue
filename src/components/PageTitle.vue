@@ -4,7 +4,7 @@ import { NSpin, NSpace } from "naive-ui";
 const props = defineProps<{
   isLoadingData?: boolean
   loadingText?: string
-}>()
+}>();
 
 </script>
 
@@ -18,12 +18,14 @@ const props = defineProps<{
       </span>
     </n-space>
   </n-space>
-  
+
 </template>
 
 <style lang="scss" scoped>
+
 .page-title {
   display: flex;
+  padding: 0 24px;
   gap: 12px;
 
   span {

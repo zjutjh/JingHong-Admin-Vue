@@ -37,7 +37,7 @@ onMounted(async () => {
   } catch (e) {
     console.log(e);
   }
-})
+});
 
 const optionsTerm = [
   { label: "上", value: "上" },
@@ -48,8 +48,8 @@ const optionsTerm = [
 const handleReset = () => {
   termYearValue.value = initialValue.value.termYear,
     termValue.value = initialValue.value.term,
-    termStartDateValue.value = initialValue.value.termStartDate
-}
+    termStartDateValue.value = initialValue.value.termStartDate;
+};
 
 const handleSubmit = async () => {
   dialog.warning({
@@ -70,13 +70,13 @@ const handleSubmit = async () => {
         console.log(e);
       }
     }
-  })
-}
+  });
+};
 </script>
 
 <template>
   <page-title>学期时间编辑</page-title>
-  <n-space>
+  <n-space style="padding: 0 24px">
 
   <n-form style="max-width: 400px">
     <n-form-item>
