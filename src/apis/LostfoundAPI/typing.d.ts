@@ -13,6 +13,7 @@ declare namespace LostfoundAPI {
     is_processed: boolean;
     /** 内容 */
     content: string;
+    publisher: string;
     img1: null | string
     img2: null | string;
     img3: null | string;

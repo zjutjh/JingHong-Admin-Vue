@@ -1,6 +1,9 @@
 import request from "../request";
 
-type GetKindsResult = Common.IResponse<string[]>;
+type GetKindsResult = Common.IResponse<{
+  id: number;
+  kind_name: string;
+}[]>;
 
 const getKindsAPI = () => {
   return request<GetKindsResult>({

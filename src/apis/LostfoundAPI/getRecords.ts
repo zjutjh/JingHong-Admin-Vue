@@ -5,7 +5,10 @@ type GetRecordsData = {
   page_size: number;
 };
 
-type GetRecordsResult = Common.IResponse<LostfoundAPI.Item[]>;
+type GetRecordsResult = Common.IResponse<{
+  data: LostfoundAPI.Item[];
+  total_page_num: number
+}>;
 
 const getRecordsAPI = (params: GetRecordsData) => {
   return request<GetRecordsResult>({

@@ -6,6 +6,7 @@ import fallbackImage from "@/assets/image-fallback.svg";
 
 const props = defineProps<{
   source: LostfoundAPI.Item
+  onClick: (record: LostfoundAPI.Item) => void;
 }>();
 
 const { source } = toRefs(props);
@@ -31,7 +32,7 @@ const imgList = computed(() => {
       </div>
     </div>
     <div class="body">
-      <div class="content">
+      <div class="content" @click="() => onClick(source)">
         {{ source.content }}
       </div>
       <div class="img-wrapper">
@@ -49,7 +50,7 @@ const imgList = computed(() => {
       </div>
     </div>
     <div class="footer">
-      <span> 数据来源 </span>
+      <span> 数据来源: {{ source.publisher }} </span>
     </div>
   </div>
 </template>
@@ -99,7 +100,6 @@ const imgList = computed(() => {
     display: flex;
     overflow-x: auto;
     gap: 6px;
-    justify-content: space-evenly;
     padding-bottom: 6px;
   }
 }
@@ -110,7 +110,6 @@ const imgList = computed(() => {
   text-align: center;
   font-size: .8rem;
 }
-
 
 .lost {
   .header {
