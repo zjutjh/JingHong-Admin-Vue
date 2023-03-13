@@ -6,7 +6,6 @@ module.exports = {
   },
   extends: [
     "plugin:vue/vue3-essential",
-    "eslint:recommended",
     "@vue/eslint-config-typescript/recommended"
   ],
   overrides: [
@@ -21,6 +20,9 @@ module.exports = {
   ],
   rules: {
     quotes: ["warn", "double"],
-    "vue/multi-word-component-names": "off"
+    semi: "error",
+    "vue/multi-word-component-names": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "no-trailing-spaces": "error"
   }
-}
+};
