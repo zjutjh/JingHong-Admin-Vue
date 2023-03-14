@@ -1,18 +1,27 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { NInput, NH1, NSpace, NButton, NForm, NFormItem } from "naive-ui";
+import { NInput,
+  NH1,
+  NSpace,
+  NButton,
+  NForm,
+  NFormItem,
+  NMessageProvider,
+  useMessage
+} from "naive-ui";
 import loginAPI from "../apis/UserAPI/login";
 import { useUserStore } from "../store";
 import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const router = useRouter();
+const message = useMessage();
 
 onMounted(() => {
   if (localStorage.getItem("passTime")) {
     router.push("/");
   }
-})
+});
 
 const username = ref("");
 const password = ref("");
@@ -31,13 +40,14 @@ const handleLogin = async () => {
     }
   } catch (e: any) {
     console.log(e);
+    message.error(`登陆失败, ${e?.message || "未知错误"}`);
   }
-}
+};
 
 const handleReset = () => {
   username.value = "";
   password.value = "";
-}
+};
 
 </script>
 
