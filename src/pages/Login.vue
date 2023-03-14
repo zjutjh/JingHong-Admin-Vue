@@ -6,7 +6,6 @@ import { NInput,
   NButton,
   NForm,
   NFormItem,
-  NMessageProvider,
   useMessage
 } from "naive-ui";
 import loginAPI from "../apis/UserAPI/login";
@@ -55,7 +54,7 @@ const handleReset = () => {
   <main class="page-container">
     <section class="logo-wrapper" style="justify-content: flex-end;">
       <a class="gh-link" href="https://github.com/zjutjh" target="_blank">
-        <img src="../assets/jh-logo.png" class="logo" />
+        <img src="../assets/jh-logo.svg" class="logo" />
       </a>
     </section>
 
