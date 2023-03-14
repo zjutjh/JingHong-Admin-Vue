@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { NButton, NIcon } from "naive-ui";
 import {
-  PersonOutline as PersonIcon,
   LogInOutline as LogInIcon,
   Menu as MenuIcon
 } from "@vicons/ionicons5";
 import { useRouter } from "vue-router";
 import { useUserStore } from "../store";
+import logo from "@/assets/favicon.svg";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -17,14 +17,14 @@ const { userInfo } = userStore;
 const handleLogout = () => {
   userStore.logout();
   router.push("/login");
-}
+};
 
 const handleShowMenu = () => {
   emit("expandMenu");
-}
+};
 
 </script>
-  
+
 <template>
   <header class="header">
     <div class="expand">
@@ -35,14 +35,14 @@ const handleShowMenu = () => {
       </n-button>
     </div>
     <div class="brand">
-      <n-icon size="22">
-        <person-icon />
+      <n-icon size="24">
+        <img :src="logo" style="width: 100%" />
       </n-icon>
-      <span>精弘管理员页面</span>
+      <span>WeJH-CMS</span>
     </div>
     <div class="user-info">
       <span class="name">{{ userInfo?.username }} </span>
-      <n-button 
+      <n-button
         @click="handleLogout"
         secondary
         round
@@ -55,7 +55,7 @@ const handleShowMenu = () => {
     </div>
   </header>
 </template>
-  
+
 <style lang="scss" scoped>
 .header {
   font-size: 16px;
@@ -96,6 +96,7 @@ const handleShowMenu = () => {
   cursor: pointer;
   padding: 6px;
   border-radius: 4px;
+  white-space: nowrap;
 
   span {
     font-size: 1.1em;
