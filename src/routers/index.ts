@@ -13,6 +13,7 @@ const routes = [
     path: "/login",
     name: "Login",
     meta: {
+      title: "登陆",
       requestAuth: false,
     },
     component: Login,
@@ -29,6 +30,7 @@ const routes = [
         path: "schoolbus",
         name: "SchoolBus",
         meta: {
+          title: "校车时间",
           requestAuth: true,
         },
         component: SchoolBus,
@@ -37,6 +39,7 @@ const routes = [
         path: "termtime",
         name: "TermTime",
         meta: {
+          title: "学期时间",
           requestAuth: true,
         },
         component: TermTime,
@@ -45,6 +48,7 @@ const routes = [
         path: "announcement",
         name: "Announcement",
         meta: {
+          title: "通知编辑",
           requestAuth: true,
         },
         component: Announcement,
@@ -53,6 +57,7 @@ const routes = [
         path: "lostfound",
         name: "Lostfound",
         meta: {
+          title: "失物招领",
           requestAuth: true,
         },
         component: LostfoundPage,
@@ -90,6 +95,10 @@ router.beforeEach(async (to) => {
       }
     }
   }
+  // TDK
+  document.title = [to.meta.title, "WeJH-CMS"]
+    .filter(item => !!item)
+    .join(" | ");
 });
 
 export default router;
