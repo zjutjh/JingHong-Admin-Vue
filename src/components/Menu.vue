@@ -58,7 +58,7 @@ const menuOptions = computed<Array<MenuOption & { access?: boolean }>>(() =>
       label: () => h(
         RouterLink,
         { to: { name: "Lostfound", } },
-        { default: () => "失物招领" }
+        { default: () => "失物寻物" }
       ),
       key: "lostfound",
       icon: renderIcon(LostfoundIcon),

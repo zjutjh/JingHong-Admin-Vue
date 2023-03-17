@@ -33,7 +33,7 @@ const formData = ref(initialValue?.value || {
 
 const kindOptions = ref<{ label: string; value: string }[]>();
 const lostfoundOptions = ref([
-  { label: "失物启事", value: true },
+  { label: "失物招领", value: true },
   { label: "寻物启事", value: false }
 ]);
 const campusOptions = ref(["朝晖", "屏峰", "莫干山"].map(item => ({
@@ -177,7 +177,7 @@ const handleDelete = () => {
           <n-upload
             :max="3"
             show-preview-button
-            accept=".jpg,.png"
+            accept=".jpg,.jpeg,.png"
             list-type="image-card"
             :default-file-list="defaultPhotoList"
             multiple

@@ -57,7 +57,7 @@ const routes = [
         path: "lostfound",
         name: "Lostfound",
         meta: {
-          title: "失物招领",
+          title: "失物寻物",
           requestAuth: true,
         },
         component: LostfoundPage,
@@ -94,6 +94,9 @@ router.beforeEach(async (to) => {
         return "/login";
       }
     }
+  }
+  if (to.path === "/") {
+    return routes.find(route => route.path === "/")?.children?.[0] || "/";
   }
   // TDK
   document.title = [to.meta.title, "WeJH-CMS"]
