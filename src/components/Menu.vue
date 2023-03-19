@@ -1,5 +1,5 @@
 <template>
-  <n-menu :options="menuOptions" />
+  <n-menu :options="menuOptions" default-value="dashboard"/>
 </template>
 
 <script setup lang="ts">
@@ -10,7 +10,8 @@ import {
   PencilOutline as PencilIcon,
   AlarmOutline as AlarmIcon,
   BusOutline as BusIcon,
-  FileTrayOutline as LostfoundIcon
+  FileTrayOutline as LostfoundIcon,
+  HomeOutline as DashboardIcon
 } from "@vicons/ionicons5";
 import { RouterLink } from "vue-router";
 import { useAccess } from "../hooks";
@@ -24,6 +25,16 @@ function renderIcon (icon: Component) {
 
 const menuOptions = computed<Array<MenuOption & { access?: boolean }>>(() =>
   [
+    {
+      label: () => h(
+        RouterLink,
+        { to: { name: "Dashboard", } },
+        { default: () => "Dashboard" }
+      ),
+      key: "dashboard",
+      icon: renderIcon(DashboardIcon),
+      access: access.value.canNotSeeNormal
+    },
     {
       label: () => h(
         RouterLink,

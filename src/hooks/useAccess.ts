@@ -3,6 +3,7 @@ import { useUserStore } from "../store";
 import { UserType } from "../constants/UserType";
 
 interface IAccess {
+  canNotSeeNormal: boolean;
   canSeeAdmin: boolean;
   canSeeLostfound: boolean;
 }
@@ -16,12 +17,16 @@ const useAccess = () => {
 
   const access = computed<IAccess>(() => {
     return {
+      canNotSeeNormal: userStore.userInfo?.userType !== UserType.DEFAULT,
       canSeeAdmin: userStore.userInfo?.userType === UserType.ADMIN,
-      canSeeLostfound: userStore.userInfo?.userType === UserType.FORYOU,
-    }
-  })
+      canSeeLostfound: userStore.userInfo?.userType === UserType.FORYOU
+       || userStore.userInfo?.userType === UserType.ZHSTUAC
+       || userStore.userInfo?.userType === UserType.PFSTUAC
+       || userStore.userInfo?.userType === UserType.MGSSTUAC
+    };
+  });
 
   return access;
-}
+};
 
 export default useAccess;
