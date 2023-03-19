@@ -3,7 +3,8 @@ import SchoolBus from "../pages/SchoolBus.vue";
 import TermTime from "../pages/TermTime.vue";
 import Announcement from "../pages/Announcement.vue";
 import LostfoundPage from "../pages/LostfoundPage/index.vue";
-import Layout from "../pages/Layout.vue";
+import Dashboard from "../pages/Dashboard/index.vue";
+import Layout from "../components/Layout.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store";
 import getUserInfoAPI from "../apis/UserAPI/getUserInfo";
@@ -24,8 +25,17 @@ const routes = [
     meta: {
       requestAuth: true,
     },
+    redirect: "/dashboard",
     component: Layout,
     children: [
+      {
+        path: "/dashboard",
+        name: "Dashboard",
+        meta: {
+          title: "Dashboard"
+        },
+        component: Dashboard
+      },
       {
         path: "schoolbus",
         name: "SchoolBus",
@@ -94,9 +104,6 @@ router.beforeEach(async (to) => {
         return "/login";
       }
     }
-  }
-  if (to.path === "/") {
-    return routes.find(route => route.path === "/")?.children?.[0] || "/";
   }
   // TDK
   document.title = [to.meta.title, "WeJH-CMS"]

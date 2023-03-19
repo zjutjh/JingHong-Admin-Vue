@@ -7,4 +7,9 @@ export const UserType = {
 
   /** ForYou */
   FORYOU: 2,
+
+  /** 学生事务大厅 */
+  ZHSTUAC: 4,
+  PFSTUAC: 5,
+  MGSSTUAC: 6,
 };

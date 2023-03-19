@@ -34,12 +34,12 @@ const handleShowMenu = () => {
         </n-icon>
       </n-button>
     </div>
-    <div class="brand">
+    <a class="brand" href="/dashboard">
       <n-icon size="24">
         <img :src="logo" style="width: 100%" />
       </n-icon>
       <span>WeJH-CMS</span>
-    </div>
+    </a>
     <div class="user-info">
       <span class="name">{{ userInfo?.username }} </span>
       <n-button
@@ -89,6 +89,8 @@ const handleShowMenu = () => {
 }
 
 .brand {
+  text-decoration: none;
+  color: #000;
   transition: .3s;
   display: flex;
   align-items: center;

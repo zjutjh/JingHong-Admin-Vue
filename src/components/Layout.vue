@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Top from "../components/Top.vue";
-import Menu from "../components/Menu.vue";
+import Top from "./Top.vue";
+import Menu from "./Menu.vue";
 import { RouterView } from "vue-router";
 import { ref } from "vue";
 
