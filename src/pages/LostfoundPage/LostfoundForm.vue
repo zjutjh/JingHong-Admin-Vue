@@ -167,7 +167,7 @@ const handleDelete = () => {
         <n-form-item label="内容">
           <n-input
             type="textarea"
-            maxlength="44"
+            maxlength="9999"
             v-model:value="formData.content"
             :autosize="{ minRows: 5 }"
             style="width: 400px"
