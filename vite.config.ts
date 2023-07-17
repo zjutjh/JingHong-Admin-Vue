@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
         "@/store": path.resolve(__dirname, "src/store")
       }
     },
-    base: env.BASE,
+    base: env.VITE_BASE,
     server: {
       proxy: {
         "/api": env.HOST

@@ -30,6 +30,10 @@ jobs:
           version: 8
           run_install: false
 
+      - name: Generate .env file
+        run: |
+          echo "VITE_BASE=${{ vars.VITE_BASE }}" > .env
+
       - run: pnpm i
 
       - name: Build
