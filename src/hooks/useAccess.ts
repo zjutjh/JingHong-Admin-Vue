@@ -6,6 +6,7 @@ interface IAccess {
   canNotSeeNormal: boolean;
   canSeeAdmin: boolean;
   canSeeLostfound: boolean;
+  canSeeInformation: boolean;
 }
 
 /**
@@ -22,7 +23,8 @@ const useAccess = () => {
       canSeeLostfound: userStore.userInfo?.userType === UserType.FORYOU
        || userStore.userInfo?.userType === UserType.ZHSTUAC
        || userStore.userInfo?.userType === UserType.PFSTUAC
-       || userStore.userInfo?.userType === UserType.MGSSTUAC
+       || userStore.userInfo?.userType === UserType.MGSSTUAC,
+      canSeeInformation: userStore.userInfo?.userType === UserType.FORYOU
     };
   });
 

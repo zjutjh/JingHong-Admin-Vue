@@ -11,7 +11,8 @@ import {
   AlarmOutline as AlarmIcon,
   BusOutline as BusIcon,
   FileTrayOutline as LostfoundIcon,
-  HomeOutline as DashboardIcon
+  HomeOutline as DashboardIcon,
+  ClipboardOutline as InformationIcon
 } from "@vicons/ionicons5";
 import { RouterLink } from "vue-router";
 import { useAccess } from "../hooks";
@@ -74,6 +75,16 @@ const menuOptions = computed<Array<MenuOption & { access?: boolean }>>(() =>
       key: "lostfound",
       icon: renderIcon(LostfoundIcon),
       access: access.value.canSeeAdmin || access.value.canSeeLostfound
+    },
+    {
+      label: () => h(
+        RouterLink,
+        { to: { name: "Information", } },
+        { default: () => "校园资讯" }
+      ),
+      key: "information",
+      icon: renderIcon(InformationIcon),
+      access: access.value.canSeeAdmin || access.value.canSeeInformation
     },
   ].filter(item => item.access && omit(item, ["access"]))
 );

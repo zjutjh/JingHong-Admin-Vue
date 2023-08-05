@@ -7,4 +7,4 @@ export default pinia;
 
 export {
   useUserStore
-}
+};

@@ -18,17 +18,17 @@ const emit = defineEmits(["finish"]);
 const initialValue = ref(props.record);
 const formData = ref<Partial<AnnouncementAPI.Announcement>>({
   ...initialValue.value
-})
+});
 
 const handleSubmit = () => {
   emit("finish", { value: formData.value });
-}
+};
 
 const handleReset = () => {
   formData.value = {
     ...initialValue.value
-  }
-}
+  };
+};
 
 </script>
 
@@ -54,8 +54,8 @@ const handleReset = () => {
       </n-form-item>
     </n-form>
     <section class="preview">
-      <announcement-preview 
-        :title="formData.title" 
+      <announcement-preview
+        :title="formData.title"
         :content="formData.content"
         :publish-time="formData.publishTime"
       />
