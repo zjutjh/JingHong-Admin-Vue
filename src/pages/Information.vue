@@ -163,25 +163,19 @@ const handleFinish =  async (formData: InformationAPI.Information) => {
       <n-h3 prefix="bar">资讯列表</n-h3>
       <n-button type="primary" @click="handleCreate">新增资讯</n-button>
   </n-space>
-    <n-space style="padding: 0 24px">
-      <n-data-table
-        :columns="columns"
-        :data="informationList"
-        scroll-x="600"
-        :loading="loading"
-      />
-    </n-space>
-    <Information-form
-      v-if="showForm"
-      @delete="handleRemove"
-      @open="handleUpdate"
-      @finish="handleFinish"
-      :initialValue="toEditData"
+  <n-space style="padding: 0 24px">
+    <n-data-table
+      :columns="columns"
+      :data="informationList"
+      scroll-x="600"
+      :loading="loading"
     />
+  </n-space>
+  <Information-form
+    v-if="showForm"
+    @delete="handleRemove"
+    @open="handleUpdate"
+    @finish="handleFinish"
+    :initialValue="toEditData"
+  />
 </template>
-
-
-<style scoped>
-
-
-</style>
