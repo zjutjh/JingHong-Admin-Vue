@@ -13,7 +13,7 @@ const updateAnnouncementAPI = (data: UpdateAnnouncementData) => {
     url: "/api/admin/announcement/update",
     withCredentials: true,
     data
-  })
-}
+  });
+};
 
 export default updateAnnouncementAPI;

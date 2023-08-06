@@ -12,7 +12,7 @@ const deleteAnnouncementAPI = (data: DeleteAnnouncementData) => {
     url: "/api/admin/announcement/delete",
     withCredentials: true,
     data
-  })
-}
+  });
+};
 
 export default deleteAnnouncementAPI;

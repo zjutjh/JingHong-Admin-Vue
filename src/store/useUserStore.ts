@@ -1,5 +1,5 @@
-import { defineStore } from "pinia"
-import { ref } from "vue"
+import { defineStore } from "pinia";
+import { ref } from "vue";
 
 export default defineStore("user", () => {
   const userInfo = ref<UserAPI.User>();
@@ -12,7 +12,7 @@ export default defineStore("user", () => {
   const login = (user: UserAPI.User) => {
     userInfo.value = user;
     localStorage.setItem("passTime", new Date().getTime().toString());
-  }
+  };
 
   /**
    * 登出
@@ -20,12 +20,12 @@ export default defineStore("user", () => {
    */
   const logout = () => {
     userInfo.value = undefined;
-    localStorage.removeItem("passTime");    
-  }
+    localStorage.removeItem("passTime");
+  };
 
-  return { 
+  return {
     userInfo,
     login,
     logout
-  }
-})
+  };
+});
