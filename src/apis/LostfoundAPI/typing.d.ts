@@ -14,7 +14,7 @@ declare namespace LostfoundAPI {
     /** 内容 */
     content: string;
     publisher: string;
-    img1: null | string
+    img1: null | string;
     img2: null | string;
     img3: null | string;
   }

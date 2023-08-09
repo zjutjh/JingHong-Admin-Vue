@@ -2,6 +2,7 @@ import Login from "../pages/Login.vue";
 import SchoolBus from "../pages/SchoolBus.vue";
 import TermTime from "../pages/TermTime.vue";
 import Announcement from "../pages/Announcement.vue";
+import Information from "../pages/Information.vue";
 import LostfoundPage from "../pages/LostfoundPage/index.vue";
 import Dashboard from "../pages/Dashboard/index.vue";
 import Layout from "../components/Layout.vue";
@@ -71,6 +72,15 @@ const routes = [
           requestAuth: true,
         },
         component: LostfoundPage,
+      },
+      {
+        path: "information",
+        name: "Information",
+        meta: {
+          title: "校园资讯",
+          requestAuth: true,
+        },
+        component: Information,
       },
     ]
   },

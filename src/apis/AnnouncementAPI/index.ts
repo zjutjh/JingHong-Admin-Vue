@@ -8,4 +8,4 @@ export {
   createAnnouncementAPI,
   updateAnnouncementAPI,
   deleteAnnouncementAPI
-}
+};

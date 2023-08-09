@@ -7,7 +7,7 @@ const getAnnouncementsAPI = () => {
     method: "POST",
     url: "/api/announcement",
     withCredentials: true,
-  })
-}
+  });
+};
 
 export default getAnnouncementsAPI;
