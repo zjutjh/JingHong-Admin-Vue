@@ -1,13 +1,145 @@
+<template>
+  <PageTitle>失物寻物</PageTitle>
+  <n-space v-show="changeFlag === 0" justify="space-between" style="padding: 0 24px">
+    <n-space justify="start">
+      <n-h3 prefix="bar">寻物启事列表</n-h3>
+      <n-button type="info" @click="changeToLost">切换为失物启事</n-button>
+    </n-space>
+    <n-button type="primary" @click="handleOpenForm">添加寻物</n-button>
+  </n-space>
+  <n-space v-show="changeFlag === 1" justify="space-between" style="padding: 0 24px">
+    <n-space justify="start">
+      <n-h3 prefix="bar">失物启事列表</n-h3>
+      <n-button type="info" @click="changeFunction">切换为寻物启事</n-button>
+    </n-space>
+    <n-button type="primary" @click="handleOpenForm">添加寻物</n-button>
+  </n-space>
+  <n-space style="padding: 0 24px">
+    <n-data-table
+      :columns="columns"
+      :data="lostfoundList"
+      scroll-x="600"
+      :loading="loading"
+    />
+  </n-space>
+</template>
+
 <script lang="ts" setup>
 import PageTitle from "@/components/PageTitle.vue";
 import { useRequest } from "vue-request";
 import * as LostfoundService from "@/apis/LostfoundAPI";
 import PreviewCard from "./PreviewCard.vue";
 import LostfoundForm from "./LostfoundForm.vue";
-import { ref } from "vue";
-import { NSpin, NSpace, NButton, useMessage } from "naive-ui";
+import {h, ref} from "vue";
+import {NSpin, NSpace, NButton, useMessage, DataTableColumns} from "naive-ui";
 // @ts-ignore
 import VirtualList from "vue3-virtual-scroll-list";
+import dayjs from "dayjs";
+
+const changeFlag = ref(0); //界面切换寻物、失物，初始化为0，默认是寻物
+
+const columns: DataTableColumns<LostfoundAPI.Item> = [
+  {
+    title: "ID",
+    key: "id",
+    width: 60,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "物品名称",
+    key: "itemName",
+    width: 120,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "拾得/遗失地点",
+    width:180,
+    key: "lost_or_found_place",
+    ellipsis: {
+      tooltip: false
+    }
+  },
+  {
+    title: "拾得/遗失时间",
+    key: "lost_or_found_time",
+    width: 120,
+    render: (row) => dayjs(row.publish_time).format("YYYY-MM-DD HH:mm")
+  },
+  {
+    title: "联系方式",
+    key: "contact",
+    width: 120,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "物品介绍",
+    key: "introduction",
+    width: 180,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "校区",
+    key: "campus",
+    width: 60,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "物品种类",
+    key: "kind",
+    width: 120,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "发布组织",
+    key: "publisher",
+    width: 180,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "发布时间",
+    key: "publish_time",
+    width: 200,
+    ellipsis: {
+      tooltip: true
+    }
+  },
+  {
+    title: "操作",
+    fixed: "right",
+    width: 100,
+    key: "action",
+    render: (row) => h(
+      NSpace, () => [
+        h(NButton, {
+          text: true,
+          size: "small",
+          type: "warning",
+          onClick: () => handleUpdate(row, true),
+        }, () => "编辑"),
+        h(NButton, {
+          text: true,
+          size: "small",
+          type: "error",
+          onClick: () => handleRemove(row.id),
+        }, () => "删除"),
+      ]
+    )
+  },
+];
 
 const {
   loading,
@@ -114,50 +246,6 @@ const handleDelete = async (id: number) => {
 
 </script>
 
-<template>
-  <n-space align="center" justify="space-between" style="padding-right: 24px">
-    <page-title :is-loading-data="loading"> 失物招领 </page-title>
-    <n-button type="primary" @click="handleCreateRecord">登记失物寻物</n-button>
-  </n-space>
-  <virtual-list
-    class="v-list"
-    data-key="id"
-    :data-sources="recordList"
-    :data-component="PreviewCard"
-    @tobottom="handleScrollToBottom"
-    :extra-props="{ onClick: handleClickCard }"
-  >
-    <template v-slot:footer>
-      <div class="loading-prompt">
-        <n-space v-if="loading">
-          <n-spin :size="14"/>
-          <span>加载中</span>
-        </n-space>
-        <span v-else-if="maxPage > currentPage">下拉查看更多</span>
-      </div>
-    </template>
-  </virtual-list>
-  <lostfound-form
-    v-if="showForm"
-    @delete="handleDelete"
-    @open="handleOpenForm"
-    @finish="handleFormFinish"
-    :initialValue="toEditData"
-  />
-</template>
-
 <style lang="scss" scoped>
-.v-list {
-  overflow-y: auto;
-  height: calc(100vh - 60px - 64px);
-  padding-left: 24px;
-  padding-right: 24px;
-}
 
-.loading-prompt {
-  padding: 8px 0;
-  display: flex;
-  color: var(--wjh-color-week);
-  justify-content: center;
-}
 </style>

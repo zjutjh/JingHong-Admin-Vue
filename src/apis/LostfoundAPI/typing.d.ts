@@ -9,13 +9,18 @@ declare namespace LostfoundAPI {
     publish_time: string;
     /** 类型, false: 丢失, true: 招领 */
     type: boolean;
-    /** 是否已处理 */
-    is_processed: boolean;
     /** 内容 */
     content: string;
     publisher: string;
     img1: null | string;
     img2: null | string;
     img3: null | string;
+    item_name: string;
+    lost_or_found_place: string;
+    lost_or_found_time: string;
+    pickup_place: string;
+    /** 联系方式 */
+    contact: string;
+    introduction: string;
   }
 }

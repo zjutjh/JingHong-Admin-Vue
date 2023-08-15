@@ -3,6 +3,7 @@ import request from "../request";
 type GetRecordsData = {
   page_num: number;
   page_size: number;
+  lost_or_found: number;
 };
 
 type GetRecordsResult = Common.IResponse<{
