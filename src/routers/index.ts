@@ -66,7 +66,7 @@ const routes = [
         component: Announcement,
       },
       {
-        path: "Lost",
+        path: "lost",
         name: "Lost",
         meta: {
           title: "失物",
@@ -75,7 +75,7 @@ const routes = [
         component: Lost,
       },
       {
-        path: "Found",
+        path: "found",
         name: "Found",
         meta: {
           title: "寻物",

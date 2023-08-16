@@ -4,10 +4,8 @@ import {
   NFormItem,
   NInput,
   NPageHeader,
-  NRadio,
   NSelect,
   NSpace,
-  NRadioGroup,
   NUpload,
   NButton,
   UploadCustomRequestOptions,
@@ -18,24 +16,20 @@ import { onMounted, ref, toRefs, computed } from "vue";
 import * as LostfoundService from "@/apis/LostfoundAPI";
 
 const props = defineProps<{
-  initialValue: LostfoundAPI.Item | undefined;
+  /** 编辑和新建共用一个表单组件，新建情况初始值为 undefined */
+  initialValue: LostfoundAPI.FoundItem | undefined;
 }>();
 const { initialValue } = toRefs(props);
 const emit = defineEmits(["finish", "delete", "open"]);
 const message = useMessage();
 
-const formData = ref(initialValue?.value || {
+const formData = ref<Partial<LostfoundAPI.FoundItem>>(initialValue?.value || {
   kind: "其他",
   type: true,
-  content: "",
   campus: "朝晖"
 });
 
 const kindOptions = ref<{ label: string; value: string }[]>();
-const lostfoundOptions = ref([
-  { label: "失物招领", value: true },
-  { label: "寻物启事", value: false }
-]);
 const campusOptions = ref(["朝晖", "屏峰", "莫干山"].map(item => ({
   label: item, value: item
 })));
@@ -120,7 +114,11 @@ const handlePhotoUploadFinish = (options: { file: UploadFileInfo }) => {
  */
 const handleSubmit = () => {
   try {
-    if (!formData.value.content) throw new Error("请填写内容");
+    if (!formData.value.item_name) throw new Error("请填写物品名称");
+    if (!formData.value.lost_or_found_place) throw new Error("请填写遗失地点");
+    if (!formData.value.lost_or_found_time) throw new Error("请填写遗失时间");
+    if (!formData.value.contact) throw new Error("请填写联系方式");
+    if (!formData.value.introduction) throw new Error("请填写物品介绍");
     if (photoList.value.find(item => item.status !== "finished")) {
       throw new Error("存在未上传成功的照片");
     }
@@ -149,30 +147,33 @@ const handleDelete = () => {
     </n-page-header>
     <n-space style="width: 100%">
       <n-form style="max-width: 400px">
-        <n-form-item>
-          <n-radio-group v-model:value="formData.type">
-            <n-radio
-              v-for="item in lostfoundOptions"
-              :key="item.label"
-              :value="item.value"
-            >{{ item.label }}</n-radio>
-          </n-radio-group>
+        <n-form-item label="物品名称">
+          <n-input v-model:value="formData.item_name" />
         </n-form-item>
-        <n-form-item label="分类">
-          <n-select :options="kindOptions" v-model:value="formData.kind"/>
+        <n-form-item label="遗失地点">
+          <n-input v-model:value="formData.lost_or_found_place" />
         </n-form-item>
-        <n-form-item label="校区">
-          <n-select :options="campusOptions" v-model:value="formData.campus"/>
+        <n-form-item label="遗失时间">
+          <n-input v-model:value="formData.lost_or_found_time" />
         </n-form-item>
-        <n-form-item label="内容">
+        <n-form-item label="联系方式">
+          <n-input v-model:value="formData.contact" />
+        </n-form-item>
+        <n-form-item label="物品介绍">
           <n-input
             type="textarea"
-            v-model:value="formData.content"
+            v-model:value="formData.introduction"
             :autosize="{ minRows: 5 }"
             style="width: 400px"
           />
         </n-form-item>
-        <n-form-item label="上传图片 (最多3张)">
+        <n-form-item label="校区">
+          <n-select :options="campusOptions" v-model:value="formData.campus"/>
+        </n-form-item>
+        <n-form-item label="物品种类">
+          <n-select :options="kindOptions" v-model:value="formData.kind"/>
+        </n-form-item>
+        <n-form-item label="上传图片 (可选，最多3张)">
           <n-upload
             :max="3"
             show-preview-button
@@ -187,20 +188,13 @@ const handleDelete = () => {
           />
         </n-form-item>
         <n-form-item>
-          <n-space justify="end" style="width: 100%">
-            <n-button
-              type="error"
-              secondary
-              round
-              size="large"
-              @click="handleDelete"
-            >删除</n-button>
-            <n-button
-              type="primary"
-              round
-              size="large"
-              @click="handleSubmit"
-            >提交</n-button>
+          <n-space justify="space-between" style="width: 100%" >
+            <n-button type="error" secondary round size="large" @click="handleDelete">
+              删除
+            </n-button>
+            <n-button type="primary" round size="large" @click="handleSubmit">
+              提交
+            </n-button>
           </n-space>
         </n-form-item>
       </n-form>

@@ -1,21 +1,27 @@
 <template>
-  <PageTitle>失物寻物</PageTitle>
+  <page-title>失物寻物</page-title>
   <n-space justify="space-between" style="padding: 0 24px">
     <n-space justify="start">
       <n-h3 prefix="bar">失物招领列表</n-h3>
-      <n-button type="info" @click="changeFunction">切换为寻物启事</n-button>
+      <n-button type="info" @click="switchLostOrFound">切换为寻物启事</n-button>
     </n-space>
-    <n-button type="primary" @click="handleOpenForm">添加失物</n-button>
+    <n-button type="primary" @click="handleCreate">添加失物</n-button>
   </n-space>
-  <n-space style="padding: 0 24px">
+  <n-space style="padding: 0 24px" justify="end">
     <n-data-table
       :columns="columns"
-      :data="recordList"
+      :data="records"
       scroll-x="600"
       :loading="loading"
     />
+    <n-pagination
+      size="large"
+      :page="pagination.page"
+      :page-count="pagination.total"
+      :on-update:page="handleClickPagination"
+    />
   </n-space>
-  <Found-form
+  <lost-form
     v-if="showForm"
     @delete="handleRemove"
     @open="handleUpdate"
@@ -31,53 +37,40 @@ import {
   NSpace,
   NButton,
   NDataTable,
+  NPagination,
   DataTableColumns,
   useMessage,
   NH3,
 } from "naive-ui";
 import { useRequest } from "vue-request";
 import PageTitle from "@/components/PageTitle.vue";
-import useLostFoundStore from "@/store/useLostFoundStore";
 import {useRouter} from "vue-router";
-import FoundForm from "@/components/FoundForm.vue";
+import LostForm from "@/components/LostForm.vue";
 import * as LostfoundService from "@/apis/LostfoundAPI";
-import {storeToRefs} from "pinia";
 
 const router = useRouter();
-const lostfoundStore = useLostFoundStore();
-const  { lostfoundFlag } = storeToRefs(lostfoundStore);
-const currentPage = ref(0);
-const maxPage = ref(0);
-const recordList = ref<LostfoundAPI.Item[]>([]);
+const pagination = ref({ page: 0, total: 0 });
 const showForm = ref(false);
-const toEditData = ref<LostfoundAPI.Item>();
+const toEditData = ref<LostfoundAPI.LostItem>();
 const message = useMessage();
 
-const changeFunction = () => {
-  lostfoundStore.setLostfoundFlag(false);
+const switchLostOrFound = () => {
   router.push("/found");
 };
-
-const FLAG = computed(() => {
-  console.log(lostfoundFlag.value ? "切换到失物招领" : null);
-  return lostfoundFlag.value ? "失物" : "寻物";
-});
 
 const {
   loading,
   run: getRecords,
-} = useRequest(LostfoundService.getRecordsAPI, {
+  data: rawData
+} = useRequest(LostfoundService.getRecordsAPI<"失物">, {
   defaultParams: [{
     page_num: 1,
     page_size: 10,
-    lost_or_found: FLAG.value
+    lost_or_found: "失物"
   }],
   onSuccess: (data) => {
     if (data.code === 1) {
-      recordList.value = recordList.value?.concat(data.data.data || []);
-      console.log(recordList.value);
-      maxPage.value = data.data.total_page_num;
-      currentPage.value++;
+      pagination.value.total = data.data.total_page_num;
     }
   },
   onError: (e) => {
@@ -86,21 +79,26 @@ const {
   }
 });
 
-const handleOpenForm = () => {
-  showForm.value = true;
-};
+const records = computed(() => {
+  return rawData.value?.data.data;
+});
 
 const handleCreate = () => {
   toEditData.value = undefined;
   showForm.value = true;
 };
 
-const handleUpdate = (record: LostfoundAPI.Item, state: boolean) => {
+const handleClickPagination = (page: number) => {
+  pagination.value.page = page;
+  getRecords({page_num: page, page_size: 10, lost_or_found: "失物"});
+};
+
+const handleUpdate = (record: LostfoundAPI.LostItem, state: boolean) => {
   showForm.value = state;
   toEditData.value = record;
 };
 
-const handleRemove = async (id: LostfoundAPI.Item["id"]) => {
+const handleRemove = async (id: LostfoundAPI.LostItem["id"]) => {
   try {
     const res = await LostfoundService.deleteRecordAPI({lost_id: id});
     if (res.code === 1) {
@@ -113,13 +111,13 @@ const handleRemove = async (id: LostfoundAPI.Item["id"]) => {
     console.log(e);
     message.error(`删除失败，${e.message || "未知错误"}`);
   }
-  await getRecords({page_num: 1, page_size: 10, lost_or_found: FLAG.value});
+  await getRecords({page_num: pagination.value.page, page_size: 10, lost_or_found: "失物"});
 };
 
 const handleFinish =  async (formData: { campus: string; kind: string; type: boolean; content: string; publisher: string; img1: string | null; img2: string | null; img3: string | null; item_name: string; lost_or_found_place: string; lost_or_found_time: string; pickup_place: string; contact: string; introduction: string; }) => {
   try {
-    const res = !toEditData.value ?
-      await LostfoundService.createRecordAPI(formData)
+    const res = !toEditData.value
+      ? await LostfoundService.createRecordAPI(formData)
       : await LostfoundService.updateRecordAPI(formData);
     if (res.code === 1) {
       message.success("提交成功");
@@ -131,10 +129,11 @@ const handleFinish =  async (formData: { campus: string; kind: string; type: boo
   } catch (e: any) {
     message.error(e.message || "未知错误");
   }
-  await getRecords({page_num: 1, page_size: 10, lost_or_found: FLAG.value});
+  await getRecords({page_num: 1, page_size: 10, lost_or_found: "失物"});
+  pagination.value.page = 1;
 };
 
-const columns: DataTableColumns<LostfoundAPI.Item> = [
+const columns: DataTableColumns<LostfoundAPI.LostItem> = [
   {
     title: "ID",
     key: "id",
@@ -146,21 +145,21 @@ const columns: DataTableColumns<LostfoundAPI.Item> = [
   {
     title: "物品名称",
     key: "item_name",
-    width: 100,
+    width: 120,
     ellipsis: {
       tooltip: true
     }
   },
   {
-    title: "拾得/遗失地点",
-    width:120,
+    title: "拾得地点",
+    width: 120,
     key: "lost_or_found_place",
     ellipsis: {
       tooltip: true
     }
   },
   {
-    title: "拾得/遗失时间",
+    title: "拾得时间",
     key: "lost_or_found_time",
     width: 80,
     ellipsis: {
@@ -168,8 +167,8 @@ const columns: DataTableColumns<LostfoundAPI.Item> = [
     }
   },
   {
-    title: "联系方式",
-    key: "contact",
+    title: "领取地点",
+    key: "pickup_place",
     width: 175,
     ellipsis: {
       tooltip: true
@@ -186,7 +185,7 @@ const columns: DataTableColumns<LostfoundAPI.Item> = [
   {
     title: "校区",
     key: "campus",
-    width: 60,
+    width: 80,
     ellipsis: {
       tooltip: true
     }
@@ -194,15 +193,7 @@ const columns: DataTableColumns<LostfoundAPI.Item> = [
   {
     title: "物品种类",
     key: "kind",
-    width: 60,
-    ellipsis: {
-      tooltip: true
-    }
-  },
-  {
-    title: "发布组织",
-    key: "publisher",
-    width: 180,
+    width: 80,
     ellipsis: {
       tooltip: true
     }
