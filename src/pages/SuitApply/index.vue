@@ -44,7 +44,7 @@
   >
   <n-button type="primary" size="large" :round="true" @click="$router.push('/suitFaq')"
   >&ensp;&ensp;问答页面&ensp;&ensp;</n-button>
-    <n-button type="primary" size="large" :round="true" @click="publish()"
+    <n-button type="primary" size="large" :round="true" @click="publish_"
       >发布正装信息</n-button
     >
     <n-button type="primary" size="large" :round="true"  @click="$router.push('/suitManger')"
@@ -69,7 +69,7 @@
           <td>{{ item.stock }}</td>
           <td>{{ item.borrowed }}</td>
           <td>
-            <n-button text @click="showEditor">编辑</n-button>/
+            <n-button text @click="showEditor">编辑</n-button>
             <n-button text @click="showInformation(item.id)">查看</n-button>
             <n-button style="margin-left: 2vw" text>删除</n-button>
           </td>
@@ -77,132 +77,104 @@
       </tbody>
     </n-table>
     <n-modal v-model:show="showModal">
-      <n-card
-        style="width: 600px"
-        title="发布正装信息"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
-        <!-- 表单 -->
-        <n-form :model="form" label-position="top">
-          <n-form-item label="物资名称">
-            <n-input v-model="form.name" />
-          </n-form-item>
-          <n-form-item label="类别">
-            <n-input :disabled="true" default-value="正装" />
-          </n-form-item>
-          <n-form-item label="尺寸">
-            <n-input v-model="form.size"  />
-          </n-form-item>
-          <n-form-item label="上传图片">
-              <n-button>更改</n-button>
-          </n-form-item>
-          <n-form-item label="库存">
-            <n-input-number v-model="form.stock" :disabled="false" :min="0"/>
-          </n-form-item>
-          <n-form-item label="已借出">
-            <n-input-number v-model="form.borrowed" :disabled="false" :min="0"/>
-          </n-form-item>
-        </n-form>
-        <template #footer>
-          <div style="display: flex;justify-content: center;">
-          <n-button type="primary" @click="publish">确认更改</n-button>
+    <n-card
+      style="width: 600px"
+      title="发布正装信息"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <!-- 表单 -->
+      <n-form :model="form" label-position="top">
+        <n-form-item label="物资名称">
+          <n-input v-model="form.name" />
+        </n-form-item>
+        <n-form-item label="类别">
+          <n-input :disabled="true" default-value="正装" />
+        </n-form-item>
+        <n-form-item label="校区">
+          <n-select :options="campusOptions" v-model:value="form.campus" />
+        </n-form-item>
+        <n-form-item label="上传图片">
+          <n-button>上传</n-button>
+        </n-form-item>
+        <n-form-item label="总数量">
+          10086
+        </n-form-item>
+        <n-form-item label="规格" style="display: flex; align-items: center;" size="small">  <n-button @click="addSpec" style="margin-left: 30%;margin-top: -20%;">+</n-button>
+</n-form-item>
+<n-form-item  style="display: flex; justify-content: center; margin-top: 4vh;" size="small">
+  <n-table :bordered="true" style="width: 40vw;">
+      <thead>
+        <tr>
+          <th>尺码</th>
+          <th>库存</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in filteredData" :key="item.name">
+          <td>{{ item.name }}</td>
+          <td>{{ item.stock }}</td>
+          <td>
+            <n-button text @click="showEditor">修改</n-button>
+            <n-button style="margin-left: 2vw" text>删除</n-button>
+          </td>
+        </tr>
+      </tbody>
+    </n-table>
+</n-form-item>
+      </n-form>
+      <template #footer>
+        <div style="display: flex;justify-content: center;">
+          <n-button type="primary" @click="publish">确认发布</n-button>
           <n-button @click="showModal = false" style="margin-left: 10vh;">取消</n-button>
         </div>
-        </template>
-      </n-card>
-    </n-modal>
-    <n-modal v-model:show="showModalEditor">
-      <n-card
-        style="width: 600px"
-        title="编辑正装信息"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
-        <!-- 表单 -->
-        <n-form :model="form" label-position="top">
-          <n-form-item label="物资名称">
-            <n-input v-model="form.name" />
-          </n-form-item>
-          <n-form-item label="类别">
-            <n-input :disabled="true" default-value="正装" />
-          </n-form-item>
-          <n-form-item label="尺寸">
-            <n-input v-model="form.size"  />
-          </n-form-item>
-          <n-form-item label="上传图片">
-              <n-button>上传</n-button>
-          </n-form-item>
-          <n-form-item label="库存">
-            <n-input-number v-model="form.stock" :disabled="false" :min="0"/>
-          </n-form-item>
-          <n-form-item label="已借出">
-            <n-input-number v-model="form.borrowed" :disabled="true" :min="0"/>
-          </n-form-item>
-        </n-form>
-        <template #footer>
-          <div style="display: flex;justify-content: center;">
-          <n-button type="primary" @click="publish">确认发布</n-button>
-          <n-button @click="showModalEditor = false" style="margin-left: 10vh;">取消</n-button>
-        </div>
-        </template>
-      </n-card>
-    </n-modal>
-    <n-modal v-model:show="showModalInformation">
-      <n-card
-        style="width: 600px"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
-        <template #title>
-          <div>{{ currentItem.name }} 的详细信息</div>
-        </template>
-        <!-- 显示物品详细信息 -->
-        <n-form label-position="top">
-          <n-form-item label="物品名称">
-            <n-input v-model="currentItem.name" :disabled="true"/>
-          </n-form-item>
-          <n-form-item label="类别">
-            <n-input v-model="currentItem.category" :disabled="true"/>
-          </n-form-item>
-          <n-form-item label="库存">
-            <n-input-number v-model="currentItem.stock" :disabled="true" :min="0"/>
-          </n-form-item>
-          <n-form-item label="已借出">
-            <n-input-number v-model="currentItem.borrowed" :disabled="true" :min="0"/>
-          </n-form-item>
-          <!-- 添加其他需要显示的信息 -->
-        </n-form>
-        <template #footer>
-          <div style="display: flex;justify-content: center;">
-            <n-button @click="showModalInformation = false">关闭</n-button>
-          </div>
-        </template>
-      </n-card>
-    </n-modal>
+      </template>
+    </n-card>
+  </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import PageTitle from "../../components/PageTitle.vue";
-import { NButton, NSpace, NTable, useMessage, NModal, NCard, NForm, NFormItem, NInput, NInputNumber } from "naive-ui";
+import { NButton, NSpace, NTable, useMessage, NModal, NCard, NForm, NFormItem, NInput,NIcon,NSelect} from "naive-ui";
 import { computed, ref } from "vue";
 import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
+const campusOptions = ref(["朝晖", "屏峰", "莫干山"].map(item => ({
+  label: item, value: item
+})));
+const spec = ref('');
+const specs = ref([]);
+const addSpec = () => {
+  specs.value.push({ size: spec.value, stock: 0 });
+  spec.value = '';
+};
+
+const editSpec = (row: any) => {
+  // 编辑逻辑
+};
+
+const deleteSpec = (row: any) => {
+  const index = specs.value.indexOf(row);
+  if (index !== -1) specs.value.splice(index, 1);
+};
 const form = ref({
   name: "",
   stock: 0,
   borrowed: 0,
   imageUrl: "", // 保存上传图片的地址
-  size: ""
+  size: "",
+  campus: "",
+  totalStock: 0
 });
 
+const publish = () => {
+  // 发布逻辑
+  message.success('成功发布正装信息');
+};
 
 // 发布操作
 // const publish = async () => {
@@ -282,7 +254,7 @@ const getButtonColor = (buttonName: string) => {
   return selectedButton.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
 
-const publish = () => {
+const publish_ = () => {
   showModal.value = true;
 };
 
