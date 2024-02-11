@@ -3,13 +3,13 @@ import SchoolBus from "../pages/SchoolBus.vue";
 import TermTime from "../pages/TermTime.vue";
 import Announcement from "../pages/Announcement.vue";
 import Information from "../pages/Information.vue";
+import LostfoundPage from "../pages/LostfoundPage/index.vue";
 import Dashboard from "../pages/Dashboard/index.vue";
 import Layout from "../components/Layout.vue";
+import SuitApply from "../pages/SuitApply/index.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store";
 import getUserInfoAPI from "../apis/UserAPI/getUserInfo";
-import Found from "@/pages/LostfoundPage/Found.vue";
-import Lost from "@/pages/LostfoundPage/Lost.vue";
 
 const routes = [
   {
@@ -66,22 +66,13 @@ const routes = [
         component: Announcement,
       },
       {
-        path: "lost",
-        name: "Lost",
+        path: "lostfound",
+        name: "Lostfound",
         meta: {
-          title: "失物",
+          title: "失物寻物",
           requestAuth: true,
         },
-        component: Lost,
-      },
-      {
-        path: "found",
-        name: "Found",
-        meta: {
-          title: "寻物",
-          requestAuth: true,
-        },
-        component: Found,
+        component: LostfoundPage,
       },
       {
         path: "information",
@@ -92,6 +83,33 @@ const routes = [
         },
         component: Information,
       },
+      {
+        path: "suitapply",
+        name: "SuitApply",
+        meta: {
+          title: "物资借用",
+          requestAuth: true,
+        },
+        component: SuitApply,
+      },
+      // {
+      //   path: "suitFaq",
+      //   name: "SuitFaq",
+      //   meta: {
+      //     title: "问答页面",
+      //     requestAuth: true,
+      //   },
+      //   component: 
+      // },
+      // {
+      //   path: "suitManger",
+      //   name: "SuitManger",
+      //   meta: {
+      //     title: "审批清点",
+      //     requestAuth: true,
+      //   },
+      //   component: 
+      // }
     ]
   },
 ];

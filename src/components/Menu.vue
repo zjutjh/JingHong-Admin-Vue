@@ -69,7 +69,7 @@ const menuOptions = computed<Array<MenuOption & { access?: boolean }>>(() =>
     {
       label: () => h(
         RouterLink,
-        { to: { name: "Found", } },
+        { to: { name: "Lostfound", } },
         { default: () => "失物寻物" }
       ),
       key: "lostfound",
@@ -86,6 +86,16 @@ const menuOptions = computed<Array<MenuOption & { access?: boolean }>>(() =>
       icon: renderIcon(InformationIcon),
       access: access.value.canSeeAdmin || access.value.canSeeInformation
     },
+    {
+      label: () => h(
+        RouterLink,
+        {to: {name: "SuitApply"}},
+        {default: () => "物资借用"}
+      ),
+      key: "suitapply",
+      icon: renderIcon(InformationIcon),
+      access: access.value.canSeeAdmin || access.value.canSeeSuitApply
+    }
   ].filter(item => item.access && omit(item, ["access"]))
 );
 
