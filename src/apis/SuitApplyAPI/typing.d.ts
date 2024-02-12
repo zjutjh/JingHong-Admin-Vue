@@ -28,11 +28,8 @@ declare namespace SuitApplyAPI {
     name: string;
     img: string;
     campus: number;
+    totalStock?: number;
+    totalBorrowed?: number;
     specs: SuitSpec[];
-  }
-  interface GetSuitInformation {
-    code: number;
-    msg: string;
-    data: SuitItem[];
   }
 }
