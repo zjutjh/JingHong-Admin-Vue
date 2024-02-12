@@ -7,6 +7,7 @@ import LostfoundPage from "../pages/LostfoundPage/index.vue";
 import Dashboard from "../pages/Dashboard/index.vue";
 import Layout from "../components/Layout.vue";
 import SuitApply from "../pages/SuitApply/index.vue";
+import suitManger from "@/pages/SuitApply/suitManger.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store";
 import getUserInfoAPI from "../apis/UserAPI/getUserInfo";
@@ -99,17 +100,17 @@ const routes = [
       //     title: "问答页面",
       //     requestAuth: true,
       //   },
-      //   component: 
+      //   component:
       // },
-      // {
-      //   path: "suitManger",
-      //   name: "SuitManger",
-      //   meta: {
-      //     title: "审批清点",
-      //     requestAuth: true,
-      //   },
-      //   component: 
-      // }
+      {
+        path: "suitManger",
+        name: "SuitManger",
+        meta: {
+          title: "审批清点",
+          requestAuth: true,
+        },
+        component: suitManger
+      }
     ]
   },
 ];
