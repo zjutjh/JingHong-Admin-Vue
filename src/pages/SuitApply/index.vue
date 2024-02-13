@@ -70,7 +70,7 @@
       <td>{{ item.totalStock}}</td>
       <td>{{ item.totalBorrowed}}</td>
       <td>
-        <n-button text @click="showEditor">编辑</n-button>
+        <n-button text @click="showEditorTotal">编辑</n-button>/
         <n-button text >查看</n-button>
         <n-button style="margin-left: 2vw" text>删除</n-button>
       </td>
@@ -88,21 +88,21 @@
       aria-modal="true"
     >
       <!-- 表单 -->
-      <n-form :model="pubilshSuit" label-position="top">
+      <n-form :model="publishSuitForm" label-position="top">
         <n-form-item label="物资名称">
-          <n-input v-model="pubilshSuit.name" />
+          <n-input v-model:value="publishSuitForm.name" />
         </n-form-item>
         <n-form-item label="类别">
           <n-input :disabled="true" default-value="正装" />
         </n-form-item>
         <n-form-item label="校区">
-          <n-select :options="campusOptions" v-model:value="pubilshSuit.campus" />
+          <n-select :options="campusOptions" v-model:value="publishSuitForm.campus" />
         </n-form-item>
         <n-form-item label="上传图片">
           <n-button>上传</n-button>
         </n-form-item>
         <n-form-item label="总数量">
-          {{ pubilshSuit.total }}
+          {{ publishSuitForm.total }}
         </n-form-item>
         <n-form-item label="规格" style="display: flex; align-items: center;" size="small">  <n-button @click="addSpec" style="margin-left: 30%;margin-top: -20%;">+</n-button>
 </n-form-item>
@@ -116,12 +116,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="item in filteredData" :key="item.name">
-          <td>{{ item.name }}</td>
+        <tr v-for=" item in publishSuitForm.specs" :key="item.spec">
+          <td>{{ item.spec }}</td>
           <td>{{ item.stock }}</td>
           <td>
-            <n-button text @click="showEditor">修改</n-button>
-            <n-button style="margin-left: 2vw" text>删除</n-button>
+            <n-button text @click="showEditor(item)">修改</n-button>
+            <n-button style="margin-left: 2vw" text @click="deleteSpec(item)">删除</n-button>
           </td>
         </tr>
       </tbody>
@@ -130,36 +130,81 @@
       </n-form>
       <template #footer>
         <div style="display: flex;justify-content: center;">
-          <n-button type="primary">确认发布</n-button>
+          <n-button type="primary" @click="publishSuitFunction">确认发布</n-button>
           <n-button @click="showModalPublish= false" style="margin-left: 10vh;">取消</n-button>
         </div>
       </template>
     </n-card>
+  </n-modal>
+  <n-modal v-model:show="showModalAddSpec">
+    <n-card
+      style="width: 300px"
+      title="发布正装尺码"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+            <n-form :model="specForm" label-position="top">
+              <n-form-item label="尺寸">
+                <n-input v-model:value="specForm.spec" />
+              </n-form-item>
+              <n-form-item label="库存">
+                <n-input v-model:value="specForm.stock" />
+              </n-form-item>
+            </n-form>
+            <template #footer>
+              <div style="display: flex;justify-content:space-around;">
+              <n-button @click="confirmSpec" type="primary">确认</n-button>
+              <n-button @click="showModalAddSpec = false">取消</n-button>
+            </div>
+            </template>
+          </n-card>
+          </n-modal>
+          <n-modal v-model:show="showModalEditor">
+            <n-card
+      style="width: 300px"
+      title="修改正装信息"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+    <n-form :model="editedSpec" label-position="top">
+      <n-form-item label="尺码">
+        <n-input v-model:value="editedSpec.spec" />
+      </n-form-item>
+      <n-form-item label="库存">
+        <n-input v-model:value="editedSpec.stock" />
+      </n-form-item>
+    </n-form>
+    <template #footer>
+      <n-button @click="confirmEdit">确认</n-button>
+    </template>
+            </n-card>
   </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import PageTitle from "../../components/PageTitle.vue";
-import { NButton, NSpace, NTable, useMessage, NModal, NCard, NForm, NFormItem, NInput,NIcon,NSelect} from "naive-ui";
+import { NButton, NSpace, NTable, useMessage, NModal, NCard, NForm, NFormItem, NInput,NSelect} from "naive-ui";
 import { computed, ref, onMounted } from "vue";
 import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
+
 const campusOptions = ref(["朝晖", "屏峰", "莫干山"].map(item => ({
   label: item, value: item
 })));
-const spec = ref('');
-const specs = ref([]);
-
 const selectedButton = ref("button1");
 const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
-  const pubilshSuit = ref<{
+  const publishSuitForm = ref<{
   name: string;
   campus: string;
   img: string;
   total: number;
-  specs: { stock: number; spec: string }[];
+  specs: { stock: number; spec: string;}[];
 }>({
   name: "",
   campus: "",
@@ -167,9 +212,26 @@ const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
   total: 0,
   specs: []
 });
+const total = computed(() => {
+  let sum = 0;
+  // 遍历 specs 数组，累加库存
+  for (const item of publishSuitForm.value.specs) {
+    sum += item.stock;
+  }
+  return sum;
+});
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
-const showModalInformation = ref(false);
+const showModalAddSpec = ref(false);
+const editedSpec = ref({
+  spec: "",
+  stock: 0
+});
+
+const specForm = ref({
+  spec: "",
+  stock: ""
+});
 const campus = computed(() => {
   if (selectedButton.value === "button1") {
     return 1;
@@ -179,19 +241,46 @@ const campus = computed(() => {
     return 3;
   }
 });
-const showEditor = () => {
+
+const showEditor = (spec: { spec: string; stock: number; }) => {
+  // 将要编辑的规格对象赋值给editedSpec
   showModalEditor.value = true;
+  editedSpec.value = { ...spec };
+  console.log(editedSpec.value);
 };
+
+
+const confirmEdit = () => {
+  const index = publishSuitForm.value.specs.findIndex(item => item.spec === editedSpec.value.spec);
+
+  if (index !== -1) {
+    publishSuitForm.value.specs[index] = { ...editedSpec.value };
+  } else {
+    publishSuitForm.value.specs.push({ spec: editedSpec.value.spec, stock: editedSpec.value.stock });
+  }
+  showModalEditor.value = false;
+};
+
+const deleteSpec = (spec: { spec: string; stock:number }) => {
+  // 找到要删除的规格对象在数组中的索引
+  const index = publishSuitForm.value.specs.findIndex(item => item.spec === spec.spec);
+  if (index !== -1) {
+    // 从数组中移除规格对象
+    publishSuitForm.value.specs.splice(index, 1);
+  }
+};
+
 onMounted(() => {
   GetSuitInformation(1);
 });
+
 const GetSuitInformation = async (campus: number) => {
   suitList.value = [];
   try {
     const res = await SuitApplyService.GetSuitAPI({ campus });
     if (res.code === 1) {
       if (res.data) {
-        const suitItems: SuitApplyAPI.SuitItem[] = res.data; // 更正类型定义
+        const suitItems: SuitApplyAPI.SuitItem[] = res.data;
         suitItems.forEach((item: SuitApplyAPI.SuitItem) => {
           if (item.specs) {
             let totalStock = 0;
@@ -216,9 +305,29 @@ const GetSuitInformation = async (campus: number) => {
 };
 
 
+const publishSuitFunction = async (publishSuitForm:SuitApplyAPI.publishForm) => {
+  try {
+    const res = await SuitApplyService.createSuitInfoDataAPI(publishSuitForm);
+  }catch (e: any) {
+    message.error(`删除失败, ${e?.message || "未知错误"}`);
+  }
+  console.log(publishSuitForm.value);
+  showModalPublish.value = false;
+};
 
-
-
+const addSpec = () => {
+  showModalAddSpec.value = true;
+};
+const confirmSpec = () => {
+  publishSuitForm.value.specs.push({
+    spec: specForm.value.spec,
+    stock: parseInt(specForm.value.stock)
+  });
+  showModalAddSpec.value = false;
+  // 清空specForm中的数据
+  specForm.value.spec = "";
+  specForm.value.stock = "";
+};
 
 const selectButton = (buttonName: string) => {
   selectedButton.value = buttonName;
@@ -231,7 +340,8 @@ const getButtonColor = (buttonName: string) => {
 
 const showPublish = () => {
   showModalPublish.value = true;
-}
+};
+
 
 
 </script>
