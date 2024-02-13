@@ -32,10 +32,4 @@ declare namespace SuitApplyAPI {
     totalBorrowed?: number;
     specs: SuitSpec[];
   }
-  interface publishForm {
-    name: string;
-    campus: number;
-    img: string;
-    specs: { stock: number; spec: string;}[];
-  }
 }

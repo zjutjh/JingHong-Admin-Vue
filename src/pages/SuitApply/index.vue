@@ -71,7 +71,7 @@
       <td>{{ item.totalBorrowed}}</td>
       <td>
         <n-button text @click="showEditorTotal">编辑</n-button>/
-        <n-button text >查看</n-button>
+        <n-button text @click="showEditorTotal">查看</n-button>
         <n-button style="margin-left: 2vw" text>删除</n-button>
       </td>
     </tr>
@@ -99,10 +99,13 @@
           <n-select :options="campusOptions" v-model:value="publishSuitForm.campus" />
         </n-form-item>
         <n-form-item label="上传图片">
-          <n-button>上传</n-button>
-        </n-form-item>
+    <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*" style="display: none" />
+    <img v-if="publishSuitForm.img" :src="publishSuitForm.img" alt="上传的图片预览" style="max-width: 200px; max-height: 200px; margin-top: 10px;" />
+    <n-button v-if="publishSuitForm.img" type="error" @click="deleteImage">删除</n-button>
+    <n-button @click="openFileInput">上传</n-button>
+  </n-form-item>
         <n-form-item label="总数量">
-          {{ publishSuitForm.total }}
+          1008
         </n-form-item>
         <n-form-item label="规格" style="display: flex; align-items: center;" size="small">  <n-button @click="addSpec" style="margin-left: 30%;margin-top: -20%;">+</n-button>
 </n-form-item>
@@ -130,7 +133,7 @@
       </n-form>
       <template #footer>
         <div style="display: flex;justify-content: center;">
-          <n-button type="primary" @click="publishSuitFunction">确认发布</n-button>
+          <n-button type="primary" @click="publishSuitFunction(publishSuitForm)">确认发布</n-button>
           <n-button @click="showModalPublish= false" style="margin-left: 10vh;">取消</n-button>
         </div>
       </template>
@@ -192,34 +195,29 @@ import { NButton, NSpace, NTable, useMessage, NModal, NCard, NForm, NFormItem, N
 import { computed, ref, onMounted } from "vue";
 import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
+import { messageProps } from "naive-ui/es/message/src/message-props";
 
-const campusOptions = ref(["朝晖", "屏峰", "莫干山"].map(item => ({
-  label: item, value: item
-})));
+const campusOptions = ref([
+  { label: "朝晖", value: 1 },
+  { label: "屏峰", value: 2 },
+  { label: "莫干山", value: 3 }
+]);
+
 const selectedButton = ref("button1");
 const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
   const publishSuitForm = ref<{
   name: string;
-  campus: string;
+  campus: number;
   img: string;
-  total: number;
   specs: { stock: number; spec: string;}[];
 }>({
   name: "",
-  campus: "",
+  campus: 0,
   img: "",
-  total: 0,
   specs: []
 });
-const total = computed(() => {
-  let sum = 0;
-  // 遍历 specs 数组，累加库存
-  for (const item of publishSuitForm.value.specs) {
-    sum += item.stock;
-  }
-  return sum;
-});
+
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
 const showModalAddSpec = ref(false);
@@ -300,18 +298,21 @@ const GetSuitInformation = async (campus: number) => {
       throw new Error(res.msg);
     }
   } catch (e: any) {
-    message.error(`删除失败, ${e?.message || "未知错误"}`);
+    message.error(`获取失败, ${e?.message || "未知错误"}`);
   }
 };
 
 
-const publishSuitFunction = async (publishSuitForm:SuitApplyAPI.publishForm) => {
-  try {
-    const res = await SuitApplyService.createSuitInfoDataAPI(publishSuitForm);
-  }catch (e: any) {
-    message.error(`删除失败, ${e?.message || "未知错误"}`);
-  }
-  console.log(publishSuitForm.value);
+const publishSuitFunction = async (publishSuitForm: { campus: number; name: string; img: string; specs: { spec: string; stock: number; }[]; }) => {
+   try {
+     const res = await SuitApplyService.createSuitInfoDataAPI(publishSuitForm);
+     if (res.code === 1) {
+       message.create("发布成功");
+     }
+   }catch (e: any) {
+    message.error(e.message || "未知错误");
+   }
+  console.log(publishSuitForm);
   showModalPublish.value = false;
 };
 
@@ -340,6 +341,28 @@ const getButtonColor = (buttonName: string) => {
 
 const showPublish = () => {
   showModalPublish.value = true;
+};
+
+const fileInput = ref<HTMLInputElement | null>(null); // 创建一个 ref 来引用文件输入框
+
+
+const handleFileChange = (event: { target: { files: any[]; }; }) => {
+  const file = event.target.files[0]; // 获取用户选择的文件
+  if (file) {
+    // 通过 URL.createObjectURL() 方法生成图片的 URL，并将其存储在 publishSuitForm.img 中
+    publishSuitForm.value.img = URL.createObjectURL(file);
+  }
+};
+
+const openFileInput = () => {
+  // 打开文件选择对话框
+  fileInput.value?.click(); // 使用可选链操作符
+};
+
+const deleteImage = () => {
+  // 删除图片 URL
+  URL.revokeObjectURL(publishSuitForm.value.img); // 释放对象 URL
+  publishSuitForm.value.img = ''; // 清空图片 URL
 };
 
 

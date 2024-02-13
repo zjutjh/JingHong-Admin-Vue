@@ -4,10 +4,7 @@ type CreateSuitInfoData = {
   campus:number,
   name:string,
   img:string,
-  specs:{
-    spec:string,
-    stock:number
-  }
+  specs: Array<{ spec: string; stock: number }>;
 }
 type CreateSuitInfoResult = Common.IResponse<null>;
 const createSuitInfoDataAPI = (data:CreateSuitInfoData) => {
