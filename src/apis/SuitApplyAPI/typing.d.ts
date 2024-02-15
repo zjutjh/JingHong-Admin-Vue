@@ -17,7 +17,7 @@ declare namespace SuitApplyAPI {
     return_time: string;
     status: number;
   }
-  
+
   interface SuitSpec {
     id: number;
     stock: number;

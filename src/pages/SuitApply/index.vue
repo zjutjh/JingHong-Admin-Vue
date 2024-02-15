@@ -72,7 +72,22 @@
       <td>
         <n-button text @click="showEditorTotal">编辑</n-button>/
         <n-button text @click="showEditorTotal">查看</n-button>
-        <n-button style="margin-left: 2vw" text>删除</n-button>
+        <n-button style="margin-left: 2vw" text @click="deleteSuit(item);">删除</n-button>
+        <n-modal v-model:show="showModalConfirmDelete">
+    <n-card
+      style="width: 400px"
+      title="确认删除"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+    <div style="display: flex;justify-content:space-around;">
+      <n-button type="primary" @click="deleteConfirmSuit(deleteItem)">确认删除</n-button>
+      <n-button @click="showModalConfirmDelete = false">取消</n-button>
+    </div>
+    </n-card>
+  </n-modal>
       </td>
     </tr>
 </tbody>
@@ -141,7 +156,7 @@
   </n-modal>
   <n-modal v-model:show="showModalAddSpec">
     <n-card
-      style="width: 300px"
+      style="width: 300px;"
       title="发布正装尺码"
       :bordered="false"
       size="huge"
@@ -196,7 +211,11 @@ import { computed, ref, onMounted } from "vue";
 import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 import { messageProps } from "naive-ui/es/message/src/message-props";
-
+const deleteItem = ref();
+const deleteSuit = (item: SuitApplyAPI.SuitItem) => {
+  showModalConfirmDelete.value = true;
+  deleteItem.value = item;
+};
 const campusOptions = ref([
   { label: "朝晖", value: 1 },
   { label: "屏峰", value: 2 },
@@ -208,12 +227,12 @@ const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
   const publishSuitForm = ref<{
   name: string;
-  campus: number;
+  campus: number | string;
   img: string;
   specs: { stock: number; spec: string;}[];
 }>({
   name: "",
-  campus: 0,
+  campus: "",
   img: "",
   specs: []
 });
@@ -221,6 +240,7 @@ const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
 const showModalAddSpec = ref(false);
+const showModalConfirmDelete = ref(false);
 const editedSpec = ref({
   spec: "",
   stock: 0
@@ -302,18 +322,44 @@ const GetSuitInformation = async (campus: number) => {
   }
 };
 
-
 const publishSuitFunction = async (publishSuitForm: { campus: number; name: string; img: string; specs: { spec: string; stock: number; }[]; }) => {
    try {
      const res = await SuitApplyService.createSuitInfoDataAPI(publishSuitForm);
      if (res.code === 1) {
        message.create("发布成功");
+       GetSuitInformation(campus.value);
      }
    }catch (e: any) {
     message.error(e.message || "未知错误");
    }
-  console.log(publishSuitForm);
+  publishSuitForm = {
+    campus: 0,
+    name: "",
+    img: "",
+    specs:[],
+  };
   showModalPublish.value = false;
+};
+
+const deleteConfirmSuit = async (deleteItem:SuitApplyAPI.SuitItem) => {
+  let res = null;
+  try {
+    for (const spec of deleteItem.specs) {
+        res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
+    }
+    if(res !== null){
+    if (res.code === 1) {
+      message.create("删除成功");
+       GetSuitInformation(campus.value);
+     }else {
+      throw new Error(res.msg);
+    }
+  }
+  } catch (e:any) {
+    // 处理错误
+    console.error("删除失败:", e.message || "未知错误");
+  }
+  showModalConfirmDelete.value = false;
 };
 
 const addSpec = () => {
@@ -343,26 +389,23 @@ const showPublish = () => {
   showModalPublish.value = true;
 };
 
-const fileInput = ref<HTMLInputElement | null>(null); // 创建一个 ref 来引用文件输入框
+const fileInput = ref<HTMLInputElement | null>(null);
 
 
 const handleFileChange = (event: { target: { files: any[]; }; }) => {
-  const file = event.target.files[0]; // 获取用户选择的文件
+  const file = event.target.files[0];
   if (file) {
-    // 通过 URL.createObjectURL() 方法生成图片的 URL，并将其存储在 publishSuitForm.img 中
     publishSuitForm.value.img = URL.createObjectURL(file);
   }
 };
 
 const openFileInput = () => {
-  // 打开文件选择对话框
-  fileInput.value?.click(); // 使用可选链操作符
+  fileInput.value?.click();
 };
 
 const deleteImage = () => {
-  // 删除图片 URL
-  URL.revokeObjectURL(publishSuitForm.value.img); // 释放对象 URL
-  publishSuitForm.value.img = ''; // 清空图片 URL
+  URL.revokeObjectURL(publishSuitForm.value.img);
+  publishSuitForm.value.img = '';
 };
 
 

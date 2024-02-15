@@ -4,6 +4,7 @@ import suppliesCheckAPI from "./setSuppliesCheck";
 import suppliesReturnAPI from "./setSuppliesReturn";
 import GetSuitAPI from "./getSuitInformation";
 import createSuitInfoDataAPI from "./createSuitInfo";
+import DeleteSuitInfoAPI from "./deleteSuitInfo";
 
 export {
   suppliesReturnAPI,
@@ -11,5 +12,6 @@ export {
   suppliesCancleAPI,
   getRequestAPI,
   GetSuitAPI,
-  createSuitInfoDataAPI
+  createSuitInfoDataAPI,
+  DeleteSuitInfoAPI
 };
