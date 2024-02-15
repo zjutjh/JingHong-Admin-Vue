@@ -7,14 +7,14 @@ type Campus = {
 type SuppliesExportResult = {
   code: number;
   data: string;
-  mgs: string;
+  msg: string;
 };
 
 const GetExportAPI =  (params:Campus) => {
   return request<SuppliesExportResult>({
     method: "GET",
     url: "/api/stuac/supplies-borrow/supplies-export",
-    params,
+    params: params,
   });
 };
 
