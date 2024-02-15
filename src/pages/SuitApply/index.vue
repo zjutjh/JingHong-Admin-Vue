@@ -42,7 +42,7 @@
     vertical
     align="center"
   >
-  <n-button type="primary" size="large" :round="true" @click="$router.push('/suitFaq')"
+  <n-button type="primary" size="large" :round="true" @click="handleShowQA"
   >&ensp;&ensp;问答页面&ensp;&ensp;</n-button>
     <n-button type="primary" size="large" :round="true" @click="publish()"
       >发布正装信息</n-button
@@ -187,6 +187,10 @@
       </n-card>
     </n-modal>
   </div>
+  <SuitApplyQA
+    v-if="showQA"
+    @open="handleUpdateQA"
+  />
 </template>
 
 <script setup lang="ts">
@@ -195,6 +199,7 @@ import { NButton, NSpace, NTable, useMessage, NModal, NCard, NForm, NFormItem, N
 import { computed, ref } from "vue";
 import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
+import SuitApplyQA from "./SuitApplyQA.vue";
 const form = ref({
   name: "",
   stock: 0,
@@ -226,6 +231,7 @@ const message = useMessage();
 const suitList = ref<SuitApplyAPI.GetSuitInformation[]>([]);
 const showModal = ref(false);
 const showModalEditor = ref(false);
+const showQA = ref(false);
 const showModalInformation = ref(false);
 const data = ref([
   {
@@ -257,9 +263,19 @@ const campus = computed(() => {
     return 3;
   }
 });
+
 const showEditor = () => {
   showModalEditor.value = true;
 };
+
+const handleShowQA = () => {
+  showQA.value = true;
+};
+
+const handleUpdateQA = (state: boolean) => {
+  showQA.value = state;
+};
+
 const GetSuitInformation = async (campus: number) => {
   try {
     const res = await SuitApplyService.GetSuitAPI({ campus: campus });
@@ -272,6 +288,7 @@ const GetSuitInformation = async (campus: number) => {
     message.error(`获取失败, ${e?.message || "未知错误"}`);
   }
 };
+
 const selectButton = (buttonName: string) => {
   selectedButton.value = buttonName;
   console.log(campus.value);
