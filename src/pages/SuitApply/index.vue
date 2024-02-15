@@ -70,9 +70,9 @@
       <td>{{ item.totalStock}}</td>
       <td>{{ item.totalBorrowed}}</td>
       <td>
-        <n-button text @click="showEditorTotal">编辑</n-button>/
-        <n-button text @click="showEditorTotal">查看</n-button>
-        <n-button style="margin-left: 2vw" text @click="deleteSuit(item);">删除</n-button>
+        <n-button text @click="showEditorSuit(item)">编辑</n-button>/
+        <n-button text @click="showEditorSuit(item)">查看</n-button>
+        <n-button style="margin-left: 2vw;color: red;" text @click="deleteSuit(item);">删除</n-button>
         <n-modal v-model:show="showModalConfirmDelete">
     <n-card
       style="width: 400px"
@@ -93,10 +93,10 @@
 </tbody>
 
     </n-table>
-    <n-modal v-model:show="showModalPublish">
+    <n-modal v-model:show="showModal">
     <n-card
       style="width: 600px"
-      title="发布正装信息"
+      :title="showModalPublish ? '发布正装尺码' : '编辑正装信息'"
       :bordered="false"
       size="huge"
       role="dialog"
@@ -130,6 +130,7 @@
         <tr>
           <th>尺码</th>
           <th>库存</th>
+          <th v-if="showModalEditorSuit">已借出</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -139,7 +140,7 @@
           <td>{{ item.stock }}</td>
           <td>
             <n-button text @click="showEditor(item)">修改</n-button>
-            <n-button style="margin-left: 2vw" text @click="deleteSpec(item)">删除</n-button>
+            <n-button style="margin-left: 2vw;color: red;" text @click="deleteSpec(item)">删除</n-button>
           </td>
         </tr>
       </tbody>
@@ -148,8 +149,9 @@
       </n-form>
       <template #footer>
         <div style="display: flex;justify-content: center;">
-          <n-button type="primary" @click="publishSuitFunction(publishSuitForm)">确认发布</n-button>
-          <n-button @click="showModalPublish= false" style="margin-left: 10vh;">取消</n-button>
+          <n-button v-if="showModalPublish" type="primary" @click="publishSuitFunction(publishSuitForm)">确认发布</n-button>
+          <n-button v-else type="primary" @click="publishSuitFunction(publishSuitForm)">确认修改</n-button>
+          <n-button @click="showModalPublish = false;showModalEditorSuit = false;borrowed=[]" style="margin-left: 10vh;">取消</n-button>
         </div>
       </template>
     </n-card>
@@ -212,6 +214,7 @@ import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 import { messageProps } from "naive-ui/es/message/src/message-props";
 const deleteItem = ref();
+const showModal = computed(() => showModalPublish.value || showModalEditorSuit.value);
 const deleteSuit = (item: SuitApplyAPI.SuitItem) => {
   showModalConfirmDelete.value = true;
   deleteItem.value = item;
@@ -241,6 +244,8 @@ const showModalPublish = ref(false);
 const showModalEditor = ref(false);
 const showModalAddSpec = ref(false);
 const showModalConfirmDelete = ref(false);
+const showModalEditorSuit = ref(false);
+const borrowed = ref<number[]>([]);
 const editedSpec = ref({
   spec: "",
   stock: 0
@@ -250,6 +255,15 @@ const specForm = ref({
   spec: "",
   stock: ""
 });
+const showEditorSuit = (item:SuitApplyAPI.SuitItem) => {
+  showModalEditorSuit.value = true;
+
+item.specs.forEach(item => {
+  // 提取每个元素的 borrowed 值，并将其存储到 borrowedArray 中
+  borrowed.value.push(item.borrowed);
+});
+console.log(borrowed.value);
+};
 const campus = computed(() => {
   if (selectedButton.value === "button1") {
     return 1;
@@ -328,7 +342,9 @@ const publishSuitFunction = async (publishSuitForm: { campus: number; name: stri
      if (res.code === 1) {
        message.create("发布成功");
        GetSuitInformation(campus.value);
-     }
+     }else {
+      throw new Error(res.msg);
+    }
    }catch (e: any) {
     message.error(e.message || "未知错误");
    }
