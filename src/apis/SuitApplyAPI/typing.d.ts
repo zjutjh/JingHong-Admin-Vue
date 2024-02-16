@@ -22,7 +22,7 @@ declare namespace SuitApplyAPI {
     id: number;
     stock: number;
     spec: string;
-    borrowed: number;
+    borrowed?: number;
   }
   interface SuitItem {
     name: string;

@@ -6,7 +6,7 @@ import GetSuitAPI from "./getSuitInformation";
 import createSuitInfoDataAPI from "./createSuitInfo";
 import DeleteSuitInfoAPI from "./deleteSuitInfo";
 import SetSuitInfoDataAPI from "./setSuitInfo";
-
+import uploadPhotoAPI from "./uploadImg";
 export {
   suppliesReturnAPI,
   suppliesCheckAPI,
@@ -15,5 +15,6 @@ export {
   GetSuitAPI,
   createSuitInfoDataAPI,
   DeleteSuitInfoAPI,
-  SetSuitInfoDataAPI
+  SetSuitInfoDataAPI,
+  uploadPhotoAPI
 };
