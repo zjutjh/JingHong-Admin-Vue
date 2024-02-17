@@ -312,10 +312,44 @@ import { computed, ref, onMounted, reactive, watchEffect, toRefs } from "vue";
 import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 import { messageProps } from "naive-ui/es/message/src/message-props";
+
 const deleteItem = ref();
+const showModalPublish = ref(false);
+const showModalEditor = ref(false);
+const showModalAddSpec = ref(false);
+const showModalConfirmDelete = ref(false);
+const showModalEditorSuit = ref(false);
+const borrowed = ref<number[]>([]);
+const editedSpec = ref({
+  spec: "",
+  stock: 0,
+});
+const selectedButton = ref("button1");
+const message = useMessage();
+const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
+const publishSuitForm = ref<{
+  name: string;
+  campus: number | string;
+  img: string;
+  specs: { stock: number; spec: string; id?: number; borrowed?: number }[];
+}>({
+  name: "",
+  campus: "",
+  img: "",
+  specs: [],
+});
+const state = reactive({
+  totalStock: 0,
+});
 const showModal = computed(
   () => showModalPublish.value || showModalEditorSuit.value
 );
+const { totalStock } = toRefs(state);
+const specForm = ref({
+  spec: "",
+  stock: 0,
+});
+
 const deleteSuit = (item: SuitApplyAPI.SuitItem) => {
   showModalConfirmDelete.value = true;
   deleteItem.value = item;
@@ -334,36 +368,6 @@ const cleanPublishSuitForm = () => {
   };
 };
 
-const selectedButton = ref("button1");
-const message = useMessage();
-const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
-const publishSuitForm = ref<{
-  name: string;
-  campus: number | string;
-  img: string;
-  specs: { stock: number; spec: string; id?: number; borrowed?: number }[];
-}>({
-  name: "",
-  campus: "",
-  img: "",
-  specs: [],
-});
-
-const showModalPublish = ref(false);
-const showModalEditor = ref(false);
-const showModalAddSpec = ref(false);
-const showModalConfirmDelete = ref(false);
-const showModalEditorSuit = ref(false);
-const borrowed = ref<number[]>([]);
-const editedSpec = ref({
-  spec: "",
-  stock: 0,
-});
-
-const state = reactive({
-  totalStock: 0,
-});
-
 const computeTotalStock = () => {
   state.totalStock = publishSuitForm.value.specs.reduce((total, spec) => {
     return total + spec.stock;
@@ -374,12 +378,7 @@ watchEffect(() => {
   computeTotalStock();
 });
 
-const { totalStock } = toRefs(state);
 
-const specForm = ref({
-  spec: "",
-  stock: 0,
-});
 const showEditorSuit = (item: SuitApplyAPI.SuitItem) => {
   showModalEditorSuit.value = true;
   publishSuitForm.value = { ...item };
