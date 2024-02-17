@@ -23,7 +23,11 @@
     </div>
     <div class="counter">
       <span class="title">正装统计</span>
-      <div v-for="kind in suitList" :key="kind"><span>{{ kind }}</span>:  件</div>
+      <div><span>上衣</span>: {{ countData.上衣 }} 件</div>
+      <div><span>裤子</span>: {{ countData.裤子 }} 件</div>
+      <div><span>衬衫</span>: {{ countData.衬衫 }} 件</div>
+      <div><span>领带</span>: {{ countData.领带 }} 件</div>
+      <div><span>鞋子</span>: {{ countData.鞋子 }} 件</div>
     </div>
     <div>
       <n-table size="small">
@@ -94,7 +98,11 @@
     </div>
     <div class="counter">
       <span class="title">正装统计</span>
-      <div v-for="kind in suitList" :key="kind"><span>{{ kind }}</span>:  件</div>
+      <div><span>上衣</span>: {{ countData.上衣 }} 件</div>
+      <div><span>裤子</span>: {{ countData.裤子 }} 件</div>
+      <div><span>衬衫</span>: {{ countData.衬衫 }} 件</div>
+      <div><span>领带</span>: {{ countData.领带 }} 件</div>
+      <div><span>鞋子</span>: {{ countData.鞋子 }} 件</div>
     </div>
     <div>
       <n-table size="small">
@@ -148,7 +156,7 @@ import {
   NPagination
 } from "naive-ui";
 import { ref, watch } from "vue";
-import { GetExportAPI, GetRecordAPI } from "@/apis/SuitApplyAPI/index";
+import { GetExportAPI, GetRecordAPI, GetSuitAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import dayjs from "dayjs";
@@ -171,18 +179,66 @@ const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = v
 const fliter_suitapply_nameUpdate = (value: string) => { fliter_suitapply_name.value = value; };
 const fliter_specUpdate = (value: string) => { fliter_spec.value = value; };
 const fliter_stateUpdate = (value: string) => { fliter_state.value = value; };
+const countData = ref({
+  "上衣": 0,
+  "裤子": 0,
+  "衬衫": 0,
+  "领带": 0,
+  "鞋子": 0,
+});
 
 const switchPage = () => {
   containId.value = !containId.value;
+  updateSuitCount();
 };
 
 const timeFormat= (time: string) => {
   return dayjs(time).format("YYYY年MM月DD日");
 };
 
+const updateSuitCount = () => {
+  useRequest(GetSuitAPI({
+    campus: containId.value ?
+      ( campusState_approval.value === "朝晖" ? 1 : (campusState_approval.value==="屏风" ? 2 : 3) ) :
+      ( campusState_inventory.value === "朝晖" ? 1 : (campusState_inventory.value==="屏风" ? 2 : 3) ),
+  }),{
+    onSuccess: (data) => {
+      console.log(data);
+      const resData = data.data;
+      if (data.code !== 1) throw new Error(data.msg);
+      countData.value.上衣 = 0;
+      countData.value.衬衫 = 0;
+      countData.value.裤子 = 0;
+      countData.value.鞋子 = 0;
+      countData.value.领带 = 0;
+      for(let i=0; i<resData.length; i++){
+        if(resData[i].name === "上衣"){
+          for(let j=0; j<resData[i].specs.length; j++)
+            countData.value.上衣 += resData[i].specs[j].stock;
+        } else if(resData[i].name === "裤子"){
+          for(let j=0; j<resData[i].specs.length; j++)
+            countData.value.裤子 += resData[i].specs[j].stock;
+        } else if(resData[i].name === "衬衫"){
+          for(let j=0; j<resData[i].specs.length; j++)
+            countData.value.衬衫 += resData[i].specs[j].stock;
+        } else if(resData[i].name === "领带"){
+          for(let j=0; j<resData[i].specs.length; j++)
+            countData.value.领带 += resData[i].specs[j].stock;
+        } else {
+          for(let j=0; j<resData[i].specs.length; j++)
+            countData.value.鞋子 += resData[i].specs[j].stock;
+        }
+      }
+    },
+    onError: (e) => {
+      console.log(e);
+      message.error(`请求数据失败, ${e.message} || "未知错误"`);
+    },
+  });
+};
+
 /* ---- pending-approval ---- */
 
-const suitList = ["上衣", "裤子", "衬衫", "领带", "鞋子"];
 const campusState_approval = ref("朝晖");
 const page_num = ref(1);
 const total_page_num = ref(0);
@@ -247,6 +303,7 @@ watch(page_num, () => {
 const switchCampus_approval = (campus: string) => {
   campusState_approval.value = campus;
   updataTableData();
+  updateSuitCount();
 };
 
 const getButtonColor_approval = (buttonName: string) => {
@@ -269,6 +326,7 @@ const inv_tableData = ref<Datum[]>();
 const switchCampus_inventory = (campus: string) => {
   campusState_inventory.value = campus;
   updataInventoryData();
+  updateSuitCount();
 };
 
 const getButtonColor_inventory = (buttonName: string) => {
