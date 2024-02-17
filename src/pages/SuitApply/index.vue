@@ -97,7 +97,14 @@
                 role="dialog"
                 aria-modal="true"
               >
-                <div style="display: flex; justify-content: space-around">
+                <span>同步删除关于该物资的统计数据，借用记录会保留</span>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-around;
+                    margin-top: 30px;
+                  "
+                >
                   <n-button
                     type="primary"
                     @click="deleteConfirmSuit(deleteItem)"
@@ -376,14 +383,6 @@ const specForm = ref({
 const showEditorSuit = (item: SuitApplyAPI.SuitItem) => {
   showModalEditorSuit.value = true;
   publishSuitForm.value = { ...item };
-
-  item.specs.forEach((item) => {
-    // 提取每个元素的 borrowed 值，并将其存储到 borrowedArray 中
-    if (item.borrowed) {
-      borrowed.value.push(item.borrowed);
-    }
-  });
-  console.log(borrowed.value);
 };
 const campus = computed(() => {
   if (selectedButton.value === "button1") {
@@ -411,10 +410,19 @@ const confirmEdit = () => {
     editedSpec.value.stock = parseInt(editedSpec.value.stock);
     publishSuitForm.value.specs[index] = { ...editedSpec.value };
   } else {
-    publishSuitForm.value.specs.push({
-      spec: editedSpec.value.spec,
-      stock: parseInt(editedSpec.value.stock),
-    });
+    if (showModalEditorSuit.value) {
+      publishSuitForm.value.specs.push({
+        spec: editedSpec.value.spec,
+        stock: parseInt(editedSpec.value.stock),
+        id: 0,
+        borrowed: 0,
+      });
+    } else {
+      publishSuitForm.value.specs.push({
+        spec: editedSpec.value.spec,
+        stock: parseInt(editedSpec.value.stock),
+      });
+    }
   }
   showModalEditor.value = false;
 };
@@ -424,13 +432,6 @@ const deleteSpec = async (spec: {
   stock: number;
   id: number;
 }) => {
-  // 找到要删除的规格对象在数组中的索引
-  const index = publishSuitForm.value.specs.findIndex(
-    (item) => item.spec === spec.spec
-  );
-  if (index !== -1) {
-    publishSuitForm.value.specs.splice(index, 1);
-  }
   try {
     // 调用删除接口传入当前规格对象的 id 进行删除
     const res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
@@ -493,28 +494,54 @@ const publishSuitFunction = async (publishForm: {
   img: string;
   specs: { spec: string; stock: number }[];
 }) => {
-  try {
-    const res = await SuitApplyService.createSuitInfoDataAPI(publishForm);
-    if (res.code === 1) {
-      message.create("发布成功");
-      GetSuitInformation(campus.value);
-    } else {
-      throw new Error(res.msg);
+  publishForm.specs.map((item) => {
+    if (item.stock < 0) {
+      message.create("库存数量不能小于0");
+      return;
     }
-  } catch (e: any) {
-    message.error(e.message || "未知错误");
+  });
+  publishForm.specs.map((item) => {
+    if (item.spec === "") {
+      message.create("尺码不能为空");
+      return;
+    }
+  });
+  let sendRequest = true; // 控制是否发送请求
+  publishForm.specs.forEach((item) => {
+    if (item.stock < 0 || item.spec === "") {
+      sendRequest = false;
+    }
+  });
+  if (sendRequest) {
+    try {
+      const res = await SuitApplyService.createSuitInfoDataAPI(publishForm);
+      if (res.code === 1) {
+        message.create("发布成功");
+        GetSuitInformation(campus.value);
+      } else {
+        throw new Error(res.msg);
+      }
+    } catch (e: any) {
+      message.error(e.message || "未知错误");
+    }
   }
+
   cleanPublishSuitForm();
   showModalPublish.value = false;
 };
 
 const deleteConfirmSuit = async (deleteItem: SuitApplyAPI.SuitItem) => {
-  let res = null;
   try {
-    for (const spec of deleteItem.specs) {
-      res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
+    if (!deleteItem || !deleteItem.specs) {
+      throw new Error("无效的删除项");
     }
-    if (res !== null) {
+
+    for (const spec of deleteItem.specs) {
+      if (!spec || !spec.id) {
+        throw new Error("无效的规格对象");
+      }
+
+      const res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
       if (res.code === 1) {
         message.create("删除成功");
         GetSuitInformation(campus.value);
@@ -524,39 +551,71 @@ const deleteConfirmSuit = async (deleteItem: SuitApplyAPI.SuitItem) => {
     }
   } catch (e: any) {
     // 处理错误
-    console.error("删除失败:", e.message || "未知错误");
+    message.error("删除失败:", e.message || "未知错误");
   }
   showModalConfirmDelete.value = false;
+  cleanPublishSuitForm();
+  GetSuitInformation(campus.value);
 };
 
 const setSuitFunction = async (publishForm: SuitApplyAPI.SuitItem) => {
   publishForm.totalBorrowed = undefined;
   publishForm.totalStock = undefined;
   publishForm.specs.map((item) => (item.borrowed = undefined));
-  try {
-    const res = await SuitApplyService.SetSuitInfoDataAPI(publishForm);
-    if (res.code === 1) {
-      message.create("编辑成功");
-      GetSuitInformation(campus.value);
-    } else {
-      throw new Error(res.msg);
+  publishForm.specs.map((item) => {
+    if (item.stock < 0) {
+      message.create("库存数量不能小于0");
+      return;
     }
-  } catch (e: any) {
-    message.error(e.message || "未知错误");
+  });
+  publishForm.specs.map((item) => {
+    if (item.spec === "") {
+      message.create("尺码不能为空");
+      return;
+    }
+  });
+  let sendRequest = true; // 控制是否发送请求的标志
+  publishForm.specs.forEach((item) => {
+    if (item.stock < 0 || item.spec === "") {
+      sendRequest = false; // 如果任何条件不满足，则不发送请求
+    }
+  });
+  if (sendRequest) {
+    try {
+      const res = await SuitApplyService.SetSuitInfoDataAPI(publishForm);
+      if (res.code === 1) {
+        message.create("编辑成功");
+        GetSuitInformation(campus.value);
+      } else {
+        throw new Error(res.msg);
+      }
+    } catch (e: any) {
+      message.error(e.message || "未知错误");
+    }
   }
   showModalEditorSuit.value = false;
   cleanPublishSuitForm();
+  GetSuitInformation(campus.value);
 };
 
 const addSpec = () => {
   showModalAddSpec.value = true;
 };
 const confirmSpec = () => {
-  publishSuitForm.value.specs.push({
-    spec: specForm.value.spec,
-    stock: parseInt(specForm.value.stock),
-    borrowed: 0, // 初始化已借出为0
-  });
+  if (showModalEditorSuit.value) {
+    publishSuitForm.value.specs.push({
+      spec: specForm.value.spec,
+      stock: parseInt(specForm.value.stock),
+      borrowed: 0, // 初始化已借出为0
+      id: 0,
+    });
+  } else {
+    publishSuitForm.value.specs.push({
+      spec: specForm.value.spec,
+      stock: parseInt(specForm.value.stock),
+      borrowed: 0, // 初始化已借出为0
+    });
+  }
   showModalAddSpec.value = false;
   // 清空specForm中的数据
 
