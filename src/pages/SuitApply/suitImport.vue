@@ -188,7 +188,7 @@ const getStudentInfo = () => {
 
 const importInfo = () => {
   if(suitImportOver.value && matualImportOver){
-    useRequest(setSuppliesImportAPI({
+    const data = {
       campus: parseInt(suitCampus.value, 10),
       count: parseInt(suitNumber.value, 10),
       kind: suitkind.value,
@@ -200,18 +200,9 @@ const importInfo = () => {
       gender: stuGender.value,
       name: stuName.value,
       student_id: studentId.value,
-      // campus: 1,
-      // count: 3,
-      // kind: "string",
-      // spec: "string",
-      // supplies_name: "string",
-      // college: "string",
-      // contact: "string",
-      // dormitory: "string",
-      // gender:"string",
-      // name: "string",
-      // student_id: "string",
-    }), {
+    };
+    console.log(data);
+    useRequest(setSuppliesImportAPI(data), {
       onSuccess(data){
         if(data.code !== 1) throw new Error(data.msg);
         message.success("导入成功");

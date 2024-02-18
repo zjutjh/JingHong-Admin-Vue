@@ -24,7 +24,7 @@ const setSuppliesImportAPI = (params: Input) => {
   return request<output>({
     method: "POST",
     url: "/api/stuac/supplies-borrow/supplies-import",
-    params: params
+    data: params
   });
 };
 

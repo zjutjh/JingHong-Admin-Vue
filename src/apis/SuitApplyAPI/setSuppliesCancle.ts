@@ -1,7 +1,6 @@
 import request from "../request";
 
 type SuppliesCancleData = {
-  supplies_cancle: number;
   id: number;
 }
 

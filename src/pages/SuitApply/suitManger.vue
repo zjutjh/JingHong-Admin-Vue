@@ -124,6 +124,7 @@
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
               <n-button size="small">查看/编辑</n-button>
+              <n-button size="small" @click="() => setSuppliesCancel(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
             </td>
           </tr>
         </tbody>
@@ -144,7 +145,7 @@ import {
   NPagination
 } from "naive-ui";
 import { ref, watch } from "vue";
-import { GetExportAPI, GetRecordAPI, GetSuitAPI } from "@/apis/SuitApplyAPI/index";
+import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import dayjs from "dayjs";
@@ -319,6 +320,19 @@ const switchCampus_inventory = (campus: string) => {
 
 const getButtonColor_inventory = (buttonName: string) => {
   return campusState_inventory.value === buttonName ? "" : "rgb(144, 238, 144)";
+};
+
+const setSuppliesCancel = (id: number) => {
+  useRequest(suppliesCancleAPI({id: id}), {
+    onSuccess: (data) => {
+      if (data.code !== 1) throw new Error(data.msg);
+      message.success("成功删除");
+    },
+    onError: (e) => {
+      console.log(e);
+      message.error(`${e.message} || "未知错误"`);
+    }
+  });
 };
 
 const exportButton = () => {
