@@ -46,7 +46,7 @@
       type="primary"
       size="large"
       :round="true"
-      @click="$router.push('/suitFaq')"
+      @click="handleShowQA"
       >&ensp;&ensp;问答页面&ensp;&ensp;</n-button
     >
     <n-button type="primary" size="large" :round="true" @click="showPublish()"
@@ -292,6 +292,10 @@
       </n-card>
     </n-modal>
   </div>
+  <SuitApplyQA
+    v-if="showQA"
+    @open="handleUpdateQA"
+  />
 </template>
 
 <script setup lang="ts">
@@ -314,6 +318,7 @@ import * as SuitApplyService from "@/apis/SuitApplyAPI";
 import { messageProps } from "naive-ui/es/message/src/message-props";
 
 const deleteItem = ref();
+const showQA = ref(false);
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
 const showModalAddSpec = ref(false);
