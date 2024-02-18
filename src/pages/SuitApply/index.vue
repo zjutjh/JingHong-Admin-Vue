@@ -383,6 +383,13 @@ watchEffect(() => {
   computeTotalStock();
 });
 
+const handleShowQA = () => {
+  showQA.value = true;
+};
+
+const handleUpdateQA = (state: boolean) => {
+  showQA.value = state;
+};
 
 const showEditorSuit = (item: SuitApplyAPI.SuitItem) => {
   showModalEditorSuit.value = true;
