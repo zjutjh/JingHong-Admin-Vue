@@ -313,9 +313,8 @@ import {
   NSelect,
 } from "naive-ui";
 import { computed, ref, onMounted, reactive, watchEffect, toRefs } from "vue";
-import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
-import { messageProps } from "naive-ui/es/message/src/message-props";
+import SuitApplyQA from "./SuitApplyQA.vue";
 
 const deleteItem = ref();
 const showQA = ref(false);
