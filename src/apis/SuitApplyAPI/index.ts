@@ -5,6 +5,8 @@ import suppliesReturnAPI from "./setSuppliesReturn";
 import GetSuitAPI from "./getSuitInformation";
 import GetExportAPI from "./getSuppliesExport";
 import GetRecordAPI from "./getRecord";
+import getStudentInfoAPI from "./getStudentInfo";
+import setSuppliesImportAPI from "./setSuppliesImport";
 
 export {
   GetExportAPI,
@@ -13,5 +15,7 @@ export {
   suppliesCancleAPI,
   getRequestAPI,
   GetSuitAPI,
-  GetRecordAPI
+  GetRecordAPI,
+  getStudentInfoAPI,
+  setSuppliesImportAPI
 };

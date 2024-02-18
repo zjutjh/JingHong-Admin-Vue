@@ -54,15 +54,6 @@
             <td>{{ timeFormat(tlData.apply_time) }}</td>
             <td>
               <n-button size="small">审批</n-button>
-              <n-popconfirm
-                @positive-click="confirmDeleteApprovalData(tlData.id)"
-                @negative-click="() => {message.info('取消删除')}"
-              >
-                <template #trigger>
-                  <n-button size="small">删除</n-button>
-                </template>
-                一切都将一去杳然，任何人都无法将其捕获。
-              </n-popconfirm>
             </td>
           </tr>
         </tbody>
@@ -76,7 +67,7 @@
       <template #title> 归还清点 </template>
     </n-page-header>
     <n-button type="info" @click="switchPage()" class="switch-page-button">切换为待审批</n-button>
-    <n-button type="primary" size="large" class="input-button">录入</n-button>
+    <n-button type="primary" size="large" class="input-button" @click="pageJumptoSuitImport">录入</n-button>
     <n-button type="primary" size="large" class="output-button" @click="exportButton">导出</n-button>
     <n-button
     v-for="cam in campusList"
@@ -132,9 +123,7 @@
             <td>{{ timeFormat(tlData.return_time) }}</td>
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
-              <n-button size="small">查看</n-button>
-              <n-button size="small">编辑</n-button>
-              <n-button size="small">删除</n-button>
+              <n-button size="small">查看/编辑</n-button>
             </td>
           </tr>
         </tbody>
@@ -152,7 +141,6 @@ import {
   NInput,
   useMessage,
   NTable,
-  NPopconfirm,
   NPagination
 } from "naive-ui";
 import { ref, watch } from "vue";
@@ -245,6 +233,10 @@ const total_page_num = ref(0);
 const page_size = 16;
 const tableData = ref<Datum[]>();
 
+const pageJumptoSuitImport = () => {
+  router.push("/suitImport");
+};
+
 const updataTableDataWithFliter = () => {
   if(Number.isNaN(fliter_id.value)){fliter_id.value = undefined;}
   page_num.value = 1;
@@ -308,10 +300,6 @@ const switchCampus_approval = (campus: string) => {
 
 const getButtonColor_approval = (buttonName: string) => {
   return campusState_approval.value === buttonName ? "" : "rgb(144, 238, 144)";
-};
-
-const confirmDeleteApprovalData = (id: number) => {
-  alert(id);
 };
 
 /* ---- pending-approval ---- */

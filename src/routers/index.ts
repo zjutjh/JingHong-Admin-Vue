@@ -8,6 +8,7 @@ import Dashboard from "../pages/Dashboard/index.vue";
 import Layout from "../components/Layout.vue";
 import SuitApply from "../pages/SuitApply/index.vue";
 import suitManger from "@/pages/SuitApply/suitManger.vue";
+import suitImport from "@/pages/SuitApply/suitImport.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store";
 import getUserInfoAPI from "../apis/UserAPI/getUserInfo";
@@ -110,6 +111,15 @@ const routes = [
           requestAuth: true,
         },
         component: suitManger
+      },
+      {
+        path: "suitImport",
+        name: "suitImport",
+        meta: {
+          title: "导入借用信息",
+          requestAuth: true,
+        },
+        component: suitImport,
       }
     ]
   },
