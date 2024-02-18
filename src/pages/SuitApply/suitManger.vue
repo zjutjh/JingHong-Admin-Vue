@@ -44,6 +44,12 @@
         </thead>
         <tbody>
           <tr v-for="tlData in tableData" :key="tlData.id">
+            <manager-form
+                v-if="showManagerForm"
+                @open="handleOpenManagerForm"
+                :source="selectedTlData"
+                :campus="campusState_inventory"
+              />
             <td>{{ tlData.id }}</td>
             <td>{{ tlData.name }}</td>
             <td>{{ tlData.student_id }}</td>
@@ -53,7 +59,7 @@
             <td>{{ tlData.count }}</td>
             <td>{{ timeFormat(tlData.apply_time) }}</td>
             <td>
-              <n-button size="small">审批</n-button>
+            <n-button size="small" @click="handleManager(tlData)">审批</n-button>
             </td>
           </tr>
         </tbody>
@@ -112,6 +118,12 @@
         </thead>
         <tbody>
           <tr v-for="tlData in inv_tableData" :key="tlData.id">
+            <count-form
+              v-if="showCountForm"
+              @open="handleOpenCountForm"
+              :source="selectedTlData"
+              :campus="campusState_inventory"
+            />
             <td>{{ tlData.id }}</td>
             <td>{{ tlData.name }}</td>
             <td>{{ tlData.student_id }}</td>
@@ -123,7 +135,7 @@
             <td>{{ timeFormat(tlData.return_time) }}</td>
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
-              <n-button size="small">查看/编辑</n-button>
+              <n-button size="small" @click="handleCount(tlData)">查看/编辑</n-button>
             </td>
           </tr>
         </tbody>
@@ -147,12 +159,16 @@ import { ref, watch } from "vue";
 import { GetExportAPI, GetRecordAPI, GetSuitAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
+import managerForm from "./manageForm.vue";
+import countForm from "./countForm.vue";
 import dayjs from "dayjs";
 
 const handleBack = () => {
   router.push("/suitapply");
 };
 
+const showManagerForm = ref(false);
+const showCountForm = ref(false);
 const campusList = ["朝晖", "屏风", "莫干山"];
 const containId = ref(true);
 const message = useMessage();
@@ -232,6 +248,7 @@ const page_num = ref(1);
 const total_page_num = ref(0);
 const page_size = 16;
 const tableData = ref<Datum[]>();
+const selectedTlData = ref<Datum>();
 
 const pageJumptoSuitImport = () => {
   router.push("/suitImport");
@@ -393,6 +410,26 @@ updataInventoryData();
 watch(inv_page_num, () => {
   updataInventoryData();
 });
+
+const handleManager =(tlData:Datum) =>{
+  showManagerForm.value = true;
+  selectedTlData.value = tlData;
+};
+
+const handleCount =(tlData:Datum) =>{
+  showCountForm.value = true;
+  selectedTlData.value = tlData;
+};
+
+const handleOpenCountForm = (state: boolean) => {
+  showCountForm.value = state;
+  updataTableData();
+};
+
+const handleOpenManagerForm = (state: boolean) => {
+  showManagerForm.value = state;
+  updataTableData();
+};
 
 /* ---- return-inventory ---- */
 

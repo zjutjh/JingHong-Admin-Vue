@@ -7,11 +7,11 @@ type suppliesReturnData = {
 
 type suppliesReturnResult = Common.IResponse<null>
 
-const suppliesReturnAPI = (params:suppliesReturnData) => {
+const suppliesReturnAPI = (data:suppliesReturnData) => {
   return request<suppliesReturnResult>({
     method: "POST",
     url: "/api/stuac/supplies-borrow/supplies-return",
-    params
+    data
   });
 };
 

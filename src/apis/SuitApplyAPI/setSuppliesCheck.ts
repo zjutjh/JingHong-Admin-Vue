@@ -7,11 +7,11 @@ type suppliesCheckData ={
 
 type suppliesCheckResult = Common.IResponse<null>;
 
-const suppliesCheckAPI = (params:suppliesCheckData) => {
+const suppliesCheckAPI = (data:suppliesCheckData) => {
   return request<suppliesCheckResult>({
     method: "POST",
     url: "/api/stuac/supplies-borrow/supplies-check",
-    params
+    data
   });
 };
 
