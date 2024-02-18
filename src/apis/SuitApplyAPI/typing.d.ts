@@ -17,22 +17,19 @@ declare namespace SuitApplyAPI {
     return_time: string;
     status: number;
   }
-  
+
   interface SuitSpec {
     id: number;
     stock: number;
     spec: string;
-    borrowed: number;
+    borrowed?: number;
   }
   interface SuitItem {
     name: string;
     img: string;
     campus: number;
+    totalStock?: number;
+    totalBorrowed?: number;
     specs: SuitSpec[];
-  }
-  interface GetSuitInformation {
-    code: number;
-    msg: string;
-    data: SuitItem[];
   }
 }
