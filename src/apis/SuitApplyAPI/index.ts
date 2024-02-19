@@ -8,6 +8,7 @@ import GetRecordAPI from "./getRecord";
 import getStudentInfoAPI from "./getStudentInfo";
 import setSuppliesImportAPI from "./setSuppliesImport";
 import SetRecordAPI from "./setRecordChange";
+import SetRejectCancelAPI from "./setRejectCancel";
 
 export {
   GetExportAPI,
@@ -19,5 +20,6 @@ export {
   GetRecordAPI,
   SetRecordAPI,
   getStudentInfoAPI,
-  setSuppliesImportAPI
+  setSuppliesImportAPI,
+  SetRejectCancelAPI
 };

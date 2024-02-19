@@ -192,7 +192,7 @@ const back = () => {
   }),{
     onSuccess:(data) =>{
       if(data.code==1){
-        message.success("已否决申请");
+        message.success("已取消归还状态");
         emit("open",false);
       }
       }
