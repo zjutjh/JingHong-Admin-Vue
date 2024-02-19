@@ -9,6 +9,10 @@ import getStudentInfoAPI from "./getStudentInfo";
 import setSuppliesImportAPI from "./setSuppliesImport";
 import SetRecordAPI from "./setRecordChange";
 import SetRejectCancelAPI from "./setRejectCancel";
+import createSuitInfoDataAPI from "./createSuitInfo";
+import DeleteSuitInfoAPI from "./deleteSuitInfo";
+import SetSuitInfoDataAPI from "./setSuitInfo";
+import uploadPhotoAPI from "./uploadImg";
 
 export {
   GetExportAPI,
@@ -22,4 +26,8 @@ export {
   getStudentInfoAPI,
   setSuppliesImportAPI,
   SetRejectCancelAPI
+  createSuitInfoDataAPI,
+  DeleteSuitInfoAPI,
+  SetSuitInfoDataAPI,
+  uploadPhotoAPI
 };
