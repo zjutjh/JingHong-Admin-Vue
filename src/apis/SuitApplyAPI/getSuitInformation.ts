@@ -1,6 +1,21 @@
 import request from "../request";
 
-type GetSuitInformation = Common.IResponse<null>;
+type GetSuitInformation = {
+  code: number;
+  msg: string;
+  data: [{
+    campus: number,
+    name: string,
+    img: string,
+    specs: [{
+      id: number,
+      stock: number,
+      spec: string,
+      borrowed: number
+    }]
+  }];
+};
+
 type Campus = {
   campus: number
 }
