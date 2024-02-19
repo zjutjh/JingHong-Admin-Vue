@@ -10,7 +10,7 @@ const suppliesCancleAPI = (data: SuppliesCancleData) => {
   return request<SuppliesCancleResult>({
     method: "POST",
     url: "/api/stuac/supplies-borrow/supplies-cancel",
-    data: data,
+    data
   });
 };
 

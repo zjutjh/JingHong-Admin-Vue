@@ -44,6 +44,12 @@
         </thead>
         <tbody>
           <tr v-for="tlData in tableData" :key="tlData.id">
+            <manager-form
+                v-if="showManagerForm"
+                @open="handleOpenManagerForm"
+                :source="selectedTlData"
+                :campus="campusState_inventory"
+              />
             <td>{{ tlData.id }}</td>
             <td>{{ tlData.name }}</td>
             <td>{{ tlData.student_id }}</td>
@@ -53,7 +59,7 @@
             <td>{{ tlData.count }}</td>
             <td>{{ timeFormat(tlData.apply_time) }}</td>
             <td>
-              <n-button size="small">审批</n-button>
+            <n-button size="small" @click="handleManager(tlData)">审批</n-button>
             </td>
           </tr>
         </tbody>
@@ -112,6 +118,12 @@
         </thead>
         <tbody>
           <tr v-for="tlData in inv_tableData" :key="tlData.id">
+            <count-form
+              v-if="showCountForm"
+              @open="handleOpenCountForm"
+              :source="selectedTlData"
+              :campus="campusState_inventory"
+            />
             <td>{{ tlData.id }}</td>
             <td>{{ tlData.name }}</td>
             <td>{{ tlData.student_id }}</td>
@@ -123,7 +135,7 @@
             <td>{{ timeFormat(tlData.return_time) }}</td>
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
-              <n-button size="small">查看/编辑</n-button>
+              <n-button size="small" @click="handleCount(tlData)">查看/编辑</n-button>
               <n-button size="small" @click="() => setSuppliesCancel(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
             </td>
           </tr>
@@ -148,13 +160,17 @@ import { ref, watch } from "vue";
 import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
+import managerForm from "./manageForm.vue";
+import countForm from "./countForm.vue";
 import dayjs from "dayjs";
 
 const handleBack = () => {
   router.push("/suitapply");
 };
 
-const campusList = ["朝晖", "屏风", "莫干山"];
+const showManagerForm = ref(false);
+const showCountForm = ref(false);
+const campusList = ["朝晖", "屏峰", "莫干山"];
 const containId = ref(true);
 const message = useMessage();
 const fliter_id = ref<string>();
@@ -179,6 +195,8 @@ const countData = ref({
 const switchPage = () => {
   containId.value = !containId.value;
   updateSuitCount();
+  updataInventoryData();
+  updataTableData();
 };
 
 const timeFormat= (time: string) => {
@@ -188,8 +206,8 @@ const timeFormat= (time: string) => {
 const updateSuitCount = () => {
   useRequest(GetSuitAPI({
     campus: containId.value ?
-      ( campusState_approval.value === "朝晖" ? 1 : (campusState_approval.value==="屏风" ? 2 : 3) ) :
-      ( campusState_inventory.value === "朝晖" ? 1 : (campusState_inventory.value==="屏风" ? 2 : 3) ),
+      ( campusState_approval.value === "朝晖" ? 1 : (campusState_approval.value==="屏峰" ? 2 : 3) ) :
+      ( campusState_inventory.value === "朝晖" ? 1 : (campusState_inventory.value==="屏峰" ? 2 : 3) ),
   }),{
     onSuccess: (data) => {
       console.log(data);
@@ -233,6 +251,7 @@ const page_num = ref(1);
 const total_page_num = ref(0);
 const page_size = 16;
 const tableData = ref<Datum[]>();
+const selectedTlData = ref<Datum>();
 
 const pageJumptoSuitImport = () => {
   router.push("/suitImport");
@@ -244,7 +263,7 @@ const updataTableDataWithFliter = () => {
   useRequest(GetRecordAPI({
     page_num: page_num.value,
     page_size: page_size,
-    campus: campusState_approval.value=="朝晖" ? 1 : (campusState_approval.value=="屏风" ? 2 : 3),
+    campus: campusState_approval.value=="朝晖" ? 1 : (campusState_approval.value=="屏峰" ? 2 : 3),
     choice: 1,
     id: fliter_id.value ? parseInt(fliter_id.value, 10) : undefined,
     student_id: fliter_student_id.value,
@@ -270,7 +289,7 @@ const updataTableData = () => {
   useRequest(GetRecordAPI({
     page_num: page_num.value,
     page_size: page_size,
-    campus: campusState_approval.value=="朝晖" ? 1 : (campusState_approval.value=="屏风" ? 2 : 3),
+    campus: campusState_approval.value=="朝晖" ? 1 : (campusState_approval.value=="屏峰" ? 2 : 3),
     choice: 1
   }),{
     onSuccess: (data) => {
@@ -339,7 +358,7 @@ const exportButton = () => {
   let camId = 1;
   switch(campusState_inventory.value){
     case "朝晖": camId = 1; break;
-    case "屏风": camId = 2; break;
+    case "屏峰": camId = 2; break;
     case "莫干山": camId=3; break;
   }
   useRequest(GetExportAPI({campus: camId}),{
@@ -359,13 +378,13 @@ const updataInventoryDataWithFliter = () => {
   useRequest(GetRecordAPI({
     page_num: inv_page_num.value,
     page_size: page_size,
-    campus: campusState_inventory.value=="朝晖" ? 1 : (campusState_inventory.value=="屏风" ? 2 : 3),
+    campus: campusState_inventory.value=="朝晖" ? 1 : (campusState_inventory.value=="屏峰" ? 2 : 3),
     choice: 2,
     id: fliter_id.value ? parseInt(fliter_id.value, 10) : undefined,
     student_id: fliter_student_id.value,
     supplies_name: fliter_suitapply_name.value,
     spec: fliter_spec.value,
-    status: fliter_state.value ? parseInt(fliter_state.value, 10) : undefined,
+    status: fliter_state.value === "未审核" ? 1 : (fliter_state.value === "被驳回" ? 2 : (fliter_state.value === "借用中" ? 3 : 4)),
   }),{
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
@@ -385,7 +404,7 @@ const updataInventoryData = () => {
   useRequest(GetRecordAPI({
     page_num: inv_page_num.value,
     page_size: page_size,
-    campus: campusState_inventory.value=="朝晖" ? 1 : (campusState_inventory.value=="屏风" ? 2 : 3),
+    campus: campusState_inventory.value=="朝晖" ? 1 : (campusState_inventory.value=="屏峰" ? 2 : 3),
     choice: 2
   }),{
     onSuccess: (data) => {
@@ -407,6 +426,26 @@ updataInventoryData();
 watch(inv_page_num, () => {
   updataInventoryData();
 });
+
+const handleManager =(tlData:Datum) =>{
+  showManagerForm.value = true;
+  selectedTlData.value = tlData;
+};
+
+const handleCount =(tlData:Datum) =>{
+  showCountForm.value = true;
+  selectedTlData.value = tlData;
+};
+
+const handleOpenCountForm = (state: boolean) => {
+  showCountForm.value = state;
+  updataInventoryData();
+};
+
+const handleOpenManagerForm = (state: boolean) => {
+  showManagerForm.value = state;
+  updataTableData();
+};
 
 /* ---- return-inventory ---- */
 

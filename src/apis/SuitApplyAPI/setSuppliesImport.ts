@@ -20,11 +20,11 @@ type output = {
   msg: string;
 }
 
-const setSuppliesImportAPI = (params: Input) => {
+const setSuppliesImportAPI = (data: Input) => {
   return request<output>({
     method: "POST",
     url: "/api/stuac/supplies-borrow/supplies-import",
-    data: params
+    data
   });
 };
 
