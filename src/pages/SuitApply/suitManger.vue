@@ -48,7 +48,7 @@
                 v-if="showManagerForm"
                 @open="handleOpenManagerForm"
                 :source="selectedTlData"
-                :campus="campusState_inventory"
+                :campus="campusState_approval"
               />
             <td>{{ tlData.id }}</td>
             <td>{{ tlData.name }}</td>
