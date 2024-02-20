@@ -170,14 +170,19 @@ const getStudentInfo = () => {
   }), {
     onSuccess(data){
       if(data.code !== 1) throw new Error(data.msg);
-      message.success("导入成功");
-      showManualImportBar.value = true;
-      stuName.value = data.data.name;
-      stuCollege.value = data.data.college;
-      stuGender.value = data.data.gender;
-      stuPhone.value = data.data.contact;
-      stuRoomNum.value = data.data.dormitory;
-      isManualImport.value = 2;
+      if(data.data.id === 0) {
+        message.warning("学生信息不存在 请确认学号或者手动导入");
+        console.log(data.data);
+      } else {
+        message.success("学生信息导入成功");
+        showManualImportBar.value = true;
+        stuName.value = data.data.name;
+        stuCollege.value = data.data.college;
+        stuGender.value = data.data.gender;
+        stuPhone.value = data.data.contact;
+        stuRoomNum.value = data.data.dormitory;
+        isManualImport.value = 2;
+      }
     },
     onError: (e) => {
       console.log(e);

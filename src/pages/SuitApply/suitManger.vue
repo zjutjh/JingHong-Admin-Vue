@@ -239,7 +239,6 @@ const updateSuitCount = () => {
     },
     onError: (e) => {
       console.log(e);
-      message.error(`请求数据失败, ${e.message} || "未知错误"`);
     },
   });
 };
