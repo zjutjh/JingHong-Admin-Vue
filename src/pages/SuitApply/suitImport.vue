@@ -19,25 +19,25 @@
         <div>
           <div>
             <span>姓名</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuName" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuName"></n-input>
           </div>
           <div>
             <span>寝室号</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuRoomNum" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuRoomNum"></n-input>
           </div>
           <div>
             <span>联系方式</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuPhone" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuPhone"></n-input>
           </div>
         </div>
         <div>
           <div>
             <span>性别</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuGender" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuGender"></n-input>
           </div>
           <div>
             <span>学院</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuCollege" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuCollege"></n-input>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
       <hr>
       <div>
         <span>是否为正装</span>
-        <n-select :options="suitSelectOption" size="small" style="width: 250px;" v-model:value="isSuit" :disabled="isManualImport === 0 || !matualImportOver"></n-select>
+        <n-select :options="suitSelectOption" size="small" style="width: 250px;" v-model:value="isSuit" :disabled="!matualImportOver"></n-select>
       </div>
       <div class="rent-info-input">
         <div>
@@ -99,7 +99,6 @@ import { getStudentInfoAPI, GetSuitAPI, setSuppliesImportAPI } from "@/apis/Suit
 const message = useMessage();
 const showManualImportBar = ref(false);
 const studentId = ref();
-const isManualImport = ref(0); // 0为未导入 1为手动导入 2为自动导入
 const suitSelectOption = [{
   label: "是",
   value: 1
@@ -161,7 +160,6 @@ const handleBack = () => {
 
 const showManualImport = () => {
   showManualImportBar.value = true;
-  isManualImport.value = 1;
 };
 
 const getStudentInfo = () => {
@@ -181,7 +179,6 @@ const getStudentInfo = () => {
         stuGender.value = data.data.gender;
         stuPhone.value = data.data.contact;
         stuRoomNum.value = data.data.dormitory;
-        isManualImport.value = 2;
       }
     },
     onError: (e) => {
