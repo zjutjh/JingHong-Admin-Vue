@@ -251,7 +251,7 @@ const page_num = ref(1);
 const total_page_num = ref(0);
 const page_size = 16;
 const tableData = ref<Datum[]>();
-const selectedTlData = ref<Datum>();
+
 
 const pageJumptoSuitImport = () => {
   router.push("/suitImport");
@@ -426,6 +426,8 @@ updataInventoryData();
 watch(inv_page_num, () => {
   updataInventoryData();
 });
+
+const selectedTlData= ref<Datum>({} as Datum);
 
 const handleManager =(tlData:Datum) =>{
   showManagerForm.value = true;

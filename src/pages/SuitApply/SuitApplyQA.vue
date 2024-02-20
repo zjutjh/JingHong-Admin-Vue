@@ -12,6 +12,7 @@ import {
     NModal,
     NH3
 } from "naive-ui";
+import router from "@/routers";
 import * as SuitApplyQAService from "@/apis/SuitApplyQAAPI";
 import SuitApplyQAForm from "@/components/SuitApplyQAForm.vue";
 
@@ -84,10 +85,8 @@ const columns: DataTableColumns<SuitApplyQAAPI.SuitApplyQA> = [
   },
 ];
 
-const emit = defineEmits(["open"]);
-
 const handleBack = () => {
-  emit("open", false);
+  router.push("/suitapply");
 };
 
 const handleUpdate = (record: SuitApplyQAAPI.SuitApplyQA, state: boolean) => {
