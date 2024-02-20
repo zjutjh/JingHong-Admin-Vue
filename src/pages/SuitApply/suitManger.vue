@@ -374,6 +374,8 @@ const exportButton = () => {
 };
 
 const updataInventoryDataWithFliter = () => {
+  if(Number.isNaN(fliter_id.value)){fliter_id.value = undefined;}
+  inv_page_num.value = 1;
   useRequest(GetRecordAPI({
     page_num: inv_page_num.value,
     page_size: page_size,
@@ -383,12 +385,13 @@ const updataInventoryDataWithFliter = () => {
     student_id: fliter_student_id.value,
     supplies_name: fliter_suitapply_name.value,
     spec: fliter_spec.value,
-    status: fliter_state.value === "未审核" ? 1 : (fliter_state.value === "被驳回" ? 2 : (fliter_state.value === "借用中" ? 3 : 4)),
+    status: fliter_state.value === "未审核" ? 1 : (fliter_state.value === "被驳回" ? 2 : (fliter_state.value === "借用中" ? 3 : (fliter_state.value === "已归还" ? 4 : undefined))),
   }),{
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
       else {
         inv_total_page_num.value = data.data.total_page_num;
+        console.log(data.data);
         inv_tableData.value = data.data.data;
       }
     },
