@@ -66,11 +66,13 @@
         <div>
           <div>
             <span>种类</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="suitkind" :disabled="isSuit !== 0 && suitCampus === undefined"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="suitkind" :disabled="isSuit !== 0 && suitCampus === undefined || isSuit === 1"></n-input>
           </div>
           <div>
             <span>规格</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="suitSpec" :disabled="isSuit !== 0 && suitCampus === undefined"></n-input>
+            <n-select class="info-input" :options="specSelectOption" size="small" v-model:value="suitSpec" :disabled="isSuit !== 0 && suitCampus === undefined"></n-select>
+
+
           </div>
           <div>
             <span>库存</span>
@@ -123,6 +125,22 @@ const genderSelectOption = [{
   label: "女",
   value: "女"
 }];
+const specSelectOption = [{
+  label: "上衣",
+  value: "上衣"
+},{
+  label: "裤子",
+  value: "裤子"
+},{
+  label: "衬衫",
+  value: "衬衫"
+},{
+  label: "领带",
+  value: "领带"
+},{
+  label: "鞋子",
+  value: "鞋子"
+},];
 const isSuit = ref();
 const stuName = ref();
 const stuRoomNum = ref();
@@ -155,7 +173,6 @@ watch(suitCampus, () => {
       },
       onError: (e) => {
         console.log(e);
-        message.error(`${e.message} || "未知错误"`);
       },
     });
   }
