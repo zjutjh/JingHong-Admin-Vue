@@ -33,7 +33,7 @@
         <div>
           <div>
             <span>性别</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuGender"></n-input>
+            <n-select class="info-input" :options="genderSelectOption" size="small" v-model:value="stuGender"></n-select>
           </div>
           <div>
             <span>学院</span>
@@ -115,6 +115,13 @@ const campusSelectOption = [{
 },{
   label: "莫干山",
   value: 3
+}];
+const genderSelectOption = [{
+  label: "男",
+  value: "男"
+},{
+  label: "女",
+  value: "女"
 }];
 const isSuit = ref();
 const stuName = ref();
@@ -260,6 +267,7 @@ const importInfo = () => {
     .manual-import-button {
       margin-top: 10px;
       color: blue;
+      cursor: pointer;
     }
   }
 
