@@ -312,7 +312,7 @@ import { computed, ref, onMounted, reactive, watchEffect, toRefs } from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 
 const savedCampus = localStorage.getItem("selectedCampus");
-const selectedButton = ref(savedCampus);
+const selectedButton = ref(savedCampus ? savedCampus: "button1");
 const deleteItem = ref();
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
@@ -403,14 +403,14 @@ const showEditor = (spec: { spec: string; stock: number }) => {
 };
 
 const confirmEdit = () => {
+  const editedSpecUpperCase = editedSpec.value.spec.toUpperCase(); // 将输入的尺码转换为大写
+
   const index = publishSuitForm.value.specs.findIndex(
-    (item) => item.spec === editedSpec.value.spec
+    (item) => item.spec.toUpperCase() === editedSpecUpperCase // 将表格中的尺码也转换为大写进行比较
   );
 
   if (index !== -1) {
-    // 将输入的字符串库存值转换为数字
-    editedSpec.value.stock = editedSpec.value.stock;
-    publishSuitForm.value.specs[index] = { ...editedSpec.value };
+    publishSuitForm.value.specs[index] = { ...editedSpec.value, spec: publishSuitForm.value.specs[index].spec };
   } else {
     if (showModalEditorSuit.value) {
       publishSuitForm.value.specs.push({
@@ -428,6 +428,7 @@ const confirmEdit = () => {
   }
   showModalEditor.value = false;
 };
+
 
 const deleteSpec = async (spec: {
   spec: string;
