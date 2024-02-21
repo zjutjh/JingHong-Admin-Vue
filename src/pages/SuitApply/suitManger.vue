@@ -147,12 +147,15 @@
             <td>{{ tlData.spec }}</td>
             <td>{{ tlData.count }}</td>
             <td>{{ timeFormat(tlData.borrow_time) }}</td>
-            <td>{{ timeFormat(tlData.return_time) }}</td>
+            <td v-if="tlData.status === 4" >{{ timeFormat(tlData.return_time) }}</td>
+            <td v-else-if="tlData.status === 3 && !isOverTime" >剩余{{ timeCount(tlData.borrow_time) }}</td>
+            <td v-else-if="tlData.status === 3 && isOverTime" >超时{{ timeCount(tlData.borrow_time) }}</td>
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
-              <n-button size="small" @click="handleCount(tlData)">查看/编辑</n-button>
+              <n-button size="small" @click="handleCount(tlData)">查看</n-button>
+              <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
               <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
-              <n-button v-if="tlData.status == 4" size="small" @click="() => setSuppliesCancel(tlData.id)">{{ tlData.kind === "正装" ? "取消确认归还" : "删除" }}</n-button>
+              <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
             </td>
           </tr>
         </tbody>
@@ -200,6 +203,7 @@ const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
 const showCountModal = ref(false);
+const isOverTime = ref(false);
 
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
@@ -478,6 +482,34 @@ const handleOpenManagerForm = (state: boolean) => {
 };
 
 /* ---- return-inventory ---- */
+
+const timeCount= (borrow_time:string) => {
+  let secondDuring =(dayjs(borrow_time).add(7,'day').unix())-(dayjs().unix());
+  if(isOverTime.value == true){
+    secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,'day').unix());
+  }
+  const setHours = Math.floor(secondDuring/60/60%24);
+  const setDay = Math.floor(secondDuring/60/60/24);
+  if (Math.abs(setDay)>0){
+    return setDay+"天\t";
+  }
+  else{
+    return setHours+"小时\t";
+  }
+};
+
+const check = (id:number) => {
+  useRequest(suppliesReturnAPI({
+    supplies_return: 1,
+    id: id,
+  }),{
+    onSuccess: (data) =>{
+        if(data.code==1){
+          message.success("已处理归还");
+        }
+    },
+  });
+};
 
 </script>
 

@@ -114,7 +114,7 @@ const campusSelectOption = [{
   label: "朝晖",
   value: 1
 },{
-  label: "屏风",
+  label: "屏峰",
   value: 2
 },{
   label: "莫干山",
@@ -174,7 +174,9 @@ const suitImportOver = computed(() => {
   return suitCampus.value !== undefined && suitNumber.value !== undefined && suitName.value !== undefined && suitSpec.value !== undefined && suitkind.value !== undefined;
 });
 
-watch(isSuit, () => {
+watch(
+  () =>isSuit.value,
+  () => {
   suitName.value = "";
   suitNumber.value = "";
   suitSpec.value = "";
@@ -182,6 +184,7 @@ watch(isSuit, () => {
   if(isSuit.value === 0)
     suitkind.value = "";
   suitCampus.value = mangerStore.campusState_inventory;
+  console.log(suitCampus.value);
 });
 
 watch(suitCampus, () => {
@@ -269,7 +272,7 @@ const importInfo = () => {
     message.warning("已选择非正装的情况下 种类不得为正装");
   } else {
     const data = {
-      campus: parseInt(suitCampus.value, 10),
+      campus: suitCampus.value=="朝晖" ? 1 : (suitCampus.value=="屏峰" ? 2 : 3),
       count: parseInt(suitNumber.value, 10),
       kind: suitkind.value,
       spec:suitSpec.value,
