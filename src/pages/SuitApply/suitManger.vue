@@ -203,7 +203,6 @@ const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
 const showCountModal = ref(false);
-const isOverTime = ref(false);
 
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
@@ -485,7 +484,7 @@ const handleOpenManagerForm = (state: boolean) => {
 
 const timeCount= (borrow_time:string) => {
   let secondDuring =(dayjs(borrow_time).add(7,'day').unix())-(dayjs().unix());
-  if(isOverTime.value == true){
+  if(secondDuring < 0){
     secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,'day').unix());
   }
   const setHours = Math.floor(secondDuring/60/60%24);
@@ -496,6 +495,11 @@ const timeCount= (borrow_time:string) => {
   else{
     return setHours+"小时\t";
   }
+};
+
+const isOverTime = (borrow_time:string) => {
+  const secondDuring =(dayjs(borrow_time).add(7,'day').unix())-(dayjs().unix());
+  return (secondDuring < 0);
 };
 
 const check = (id:number) => {
