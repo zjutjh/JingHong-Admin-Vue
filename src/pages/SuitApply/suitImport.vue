@@ -71,8 +71,6 @@
           <div>
             <span>规格</span>
             <n-select class="info-input" :options="specSelectOption" size="small" v-model:value="suitSpec" :disabled="isSuit !== 0 && suitCampus === undefined"></n-select>
-
-
           </div>
           <div>
             <span>库存</span>
@@ -158,6 +156,14 @@ const matualImportOver = computed(() => {
 });
 const suitImportOver = computed(() => {
   return suitCampus.value !== undefined && suitNumber.value !== undefined && suitName.value !== undefined && suitSpec.value !== undefined && suitkind.value !== undefined;
+});
+
+watch(isSuit, () => {
+  suitCampus.value = ""; //****** */
+  suitName.value = "";
+  suitNumber.value = "";
+  suitSpec.value = "";
+  suitStock.value = "";
 });
 
 watch(suitCampus, () => {

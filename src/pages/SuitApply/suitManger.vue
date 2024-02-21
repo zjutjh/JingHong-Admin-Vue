@@ -254,11 +254,6 @@ const total_page_num = ref(0);
 const page_size = 16;
 const tableData = ref<Datum[]>();
 
-
-const pageJumptoSuitImport = () => {
-  router.push("/suitImport");
-};
-
 const updataTableDataWithFliter = () => {
   if(Number.isNaN(fliter_id.value)){fliter_id.value = undefined;}
   page_num.value = 1;
@@ -332,6 +327,10 @@ const inv_page_num = ref(1);
 const inv_total_page_num = ref(0);
 const inv_tableData = ref<Datum[]>();
 
+
+const pageJumptoSuitImport = () => {
+  router.push("/suitImport");
+};
 
 const switchCampus_inventory = (campus: string) => {
   campusState_inventory.value = campus;
