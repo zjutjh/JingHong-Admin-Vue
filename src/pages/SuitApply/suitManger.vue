@@ -22,6 +22,7 @@
       <span>学号</span><n-input class="f-input" type="text" placeholder="可输入学号" @keyup.enter="updataTableDataWithFliter()" :value="fliter_student_id" @update:value="fliter_student_idUpdate"/>
       <span>物资名称</span><n-input class="f-input" type="text" placeholder="可输入名称" @keyup.enter="updataTableDataWithFliter()" :value="fliter_suitapply_name" @update:value="fliter_suitapply_nameUpdate"/>
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataTableDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
+      <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
     <div class="counter" @click="clickCounter">
       <span class="title">已借出正装统计</span>
@@ -110,12 +111,29 @@
       <span>学号</span><n-input class="f-input" type="text" placeholder="可输入学号" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_student_id" @update:value="fliter_student_idUpdate"/>
       <span>物资名称</span><n-input class="f-input" type="text" placeholder="可输入名称" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_suitapply_name" @update:value="fliter_suitapply_nameUpdate"/>
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
-      <span>状态</span><n-input class="f-input" type="text" placeholder="可输入状态" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_state" @update:value="fliter_stateUpdate"/>
+      <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
-    <div class="counter">
+    <div class="counter" @click="clickCounter">
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
     </div>
+    <n-modal v-model:show="showCountModal">
+      <n-card
+        style="width: 400px"
+        title="统计"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <n-table>
+          <tr v-for="data in countDataBeta" :key="data.name">
+            <td>{{ data.name }}</td>
+            <td v-for="d in data.specs" :key="d.id">{{ d.spec }} / {{ d.borrowed }}</td>
+          </tr>
+        </n-table>
+      </n-card>
+    </n-modal>
     <div>
       <n-table size="small">
         <thead>
@@ -148,8 +166,8 @@
             <td>{{ tlData.count }}</td>
             <td>{{ timeFormat(tlData.borrow_time) }}</td>
             <td v-if="tlData.status === 4" >{{ timeFormat(tlData.return_time) }}</td>
-            <td v-else-if="tlData.status === 3 && !isOverTime" >剩余{{ timeCount(tlData.borrow_time) }}</td>
-            <td v-else-if="tlData.status === 3 && isOverTime" >超时{{ timeCount(tlData.borrow_time) }}</td>
+            <td v-else-if="tlData.status === 3 && !isOverTime(tlData.borrow_time)" >剩余{{ timeCount(tlData.borrow_time) }}</td>
+            <td v-else-if="tlData.status === 3 && isOverTime(tlData.borrow_time)" >超时{{ timeCount(tlData.borrow_time) }}</td>
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
               <n-button size="small" @click="handleCount(tlData)">查看</n-button>
@@ -175,9 +193,10 @@ import {
   NTable,
   NPagination,
   NModal,
-  NCard
+  NCard,
+  NSelect
 } from "naive-ui";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
@@ -208,9 +227,33 @@ const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
 const fliter_suitapply_nameUpdate = (value: string) => { fliter_suitapply_name.value = value; };
 const fliter_specUpdate = (value: string) => { fliter_spec.value = value; };
-const fliter_stateUpdate = (value: string) => { fliter_state.value = value; };
 const countData = ref();
 const countDataBeta = ref();
+const stateOption = computed(() => {
+  if(containId.value){
+    return [{
+      label: "未审核",
+      value: "未审核"
+    },{
+      label: "被驳回",
+      value: "被驳回"
+    },{
+      label: "所有",
+      value: ""
+    }];
+  } else {
+    return [{
+      label: "借用中",
+      value: "借用中"
+    },{
+      label: "已归还",
+      value: "已归还"
+    },{
+      label: "所有",
+      value: ""
+    }];
+  }
+});
 
 const switchPage = () => {
   containId.value = !containId.value;
@@ -273,6 +316,7 @@ const updataTableDataWithFliter = () => {
     student_id: fliter_student_id.value,
     supplies_name: fliter_suitapply_name.value,
     spec: fliter_spec.value,
+    status: fliter_state.value === "未审核" ? 1 : (fliter_state.value === "被驳回" ? 2 : (fliter_state.value === "借用中" ? 3 : (fliter_state.value === "已归还" ? 4 : undefined))),
   }),{
     onSuccess: (data) => {
       console.log(data);
@@ -284,7 +328,6 @@ const updataTableDataWithFliter = () => {
     },
     onError: (e) => {
       console.log(e);
-      message.error(`请求数据失败, ${e.message} || "未知错误"`);
     },
   });
 };
@@ -334,6 +377,10 @@ const inv_page_num = ref(1);
 const inv_total_page_num = ref(0);
 const inv_tableData = ref<Datum[]>();
 
+watch(fliter_state, () => {
+  updataInventoryDataWithFliter();
+  updataTableDataWithFliter();
+});
 
 const pageJumptoSuitImport = () => {
   router.push("/suitImport");
@@ -426,7 +473,6 @@ const updataInventoryDataWithFliter = () => {
     },
     onError: (e) => {
       console.log(e);
-      message.error(`请求数据失败, ${e.message} || "未知错误"`);
     },
   });
 };
@@ -483,9 +529,9 @@ const handleOpenManagerForm = (state: boolean) => {
 /* ---- return-inventory ---- */
 
 const timeCount= (borrow_time:string) => {
-  let secondDuring =(dayjs(borrow_time).add(7,'day').unix())-(dayjs().unix());
+  let secondDuring =(dayjs(borrow_time).add(7,"day").unix())-(dayjs().unix());
   if(secondDuring < 0){
-    secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,'day').unix());
+    secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,"day").unix());
   }
   const setHours = Math.floor(secondDuring/60/60%24);
   const setDay = Math.floor(secondDuring/60/60/24);
@@ -498,7 +544,7 @@ const timeCount= (borrow_time:string) => {
 };
 
 const isOverTime = (borrow_time:string) => {
-  const secondDuring =(dayjs(borrow_time).add(7,'day').unix())-(dayjs().unix());
+  const secondDuring =(dayjs(borrow_time).add(7,"day").unix())-(dayjs().unix());
   return (secondDuring < 0);
 };
 
@@ -540,8 +586,15 @@ const check = (id:number) => {
 
 
   .fliter .f-input{
+    display: inline-block;
+    position: relative;
     margin: 10px;
     width: 10vw;
+
+    .f-select {
+      position: absolute;
+      top: -13px;
+    }
   }
 
   .counter {
@@ -584,8 +637,15 @@ const check = (id:number) => {
   }
 
   .fliter .f-input{
+    display: inline-block;
+    position: relative;
     margin: 10px;
     width: 10vw;
+
+    .f-select {
+      position: absolute;
+      top: -13px;
+    }
   }
 
   .counter {

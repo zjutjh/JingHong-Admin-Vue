@@ -56,7 +56,7 @@
           </div>
           <div>
             <span>名称</span>
-            <n-input v-if="isSuit === undefined || isSuit === 0" size="small" v-model:value="suitName"></n-input>
+            <n-input v-if="isSuit === undefined || isSuit === 0" size="small" v-model:value="suitName" :disabled="isSuit === undefined"></n-input>
             <n-select v-if="isSuit === 1" class="info-input" :options="nameSelectOption" size="small" v-model:value="suitName" :disabled="isSuit !== 0 && suitCampus === undefined"></n-select>
           </div>
           <div>
@@ -71,7 +71,7 @@
           </div>
           <div>
             <span>规格</span>
-            <n-input v-if="isSuit === undefined || isSuit === 0" size="small" v-model:value="suitSpec"></n-input>
+            <n-input v-if="isSuit === undefined || isSuit === 0" size="small" v-model:value="suitSpec" :disabled="isSuit === undefined"></n-input>
             <n-select v-if="isSuit === 1" class="info-input" :options="specSelectOption" size="small" v-model:value="suitSpec" :disabled="isSuit !== 0 && suitCampus === undefined"></n-select>
           </div>
           <div v-if="isSuit !== 0">
@@ -127,22 +127,14 @@ const genderSelectOption = [{
   label: "女",
   value: "女"
 }];
-const nameSelectOption = [{
-  label: "上衣",
-  value: "上衣"
-},{
-  label: "裤子",
-  value: "裤子"
-},{
-  label: "衬衫",
-  value: "衬衫"
-},{
-  label: "领带",
-  value: "领带"
-},{
-  label: "鞋子",
-  value: "鞋子"
-},];
+const nameSelectOption = computed(() => {
+  const list = [];
+  if(suitData.value)
+    for(let i=0; i<suitData.value?.length; i++){
+      list.push({label: suitData.value[i].name, value: suitData.value[i].name});
+    }
+  return list;
+});
 const specSelectOption = ref();
 const isSuit = ref();
 const stuName = ref();
@@ -183,7 +175,7 @@ watch(
   suitStock.value = "";
   if(isSuit.value === 0)
     suitkind.value = "";
-  suitCampus.value = mangerStore.campusState_inventory;
+  suitCampus.value = mangerStore.campusState_inventory === "朝晖" ? 1 : (mangerStore.campusState_inventory === "屏峰" ? 2 : 3);
   console.log(suitCampus.value);
 });
 
