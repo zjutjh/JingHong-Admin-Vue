@@ -40,6 +40,7 @@
           <th>尺码</th>
           <th>数量</th>
           <th>申请日期</th>
+          <th>状态</th>
           <th>操作</th>
         </thead>
         <tbody>
@@ -58,6 +59,7 @@
             <td>{{ tlData.spec }}</td>
             <td>{{ tlData.count }}</td>
             <td>{{ timeFormat(tlData.apply_time) }}</td>
+            <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
             <n-button size="small" @click="handleManager(tlData)">审批</n-button>
             </td>
@@ -361,7 +363,7 @@ const setSuppliesCancel = (id: number) => {
   useRequest(suppliesCancleAPI({id: id}), {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功删除");
+      message.success("成功取消借出");
       updateSuitCount();
       updataInventoryData();
       updataTableData();
