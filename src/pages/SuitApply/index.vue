@@ -312,7 +312,7 @@ import { computed, ref, onMounted, reactive, watchEffect, toRefs } from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 
 const savedCampus = localStorage.getItem("selectedCampus");
-const selectedButton = ref(savedCampus);
+const selectedButton = ref(savedCampus ? savedCampus: "button1");
 const deleteItem = ref();
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
