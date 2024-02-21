@@ -166,15 +166,18 @@ import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import managerForm from "./manageForm.vue";
 import countForm from "./countForm.vue";
 import dayjs from "dayjs";
+import { useMangerStore } from "@/store";
 
 const handleBack = () => {
   router.push("/suitapply");
 };
 
+const mangerStore = useMangerStore();
+mangerStore.setCampusState_inventory("朝晖");
 const showManagerForm = ref(false);
 const showCountForm = ref(false);
 const campusList = ["朝晖", "屏峰", "莫干山"];
-const containId = ref(true);
+const containId = ref(mangerStore.containId);
 const message = useMessage();
 const fliter_id = ref<string>();
 const fliter_student_id = ref<string>();
@@ -197,6 +200,7 @@ const countData = ref({
 
 const switchPage = () => {
   containId.value = !containId.value;
+  mangerStore.setContianId(containId.value);
   updateSuitCount();
   updataInventoryData();
   updataTableData();
@@ -334,6 +338,7 @@ const pageJumptoSuitImport = () => {
 
 const switchCampus_inventory = (campus: string) => {
   campusState_inventory.value = campus;
+  mangerStore.setCampusState_inventory(campus);
   updataInventoryData();
   updateSuitCount();
 };
