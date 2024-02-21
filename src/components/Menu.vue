@@ -12,7 +12,8 @@ import {
   BusOutline as BusIcon,
   FileTrayOutline as LostfoundIcon,
   HomeOutline as DashboardIcon,
-  ClipboardOutline as InformationIcon
+  ClipboardOutline as InformationIcon,
+  ShirtOutline as SuitApplyIcon
 } from "@vicons/ionicons5";
 import { RouterLink } from "vue-router";
 import { useAccess } from "../hooks";
@@ -93,7 +94,7 @@ const menuOptions = computed<Array<MenuOption & { access?: boolean }>>(() =>
         {default: () => "物资借用"}
       ),
       key: "suitapply",
-      icon: renderIcon(InformationIcon),
+      icon: renderIcon(SuitApplyIcon),
       access: access.value.canSeeAdmin || access.value.canSeeSuitApply
     }
   ].filter(item => item.access && omit(item, ["access"]))

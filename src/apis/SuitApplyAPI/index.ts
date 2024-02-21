@@ -25,7 +25,7 @@ export {
   SetRecordAPI,
   getStudentInfoAPI,
   setSuppliesImportAPI,
-  SetRejectCancelAPI
+  SetRejectCancelAPI,
   createSuitInfoDataAPI,
   DeleteSuitInfoAPI,
   SetSuitInfoDataAPI,

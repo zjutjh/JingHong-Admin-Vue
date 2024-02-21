@@ -22,7 +22,7 @@
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataTableDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
     </div>
     <div class="counter">
-      <span class="title">正装统计</span>
+      <span class="title">已借出正装统计</span>
       <div><span>上衣</span>: {{ countData.上衣 }} 件</div>
       <div><span>裤子</span>: {{ countData.裤子 }} 件</div>
       <div><span>衬衫</span>: {{ countData.衬衫 }} 件</div>
@@ -48,7 +48,7 @@
                 v-if="showManagerForm"
                 @open="handleOpenManagerForm"
                 :source="selectedTlData"
-                :campus="campusState_inventory"
+                :campus="campusState_approval"
               />
             <td>{{ tlData.id }}</td>
             <td>{{ tlData.name }}</td>
@@ -94,7 +94,7 @@
       <span>状态</span><n-input class="f-input" type="text" placeholder="可输入状态" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_state" @update:value="fliter_stateUpdate"/>
     </div>
     <div class="counter">
-      <span class="title">正装统计</span>
+      <span class="title">已借出正装统计</span>
       <div><span>上衣</span>: {{ countData.上衣 }} 件</div>
       <div><span>裤子</span>: {{ countData.裤子 }} 件</div>
       <div><span>衬衫</span>: {{ countData.衬衫 }} 件</div>
@@ -136,7 +136,8 @@
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
               <n-button size="small" @click="handleCount(tlData)">查看/编辑</n-button>
-              <n-button size="small" @click="() => setSuppliesCancel(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
+              <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
+              <n-button v-if="tlData.status == 4" size="small" @click="() => setSuppliesCancel(tlData.id)">{{ tlData.kind === "正装" ? "取消确认归还" : "删除" }}</n-button>
             </td>
           </tr>
         </tbody>
@@ -157,7 +158,7 @@ import {
   NPagination
 } from "naive-ui";
 import { ref, watch } from "vue";
-import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI } from "@/apis/SuitApplyAPI/index";
+import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import managerForm from "./manageForm.vue";
@@ -221,19 +222,19 @@ const updateSuitCount = () => {
       for(let i=0; i<resData.length; i++){
         if(resData[i].name === "上衣"){
           for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.上衣 += resData[i].specs[j].stock;
+            countData.value.上衣 += resData[i].specs[j].borrowed;
         } else if(resData[i].name === "裤子"){
           for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.裤子 += resData[i].specs[j].stock;
+            countData.value.裤子 += resData[i].specs[j].borrowed;
         } else if(resData[i].name === "衬衫"){
           for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.衬衫 += resData[i].specs[j].stock;
+            countData.value.衬衫 += resData[i].specs[j].borrowed;
         } else if(resData[i].name === "领带"){
           for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.领带 += resData[i].specs[j].stock;
-        } else {
+            countData.value.领带 += resData[i].specs[j].borrowed;
+        } else if(resData[i].name === "鞋子"){
           for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.鞋子 += resData[i].specs[j].stock;
+            countData.value.鞋子 += resData[i].specs[j].borrowed;
         }
       }
     },
@@ -251,7 +252,7 @@ const page_num = ref(1);
 const total_page_num = ref(0);
 const page_size = 16;
 const tableData = ref<Datum[]>();
-const selectedTlData = ref<Datum>();
+
 
 const pageJumptoSuitImport = () => {
   router.push("/suitImport");
@@ -341,11 +342,30 @@ const getButtonColor_inventory = (buttonName: string) => {
   return campusState_inventory.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
 
+const setSuppliesReturn = (id: number) => {
+  useRequest(suppliesReturnAPI({id: id,supplies_return: 2}), {
+    onSuccess: (data) => {
+      if (data.code !== 1) throw new Error(data.msg);
+      message.success("成功删除");
+      updateSuitCount();
+      updataInventoryData();
+      updataTableData();
+    },
+    onError: (e) => {
+      console.log(e);
+      message.error(`${e.message} || "未知错误"`);
+    }
+  });
+};
+
 const setSuppliesCancel = (id: number) => {
   useRequest(suppliesCancleAPI({id: id}), {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
       message.success("成功删除");
+      updateSuitCount();
+      updataInventoryData();
+      updataTableData();
     },
     onError: (e) => {
       console.log(e);
@@ -426,6 +446,8 @@ updataInventoryData();
 watch(inv_page_num, () => {
   updataInventoryData();
 });
+
+const selectedTlData= ref<Datum>({} as Datum);
 
 const handleManager =(tlData:Datum) =>{
   showManagerForm.value = true;
