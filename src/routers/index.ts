@@ -9,6 +9,7 @@ import Layout from "../components/Layout.vue";
 import SuitApply from "../pages/SuitApply/index.vue";
 import suitManger from "@/pages/SuitApply/suitManger.vue";
 import suitImport from "@/pages/SuitApply/suitImport.vue";
+import SuitApplyQAVue from "@/pages/SuitApply/SuitApplyQA.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store";
 import getUserInfoAPI from "../apis/UserAPI/getUserInfo";
@@ -94,15 +95,15 @@ const routes = [
         },
         component: SuitApply,
       },
-      // {
-      //   path: "suitFaq",
-      //   name: "SuitFaq",
-      //   meta: {
-      //     title: "问答页面",
-      //     requestAuth: true,
-      //   },
-      //   component:
-      // },
+      {
+        path: "suitFaq",
+        name: "SuitFaq",
+        meta: {
+          title: "问答页面",
+          requestAuth: true,
+        },
+        component:SuitApplyQAVue
+      },
       {
         path: "suitManger",
         name: "SuitManger",

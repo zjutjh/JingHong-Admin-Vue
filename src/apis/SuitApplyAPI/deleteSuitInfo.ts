@@ -1,7 +1,7 @@
 import request from "../request";
 
 type DeleteSuitInfoData = {
-  id: number
+  id?: number
 }
 type DeleteSuitInfoResult = Common.IResponse<null>;
 const DeleteSuitInfoAPI = (params:DeleteSuitInfoData) => {

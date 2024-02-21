@@ -46,7 +46,7 @@
       type="primary"
       size="large"
       :round="true"
-      @click="handleShowQA"
+      @click="$router.push('/suitFaq')"
       >&ensp;&ensp;问答页面&ensp;&ensp;</n-button
     >
     <n-button type="primary" size="large" :round="true" @click="showPublish()"
@@ -80,8 +80,7 @@
           <td>{{ item.totalStock }}</td>
           <td>{{ item.totalBorrowed }}</td>
           <td>
-            <n-button text @click="showEditorSuit(item)">编辑</n-button>/
-            <n-button text @click="showEditorSuit(item)">查看</n-button>
+            <n-button text @click="showEditorSuit(item)">编辑</n-button>
             <n-button
               style="margin-left: 2vw; color: red"
               text
@@ -144,31 +143,32 @@
             />
           </n-form-item>
           <n-form-item label="上传图片">
-            <!-- 隐藏的文件输入框 -->
-            <input
-              type="file"
-              ref="fileInput"
-              @change="handleFileChange($event.target.files[0])"
-              accept="image/*"
-              style="display: none"
-            />
-            <!-- 显示已上传的图片预览 -->
-            <img
-              v-if="publishSuitForm.img"
-              :src="publishSuitForm.img"
-              alt="上传的图片预览"
-              style="max-width: 200px; max-height: 200px; margin-top: 10px"
-            />
-            <!-- 如果已上传图片，则显示删除按钮 -->
-            <n-button
-              v-if="publishSuitForm.img"
-              type="error"
-              @click="deleteImage"
-              >删除</n-button
-            >
-            <!-- 触发文件选择的按钮 -->
-            <n-button @click="openFileInput">上传</n-button>
-          </n-form-item>
+    <!-- 隐藏的文件输入框 -->
+    <input
+      ref="fileInput"
+      type="file"
+      @change="handleFileChange"
+      accept="image/*"
+      style="display: none"
+    />
+    <!-- 显示已上传的图片预览 -->
+    <img
+      v-if="publishSuitForm.img"
+      :src="publishSuitForm.img"
+      alt="上传的图片预览"
+      style="max-width: 200px; max-height: 200px; margin-top: 10px"
+    />
+    <!-- 如果已上传图片，则显示删除按钮 -->
+    <n-button
+      v-if="publishSuitForm.img"
+      type="error"
+      @click="deleteImage"
+    >
+      删除
+    </n-button>
+    <!-- 触发文件选择的按钮 -->
+    <n-button @click="openFileInput">上传</n-button>
+  </n-form-item>
 
           <n-form-item label="总数量">
             {{ totalStock }}
@@ -283,7 +283,7 @@
             <n-input v-model:value="editedSpec.spec" />
           </n-form-item>
           <n-form-item label="库存">
-            <n-input v-model:value="editedSpec.stock" />
+            <n-input-number v-model:value="editedSpec.stock" clearable />
           </n-form-item>
         </n-form>
         <template #footer>
@@ -292,10 +292,6 @@
       </n-card>
     </n-modal>
   </div>
-  <SuitApplyQA
-    v-if="showQA"
-    @open="handleUpdateQA"
-  />
 </template>
 
 <script setup lang="ts">
@@ -314,10 +310,10 @@ import {
 } from "naive-ui";
 import { computed, ref, onMounted, reactive, watchEffect, toRefs } from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
-import SuitApplyQA from "./SuitApplyQA.vue";
 
+const savedCampus = localStorage.getItem("selectedCampus");
+const selectedButton = ref(savedCampus);
 const deleteItem = ref();
-const showQA = ref(false);
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
 const showModalAddSpec = ref(false);
@@ -328,7 +324,6 @@ const editedSpec = ref({
   spec: "",
   stock: 0,
 });
-const selectedButton = ref("button1");
 const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
 const publishSuitForm = ref<{
@@ -351,7 +346,7 @@ const showModal = computed(
 const { totalStock } = toRefs(state);
 const specForm = ref({
   spec: "",
-  stock: 0,
+  stock: "",
 });
 
 const deleteSuit = (item: SuitApplyAPI.SuitItem) => {
@@ -378,17 +373,14 @@ const computeTotalStock = () => {
   }, 0);
 };
 
+onMounted(() => {
+
+  GetSuitInformation(campus.value ? campus.value : 1);
+});
+
 watchEffect(() => {
   computeTotalStock();
 });
-
-const handleShowQA = () => {
-  showQA.value = true;
-};
-
-const handleUpdateQA = (state: boolean) => {
-  showQA.value = state;
-};
 
 const showEditorSuit = (item: SuitApplyAPI.SuitItem) => {
   showModalEditorSuit.value = true;
@@ -417,20 +409,20 @@ const confirmEdit = () => {
 
   if (index !== -1) {
     // 将输入的字符串库存值转换为数字
-    editedSpec.value.stock = parseInt(editedSpec.value.stock);
+    editedSpec.value.stock = editedSpec.value.stock;
     publishSuitForm.value.specs[index] = { ...editedSpec.value };
   } else {
     if (showModalEditorSuit.value) {
       publishSuitForm.value.specs.push({
-        spec: editedSpec.value.spec,
-        stock: parseInt(editedSpec.value.stock),
+        spec: editedSpec.value.spec.toUpperCase(),
+        stock: editedSpec.value.stock,
         id: 0,
         borrowed: 0,
       });
     } else {
       publishSuitForm.value.specs.push({
-        spec: editedSpec.value.spec,
-        stock: parseInt(editedSpec.value.stock),
+        spec: editedSpec.value.spec.toUpperCase(),
+        stock: editedSpec.value.stock,
       });
     }
   }
@@ -440,7 +432,8 @@ const confirmEdit = () => {
 const deleteSpec = async (spec: {
   spec: string;
   stock: number;
-  id: number;
+  id?: number;
+  borrowed?: number;
 }) => {
   try {
     // 调用删除接口传入当前规格对象的 id 进行删除
@@ -457,14 +450,10 @@ const deleteSpec = async (spec: {
     } else {
       throw new Error(res.msg || "删除失败");
     }
-  } catch (e) {
+  } catch (e: any) {
     message.error(e.message || "删除失败");
   }
 };
-
-onMounted(() => {
-  GetSuitInformation(1);
-});
 
 const GetSuitInformation = async (campus: number) => {
   suitList.value = [];
@@ -568,9 +557,17 @@ const deleteConfirmSuit = async (deleteItem: SuitApplyAPI.SuitItem) => {
   GetSuitInformation(campus.value);
 };
 
-const setSuitFunction = async (publishForm: SuitApplyAPI.SuitItem) => {
-  publishForm.totalBorrowed = undefined;
-  publishForm.totalStock = undefined;
+const setSuitFunction = async (publishForm: {
+  name: string;
+  campus: string | number;
+  img: string;
+  specs: {
+    stock: number;
+    spec: string;
+    id?: number | undefined;
+    borrowed?: number | undefined;
+  }[];
+}) => {
   publishForm.specs.map((item) => (item.borrowed = undefined));
   publishForm.specs.map((item) => {
     if (item.stock < 0) {
@@ -614,14 +611,14 @@ const addSpec = () => {
 const confirmSpec = () => {
   if (showModalEditorSuit.value) {
     publishSuitForm.value.specs.push({
-      spec: specForm.value.spec,
+      spec: specForm.value.spec.toUpperCase(),
       stock: parseInt(specForm.value.stock),
       borrowed: 0, // 初始化已借出为0
       id: 0,
     });
   } else {
     publishSuitForm.value.specs.push({
-      spec: specForm.value.spec,
+      spec: specForm.value.spec.toUpperCase(),
       stock: parseInt(specForm.value.stock),
       borrowed: 0, // 初始化已借出为0
     });
@@ -630,14 +627,16 @@ const confirmSpec = () => {
   // 清空specForm中的数据
 
   specForm.value.spec = "";
-  specForm.value.stock = 0;
+  specForm.value.stock = "";
 };
+
 
 const selectButton = (buttonName: string) => {
   selectedButton.value = buttonName;
+  // 保存选中的校区状态到本地存储
+  localStorage.setItem("selectedCampus", buttonName);
   GetSuitInformation(campus.value);
 };
-
 const getButtonColor = (buttonName: string) => {
   return selectedButton.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
@@ -648,7 +647,9 @@ const showPublish = () => {
 
 const fileInput = ref<HTMLInputElement | null>(null);
 
-const handleFileChange = async (file: string | Blob) => {
+const handleFileChange = async (event: Event) => {
+  const fileInput = event.target as HTMLInputElement;
+  const file = fileInput.files && fileInput.files[0];
   if (file) {
     if (!publishSuitForm.value.img) {
       const formData = new FormData();
