@@ -80,8 +80,7 @@
           <td>{{ item.totalStock }}</td>
           <td>{{ item.totalBorrowed }}</td>
           <td>
-            <n-button text @click="showEditorSuit(item)">编辑</n-button>/
-            <n-button text @click="showEditorSuit(item)">查看</n-button>
+            <n-button text @click="showEditorSuit(item)">编辑</n-button>
             <n-button
               style="margin-left: 2vw; color: red"
               text
@@ -310,10 +309,10 @@ import {
   NSelect,
 } from "naive-ui";
 import { computed, ref, onMounted, reactive, watchEffect, toRefs } from "vue";
-import { useRequest } from "vue-request";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
-import { messageProps } from "naive-ui/es/message/src/message-props";
 
+const savedCampus = localStorage.getItem("selectedCampus");
+const selectedButton = ref(savedCampus);
 const deleteItem = ref();
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
@@ -325,7 +324,6 @@ const editedSpec = ref({
   spec: "",
   stock: 0,
 });
-const selectedButton = ref("button1");
 const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
 const publishSuitForm = ref<{
@@ -375,6 +373,11 @@ const computeTotalStock = () => {
   }, 0);
 };
 
+onMounted(() => {
+
+  GetSuitInformation(campus.value ? campus.value : 1);
+});
+
 watchEffect(() => {
   computeTotalStock();
 });
@@ -411,14 +414,14 @@ const confirmEdit = () => {
   } else {
     if (showModalEditorSuit.value) {
       publishSuitForm.value.specs.push({
-        spec: editedSpec.value.spec,
+        spec: editedSpec.value.spec.toUpperCase(),
         stock: editedSpec.value.stock,
         id: 0,
         borrowed: 0,
       });
     } else {
       publishSuitForm.value.specs.push({
-        spec: editedSpec.value.spec,
+        spec: editedSpec.value.spec.toUpperCase(),
         stock: editedSpec.value.stock,
       });
     }
@@ -451,10 +454,6 @@ const deleteSpec = async (spec: {
     message.error(e.message || "删除失败");
   }
 };
-
-onMounted(() => {
-  GetSuitInformation(1);
-});
 
 const GetSuitInformation = async (campus: number) => {
   suitList.value = [];
@@ -612,14 +611,14 @@ const addSpec = () => {
 const confirmSpec = () => {
   if (showModalEditorSuit.value) {
     publishSuitForm.value.specs.push({
-      spec: specForm.value.spec,
+      spec: specForm.value.spec.toUpperCase(),
       stock: parseInt(specForm.value.stock),
       borrowed: 0, // 初始化已借出为0
       id: 0,
     });
   } else {
     publishSuitForm.value.specs.push({
-      spec: specForm.value.spec,
+      spec: specForm.value.spec.toUpperCase(),
       stock: parseInt(specForm.value.stock),
       borrowed: 0, // 初始化已借出为0
     });
@@ -631,11 +630,13 @@ const confirmSpec = () => {
   specForm.value.stock = "";
 };
 
+
 const selectButton = (buttonName: string) => {
   selectedButton.value = buttonName;
+  // 保存选中的校区状态到本地存储
+  localStorage.setItem("selectedCampus", buttonName);
   GetSuitInformation(campus.value);
 };
-
 const getButtonColor = (buttonName: string) => {
   return selectedButton.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
