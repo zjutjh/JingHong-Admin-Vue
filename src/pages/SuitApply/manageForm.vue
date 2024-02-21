@@ -38,7 +38,7 @@
         <n-form-item>
           <n-space>
           <n-card :bordered="false" title="联系方式" style="width: 275px;height:43px">
-            <n-input v-model:value="form.contact" type="text" placeholder="请输入联系方式" />
+            <n-input v-model:value="form.contact" type="text" placeholder="请输入手机号码" />
             </n-card>
           </n-space>
         </n-form-item>
@@ -70,7 +70,7 @@
         <n-form-item>
           <n-space>
           <n-card :bordered="false" title="数量" style="width: 275px;height:43px">
-            <n-input-number v-model:value="form.count" clearable />
+            <n-input-number v-model:value="form.count" :min="1" :max="form.stock" clearable />
             </n-card>
             <n-card :bordered="false" title="库存" style="width: 275px;height:43px">
               {{ form.stock }}
@@ -78,14 +78,11 @@
           </n-space>
         </n-form-item>
         <n-form-item>
-          <n-button v-if="!isReject" type="primary" style="left: 19px;top: 37px;" @click="check">
-            同意
+          <n-button v-if="!isReject" type="primary" style="left: 19px;top: 37px;" @click="changeAndCheck">
+            通过
           </n-button>
           <n-button v-if="!isReject" type="error" secondary style="left: 39px ;top: 37px" @click="reject">
             否决
-          </n-button>
-          <n-button v-if="!isReject" type="info" third style="left: 59px ;top: 37px" @click="change">
-            确认修改
           </n-button>
           <n-button v-if="isReject" type="error" secondary style="left: 39px ;top: 37px" @click="rejectCancel">
             取消否决
@@ -106,7 +103,7 @@ import {
   NButton,
   useMessage,
 } from "naive-ui";
-import { toRefs , reactive , watch ,computed} from "vue";
+import { toRefs , reactive , watch , computed, ref} from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 import { GetSuitAPI } from "@/apis/SuitApplyAPI/index";
 //import type suitcheckitem from "@/apis/typing";
@@ -220,26 +217,6 @@ const updateSize = () => {
   });
 };
 
-const change = () =>{
-  useRequest(SuitApplyService.SetRecordAPI({
-    id: source.value.id,
-    name:form.name,
-    gender:form.gender,
-    college:form.college,
-    supplies_id:form.supplies_id,
-    dormitory: form.dormitory,
-    count: form.count,
-    contact: form.contact
-  }),{
-    onSuccess: (data) =>{
-      if (data.code !== 1) throw new Error(data.msg);
-      else{
-        message.success("修改成功");
-      }
-    },
-  });
-};
-
 const check = () => {
   useRequest(SuitApplyService.suppliesCheckAPI({
     supplies_check: 1,
@@ -250,8 +227,42 @@ const check = () => {
         message.success("已同意申请");
         emit("open",false);
         }
+        else{
+          message.error(data.msg);
+        }
     },
   });
+};
+
+const changeAndCheck = () =>{
+  if(!isEmpty.value){
+    const phoneRegex = /^1\d{10}$/;
+    if (phoneRegex.test(form.contact)){
+    useRequest(SuitApplyService.SetRecordAPI({
+      id: source.value.id,
+      name:form.name,
+      gender:form.gender,
+      college:form.college,
+      supplies_id:form.supplies_id,
+      dormitory: form.dormitory,
+      count: form.count,
+      contact: form.contact
+    }),{
+      onSuccess: (data) =>{
+        if (data.code !== 1) throw new Error(data.msg);
+        else{
+          check();
+        }
+      },
+    });
+    }
+    else{
+      message.error("请输入正确的手机号格式");
+    }
+  }
+  else{
+    message.error("所有信息都不可为空");
+  }
 };
 
 const reject = () => {
@@ -317,9 +328,23 @@ watch(
     console.log(sizeOptions);
     console.log(nameOptions);
 });
+
+const isEmpty = ref(false);
+watch(
+  () =>[form.name,form.gender,form.college,form.contact,form.dormitory],
+  () =>{
+    if(form.name === "" || form.gender === "" || form.college === "" || form.contact === "" || form.dormitory === ""){
+      isEmpty.value = true;
+    }
+    else{
+      isEmpty.value = false;
+    }
+});
+
 const isReject = computed(() => {
   return source.value.status === 2;
 });
+
 </script>
 <style>
 .form-container {
