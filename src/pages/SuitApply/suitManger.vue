@@ -4,31 +4,46 @@
       <template #title> 待审批 </template>
     </n-page-header>
     <n-button type="info" @click="switchPage()" class="switch-page-button">切换为归还清点</n-button>
-    <n-button
-    v-for="cam in campusList"
-    :key="cam"
-    type="primary"
-    size="large"
-    round
-    class="campus-button"
-    :color="getButtonColor_approval(cam)"
-    @click="switchCampus_approval(cam)">
-      {{ cam }}
-    </n-button>
+    <div class="button-div">
+      <n-button
+      v-for="cam in campusList"
+      :key="cam"
+      type="primary"
+      size="large"
+      round
+      class="campus-button"
+      :color="getButtonColor_approval(cam)"
+      @click="switchCampus_approval(cam)">
+        {{ cam }}
+      </n-button>
+    </div>
     <div class="fliter">
       <span>编号</span><n-input class="f-input" type="text" placeholder="可输入ID" @keyup.enter="updataTableDataWithFliter()" :value="fliter_id" @update:value="fliter_idUpdate"/>
       <span>学号</span><n-input class="f-input" type="text" placeholder="可输入学号" @keyup.enter="updataTableDataWithFliter()" :value="fliter_student_id" @update:value="fliter_student_idUpdate"/>
       <span>物资名称</span><n-input class="f-input" type="text" placeholder="可输入名称" @keyup.enter="updataTableDataWithFliter()" :value="fliter_suitapply_name" @update:value="fliter_suitapply_nameUpdate"/>
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataTableDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
     </div>
-    <div class="counter">
+    <div class="counter" @click="clickCounter">
       <span class="title">已借出正装统计</span>
-      <div><span>上衣</span>: {{ countData.上衣 }} 件</div>
-      <div><span>裤子</span>: {{ countData.裤子 }} 件</div>
-      <div><span>衬衫</span>: {{ countData.衬衫 }} 件</div>
-      <div><span>领带</span>: {{ countData.领带 }} 件</div>
-      <div><span>鞋子</span>: {{ countData.鞋子 }} 件</div>
+      <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
     </div>
+    <n-modal v-model:show="showCountModal">
+      <n-card
+        style="width: 400px"
+        title="统计"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <n-table>
+          <tr v-for="data in countDataBeta" :key="data.name">
+            <td>{{ data.name }}</td>
+            <td v-for="d in data.specs" :key="d.id">{{ d.spec }} / {{ d.borrowed }}</td>
+          </tr>
+        </n-table>
+      </n-card>
+    </n-modal>
     <div>
       <n-table size="small">
         <thead>
@@ -40,6 +55,7 @@
           <th>尺码</th>
           <th>数量</th>
           <th>申请日期</th>
+          <th>状态</th>
           <th>操作</th>
         </thead>
         <tbody>
@@ -58,6 +74,7 @@
             <td>{{ tlData.spec }}</td>
             <td>{{ tlData.count }}</td>
             <td>{{ timeFormat(tlData.apply_time) }}</td>
+            <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
             <n-button size="small" @click="handleManager(tlData)">审批</n-button>
             </td>
@@ -73,19 +90,21 @@
       <template #title> 归还清点 </template>
     </n-page-header>
     <n-button type="info" @click="switchPage()" class="switch-page-button">切换为待审批</n-button>
-    <n-button type="primary" size="large" class="input-button" @click="pageJumptoSuitImport">录入</n-button>
-    <n-button type="primary" size="large" class="output-button" @click="exportButton">导出</n-button>
-    <n-button
-    v-for="cam in campusList"
-    :key="cam"
-    type="primary"
-    size="large"
-    round
-    class="campus-button"
-    :color="getButtonColor_inventory(cam)"
-    @click="switchCampus_inventory(cam)">
-      {{ cam }}
-    </n-button>
+    <n-button type="primary" class="input-button" @click="pageJumptoSuitImport">录入</n-button>
+    <n-button type="primary" class="output-button" @click="exportButton">导出</n-button>
+    <div class="button-div">
+      <n-button
+      v-for="cam in campusList"
+      :key="cam"
+      type="primary"
+      size="large"
+      round
+      class="campus-button"
+      :color="getButtonColor_inventory(cam)"
+      @click="switchCampus_inventory(cam)">
+        {{ cam }}
+      </n-button>
+    </div>
     <div class="fliter">
       <span>编号</span><n-input class="f-input" type="text" placeholder="可输入ID" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_id" @update:value="fliter_idUpdate"/>
       <span>学号</span><n-input class="f-input" type="text" placeholder="可输入学号" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_student_id" @update:value="fliter_student_idUpdate"/>
@@ -95,11 +114,7 @@
     </div>
     <div class="counter">
       <span class="title">已借出正装统计</span>
-      <div><span>上衣</span>: {{ countData.上衣 }} 件</div>
-      <div><span>裤子</span>: {{ countData.裤子 }} 件</div>
-      <div><span>衬衫</span>: {{ countData.衬衫 }} 件</div>
-      <div><span>领带</span>: {{ countData.领带 }} 件</div>
-      <div><span>鞋子</span>: {{ countData.鞋子 }} 件</div>
+      <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
     </div>
     <div>
       <n-table size="small">
@@ -155,7 +170,9 @@ import {
   NInput,
   useMessage,
   NTable,
-  NPagination
+  NPagination,
+  NModal,
+  NCard
 } from "naive-ui";
 import { ref, watch } from "vue";
 import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
@@ -164,44 +181,48 @@ import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import managerForm from "./manageForm.vue";
 import countForm from "./countForm.vue";
 import dayjs from "dayjs";
+import { useMangerStore } from "@/store";
 
 const handleBack = () => {
   router.push("/suitapply");
 };
 
+const mangerStore = useMangerStore();
+mangerStore.setCampusState_inventory("朝晖");
 const showManagerForm = ref(false);
 const showCountForm = ref(false);
 const campusList = ["朝晖", "屏峰", "莫干山"];
-const containId = ref(true);
+const containId = ref(mangerStore.containId);
 const message = useMessage();
 const fliter_id = ref<string>();
 const fliter_student_id = ref<string>();
 const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
+const showCountModal = ref(false);
 
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
 const fliter_suitapply_nameUpdate = (value: string) => { fliter_suitapply_name.value = value; };
 const fliter_specUpdate = (value: string) => { fliter_spec.value = value; };
 const fliter_stateUpdate = (value: string) => { fliter_state.value = value; };
-const countData = ref({
-  "上衣": 0,
-  "裤子": 0,
-  "衬衫": 0,
-  "领带": 0,
-  "鞋子": 0,
-});
+const countData = ref();
+const countDataBeta = ref();
 
 const switchPage = () => {
   containId.value = !containId.value;
+  mangerStore.setContianId(containId.value);
   updateSuitCount();
   updataInventoryData();
   updataTableData();
 };
 
-const timeFormat= (time: string) => {
+const timeFormat = (time: string) => {
   return dayjs(time).format("YYYY年MM月DD日");
+};
+
+const clickCounter = () => {
+  showCountModal.value = true;
 };
 
 const updateSuitCount = () => {
@@ -213,34 +234,18 @@ const updateSuitCount = () => {
     onSuccess: (data) => {
       console.log(data);
       const resData = data.data;
+      countDataBeta.value = data.data;
       if (data.code !== 1) throw new Error(data.msg);
-      countData.value.上衣 = 0;
-      countData.value.衬衫 = 0;
-      countData.value.裤子 = 0;
-      countData.value.鞋子 = 0;
-      countData.value.领带 = 0;
+      countData.value = [];
       for(let i=0; i<resData.length; i++){
-        if(resData[i].name === "上衣"){
-          for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.上衣 += resData[i].specs[j].borrowed;
-        } else if(resData[i].name === "裤子"){
-          for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.裤子 += resData[i].specs[j].borrowed;
-        } else if(resData[i].name === "衬衫"){
-          for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.衬衫 += resData[i].specs[j].borrowed;
-        } else if(resData[i].name === "领带"){
-          for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.领带 += resData[i].specs[j].borrowed;
-        } else if(resData[i].name === "鞋子"){
-          for(let j=0; j<resData[i].specs.length; j++)
-            countData.value.鞋子 += resData[i].specs[j].borrowed;
+        countData.value.push([resData[i].name, 0]);
+        for(let j=0; j<resData[i].specs.length; j++){
+          countData.value[countData.value.length-1][1] += resData[i].specs[j].borrowed;
         }
       }
     },
     onError: (e) => {
       console.log(e);
-      message.error(`请求数据失败, ${e.message} || "未知错误"`);
     },
   });
 };
@@ -252,11 +257,6 @@ const page_num = ref(1);
 const total_page_num = ref(0);
 const page_size = 16;
 const tableData = ref<Datum[]>();
-
-
-const pageJumptoSuitImport = () => {
-  router.push("/suitImport");
-};
 
 const updataTableDataWithFliter = () => {
   if(Number.isNaN(fliter_id.value)){fliter_id.value = undefined;}
@@ -332,8 +332,13 @@ const inv_total_page_num = ref(0);
 const inv_tableData = ref<Datum[]>();
 
 
+const pageJumptoSuitImport = () => {
+  router.push("/suitImport");
+};
+
 const switchCampus_inventory = (campus: string) => {
   campusState_inventory.value = campus;
+  mangerStore.setCampusState_inventory(campus);
   updataInventoryData();
   updateSuitCount();
 };
@@ -362,7 +367,7 @@ const setSuppliesCancel = (id: number) => {
   useRequest(suppliesCancleAPI({id: id}), {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功删除");
+      message.success("成功取消借出");
       updateSuitCount();
       updataInventoryData();
       updataTableData();
@@ -395,6 +400,8 @@ const exportButton = () => {
 };
 
 const updataInventoryDataWithFliter = () => {
+  if(Number.isNaN(fliter_id.value)){fliter_id.value = undefined;}
+  inv_page_num.value = 1;
   useRequest(GetRecordAPI({
     page_num: inv_page_num.value,
     page_size: page_size,
@@ -404,12 +411,13 @@ const updataInventoryDataWithFliter = () => {
     student_id: fliter_student_id.value,
     supplies_name: fliter_suitapply_name.value,
     spec: fliter_spec.value,
-    status: fliter_state.value === "未审核" ? 1 : (fliter_state.value === "被驳回" ? 2 : (fliter_state.value === "借用中" ? 3 : 4)),
+    status: fliter_state.value === "未审核" ? 1 : (fliter_state.value === "被驳回" ? 2 : (fliter_state.value === "借用中" ? 3 : (fliter_state.value === "已归还" ? 4 : undefined))),
   }),{
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
       else {
         inv_total_page_num.value = data.data.total_page_num;
+        console.log(data.data);
         inv_tableData.value = data.data.data;
       }
     },
@@ -476,14 +484,24 @@ const handleOpenManagerForm = (state: boolean) => {
 <style lang="scss">
 .pending-approval-container {
   padding: 30px;
+  position: relative;
 
   .switch-page-button {
-    margin-right: 60vh;
+    margin: 10px 60vh 10px 0;
   }
 
-  .campus-button {
-    margin: 20px 3vh;
+  .button-div {
+    position: absolute;
+    top: 100px;
+    right: 160px;
+    display: flex;
+    flex-direction: row;
+
+    .campus-button {
+      margin: 0 10px;
+    }
   }
+
 
   .fliter .f-input{
     margin: 10px;
@@ -491,10 +509,11 @@ const handleOpenManagerForm = (state: boolean) => {
   }
 
   .counter {
+    padding: 10px 0;
     .title { margin-right: 127px; }
     div {
       display: inline-block;
-      margin: 10px 25px;
+      margin: 0 25px;
       span { color: rgba(10, 111, 194, 1); }
     }
   }
@@ -502,9 +521,10 @@ const handleOpenManagerForm = (state: boolean) => {
 
 .return-inventory-container {
   padding: 30px;
+  position: relative;
 
   .switch-page-button {
-    margin: 0;
+    margin: 10px 0 10px 0;
   }
 
   .input-button {
@@ -515,8 +535,16 @@ const handleOpenManagerForm = (state: boolean) => {
     margin-right: 147px;
   }
 
-  .campus-button {
-    margin: 20px 3vh;
+  .button-div {
+    position: absolute;
+    top: 100px;
+    right: 160px;
+    display: flex;
+    flex-direction: row;
+
+    .campus-button {
+      margin: 0 10px;
+    }
   }
 
   .fliter .f-input{
@@ -525,10 +553,11 @@ const handleOpenManagerForm = (state: boolean) => {
   }
 
   .counter {
+    padding: 10px 0;
     .title { margin-right: 127px; }
     div {
       display: inline-block;
-      margin: 10px 25px;
+      margin: 0 25px;
       span { color: rgba(10, 111, 194, 1); }
     }
   }
