@@ -283,7 +283,7 @@
             <n-input v-model:value="editedSpec.spec" />
           </n-form-item>
           <n-form-item label="库存">
-            <n-input-number v-model:value="editedSpec.stock" clearable />
+            <n-input-number v-model:value="editedSpec.stock" clearable :min="0"/>
           </n-form-item>
         </n-form>
         <template #footer>
@@ -454,6 +454,7 @@ const confirmEdit = () => {
       publishSuitForm.value.specs.push({
         spec: editedSpec.value.spec.toUpperCase(),
         stock: editedSpec.value.stock,
+        id: 0,
       });
     }
   }
@@ -477,7 +478,7 @@ const deleteSpec = async (spec: {
   id?: number;
   borrowed?: number;
 }) => {
-  if(spec.id !== 0){
+  if(spec.id !== 0 &&spec.id !==undefined){
   try {
     // 调用删除接口传入当前规格对象的 id 进行删除
     const res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
@@ -498,7 +499,7 @@ const deleteSpec = async (spec: {
   }
 }else{
   const index = publishSuitForm.value.specs.findIndex(
-        (item) => item.id === spec.id
+        (item) => item.spec === spec.spec
       );
       if (index !== -1) {
         publishSuitForm.value.specs.splice(index, 1);
@@ -662,6 +663,22 @@ const addSpec = () => {
   showModalAddSpec.value = true;
 };
 const confirmSpec = () => {
+  // 检查是否存在相同尺码
+  const existingSpecIndex = publishSuitForm.value.specs.findIndex(spec => spec.spec.toUpperCase() === specForm.value.spec.toUpperCase()); 
+  if (existingSpecIndex !== -1) {
+    // 如果存在相同尺码，则弹出提示框
+    message.warning("已存在相同尺码");
+    specForm.value.spec = "";
+    specForm.value.stock = "";
+    showModalAddSpec.value = false;
+  } else {
+    // 如果不存在相同尺码，则添加新的尺码数据到表格中
+    addNewSpec();
+  }
+};
+
+
+const addNewSpec = () => {
   if (showModalEditorSuit.value) {
     publishSuitForm.value.specs.push({
       spec: specForm.value.spec.toUpperCase(),
@@ -678,10 +695,10 @@ const confirmSpec = () => {
   }
   showModalAddSpec.value = false;
   // 清空specForm中的数据
-
   specForm.value.spec = "";
   specForm.value.stock = "";
 };
+
 
 
 const selectButton = (buttonName: string) => {
