@@ -19,25 +19,25 @@
         <div>
           <div>
             <span>姓名</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuName" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuName"></n-input>
           </div>
           <div>
             <span>寝室号</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuRoomNum" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuRoomNum"></n-input>
           </div>
           <div>
             <span>联系方式</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuPhone" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuPhone"></n-input>
           </div>
         </div>
         <div>
           <div>
             <span>性别</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuGender" :disabled="isManualImport === 2"></n-input>
+            <n-select class="info-input" :options="genderSelectOption" size="small" v-model:value="stuGender"></n-select>
           </div>
           <div>
             <span>学院</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="stuCollege" :disabled="isManualImport === 2"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="stuCollege"></n-input>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
       <hr>
       <div>
         <span>是否为正装</span>
-        <n-select :options="suitSelectOption" size="small" style="width: 250px;" v-model:value="isSuit" :disabled="isManualImport === 0 || !matualImportOver"></n-select>
+        <n-select :options="suitSelectOption" size="small" style="width: 250px;" v-model:value="isSuit" :disabled="!matualImportOver"></n-select>
       </div>
       <div class="rent-info-input">
         <div>
@@ -56,7 +56,8 @@
           </div>
           <div>
             <span>名称</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="suitName" :disabled="isSuit !== 0 && suitCampus === undefined"></n-input>
+            <n-input v-if="isSuit === undefined || isSuit === 0" size="small" v-model:value="suitName" :disabled="isSuit === undefined"></n-input>
+            <n-select v-if="isSuit === 1" class="info-input" :options="nameSelectOption" size="small" v-model:value="suitName" :disabled="isSuit !== 0 && suitCampus === undefined"></n-select>
           </div>
           <div>
             <span>数量</span>
@@ -66,13 +67,14 @@
         <div>
           <div>
             <span>种类</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="suitkind" :disabled="isSuit !== 0 && suitCampus === undefined"></n-input>
+            <n-input type="text" class="info-input" size="small" v-model:value="suitkind" :disabled="isSuit !== 0 && suitCampus === undefined || isSuit === 1"></n-input>
           </div>
           <div>
             <span>规格</span>
-            <n-input type="text" class="info-input" size="small" v-model:value="suitSpec" :disabled="isSuit !== 0 && suitCampus === undefined"></n-input>
+            <n-input v-if="isSuit === undefined || isSuit === 0" size="small" v-model:value="suitSpec" :disabled="isSuit === undefined"></n-input>
+            <n-select v-if="isSuit === 1" class="info-input" :options="specSelectOption" size="small" v-model:value="suitSpec" :disabled="isSuit !== 0 && suitCampus === undefined"></n-select>
           </div>
-          <div>
+          <div v-if="isSuit !== 0">
             <span>库存</span>
             <n-input type="text" class="info-input" size="small" v-model:value="suitStock" :disabled="true"></n-input>
           </div>
@@ -95,11 +97,12 @@ import {
 import { computed, ref, watch } from "vue";
 import { useRequest } from "vue-request";
 import { getStudentInfoAPI, GetSuitAPI, setSuppliesImportAPI } from "@/apis/SuitApplyAPI";
+import { useMangerStore } from "@/store";
 
+const mangerStore = useMangerStore();
 const message = useMessage();
 const showManualImportBar = ref(false);
 const studentId = ref();
-const isManualImport = ref(0); // 0为未导入 1为手动导入 2为自动导入
 const suitSelectOption = [{
   label: "是",
   value: 1
@@ -111,12 +114,28 @@ const campusSelectOption = [{
   label: "朝晖",
   value: 1
 },{
-  label: "屏风",
+  label: "屏峰",
   value: 2
 },{
   label: "莫干山",
   value: 3
 }];
+const genderSelectOption = [{
+  label: "男",
+  value: "男"
+},{
+  label: "女",
+  value: "女"
+}];
+const nameSelectOption = computed(() => {
+  const list = [];
+  if(suitData.value)
+    for(let i=0; i<suitData.value?.length; i++){
+      list.push({label: suitData.value[i].name, value: suitData.value[i].name});
+    }
+  return list;
+});
+const specSelectOption = ref();
 const isSuit = ref();
 const stuName = ref();
 const stuRoomNum = ref();
@@ -129,11 +148,35 @@ const suitName = ref();
 const suitStock = ref();
 const suitSpec = ref();
 const suitkind = ref();
+const suitData = ref<[{
+    campus: number;
+    name: string;
+    img: string;
+    specs: [{
+        id: number;
+        stock: number;
+        spec: string;
+        borrowed: number;
+    }];
+}]>();
 const matualImportOver = computed(() => {
   return stuName.value !== undefined && stuRoomNum.value !== undefined && stuPhone.value !== undefined && stuGender.value !== undefined && stuCollege.value !== undefined;
 });
 const suitImportOver = computed(() => {
   return suitCampus.value !== undefined && suitNumber.value !== undefined && suitName.value !== undefined && suitSpec.value !== undefined && suitkind.value !== undefined;
+});
+
+watch(
+  () =>isSuit.value,
+  () => {
+  suitName.value = "";
+  suitNumber.value = "";
+  suitSpec.value = "";
+  suitStock.value = "";
+  if(isSuit.value === 0)
+    suitkind.value = "";
+  suitCampus.value = mangerStore.campusState_inventory === "朝晖" ? 1 : (mangerStore.campusState_inventory === "屏峰" ? 2 : 3);
+  console.log(suitCampus.value);
 });
 
 watch(suitCampus, () => {
@@ -142,17 +185,40 @@ watch(suitCampus, () => {
     useRequest(GetSuitAPI({campus: suitCampus.value}), {
       onSuccess(data){
         if(data.code !== 1) throw new Error(data.msg);
-        suitName.value = data.data[0].name;
-        suitSpec.value = data.data[0].specs[0].spec;
-        suitNumber.value = 1;
-        suitStock.value = data.data[0].specs[0].stock;
+        suitData.value = data.data;
+        data.data[0].specs;
       },
       onError: (e) => {
         console.log(e);
-        message.error(`${e.message} || "未知错误"`);
+        message.warning("该校区暂无正装可供借用");
       },
     });
   }
+});
+
+watch(suitName, () => {
+  if(suitData.value)
+    for(let i=0; i<suitData.value.length; i++){
+      if(suitData.value[i].name === suitName.value){
+        specSelectOption.value = [];
+        for(let j=0; j<suitData.value[i].specs.length; j++){
+          specSelectOption.value.push({label: suitData.value[i].specs[j].spec, value:suitData.value[i].specs[j].spec});
+        }
+      }
+    }
+});
+
+watch(suitSpec, () => {
+  if(suitData.value)
+    for(let i=0; i<suitData.value.length; i++){
+      if(suitData.value[i].name === suitName.value){
+        for(let j=0; j<suitData.value[i].specs.length; j++){
+          if(suitData.value[i].specs[j].spec === suitSpec.value){
+            suitStock.value = suitData.value[i].specs[j].stock.toString();
+          }
+        }
+      }
+    }
 });
 
 const handleBack = () => {
@@ -161,7 +227,6 @@ const handleBack = () => {
 
 const showManualImport = () => {
   showManualImportBar.value = true;
-  isManualImport.value = 1;
 };
 
 const getStudentInfo = () => {
@@ -170,14 +235,18 @@ const getStudentInfo = () => {
   }), {
     onSuccess(data){
       if(data.code !== 1) throw new Error(data.msg);
-      message.success("导入成功");
-      showManualImportBar.value = true;
-      stuName.value = data.data.name;
-      stuCollege.value = data.data.college;
-      stuGender.value = data.data.gender;
-      stuPhone.value = data.data.contact;
-      stuRoomNum.value = data.data.dormitory;
-      isManualImport.value = 2;
+      if(data.data.id === 0) {
+        message.warning("学生信息不存在 请确认学号或者手动导入");
+        console.log(data.data);
+      } else {
+        message.success("学生信息导入成功");
+        showManualImportBar.value = true;
+        stuName.value = data.data.name;
+        stuCollege.value = data.data.college;
+        stuGender.value = data.data.gender;
+        stuPhone.value = data.data.contact;
+        stuRoomNum.value = data.data.dormitory;
+      }
     },
     onError: (e) => {
       console.log(e);
@@ -187,9 +256,15 @@ const getStudentInfo = () => {
 };
 
 const importInfo = () => {
-  if(suitImportOver.value && matualImportOver){
+  if(!(suitImportOver.value && matualImportOver)){
+    message.warning("请先检查信息是否填写完毕");
+  } else if(parseInt(suitNumber.value, 10) > parseInt(suitStock.value, 10) && isSuit.value === 1) {
+    message.warning("请检查借用数量是否超过库存");
+  } else if(isSuit.value === 0 && suitkind.value === "正装") {
+    message.warning("已选择非正装的情况下 种类不得为正装");
+  } else {
     const data = {
-      campus: parseInt(suitCampus.value, 10),
+      campus: suitCampus.value,
       count: parseInt(suitNumber.value, 10),
       kind: suitkind.value,
       spec:suitSpec.value,
@@ -213,8 +288,6 @@ const importInfo = () => {
         message.error(`${e.message} || "未知错误"`);
       },
     });
-  } else {
-    message.warning("请先检查信息是否填写完毕");
   }
 };
 
@@ -258,6 +331,7 @@ const importInfo = () => {
     .manual-import-button {
       margin-top: 10px;
       color: blue;
+      cursor: pointer;
     }
   }
 

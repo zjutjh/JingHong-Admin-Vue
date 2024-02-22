@@ -207,7 +207,7 @@
                     <n-button
                       style="margin-left: 2vw; color: red"
                       text
-                      @click="deleteSpec(item)"
+                      @click="deleteSpecConfirm(item)"
                       >删除</n-button
                     >
                   </td>
@@ -283,7 +283,7 @@
             <n-input v-model:value="editedSpec.spec" />
           </n-form-item>
           <n-form-item label="库存">
-            <n-input-number v-model:value="editedSpec.stock" clearable />
+            <n-input-number v-model:value="editedSpec.stock" clearable :min="0"/>
           </n-form-item>
         </n-form>
         <template #footer>
@@ -291,6 +291,33 @@
         </template>
       </n-card>
     </n-modal>
+    <n-modal v-model:show="showModalConfirmDeleteSpec">
+              <n-card
+                style="width: 400px"
+                title="确认删除"
+                :bordered="false"
+                size="huge"
+                role="dialog"
+                aria-modal="true"
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-around;
+                    margin-top: 30px;
+                  "
+                >
+                  <n-button
+                    type="primary"
+                    @click="deleteSpec(deleteSpecItem)"
+                    >确认删除</n-button
+                  >
+                  <n-button @click="showModalConfirmDeleteSpec = false"
+                    >取消</n-button
+                  >
+                </div>
+              </n-card>
+            </n-modal>
   </div>
 </template>
 
@@ -319,6 +346,8 @@ const showModalEditor = ref(false);
 const showModalAddSpec = ref(false);
 const showModalConfirmDelete = ref(false);
 const showModalEditorSuit = ref(false);
+const showModalConfirmDeleteSpec = ref(false);
+const deleteSpecItem = ref();
 const borrowed = ref<number[]>([]);
 const editedSpec = ref({
   spec: "",
@@ -326,16 +355,14 @@ const editedSpec = ref({
 });
 const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
-const publishSuitForm = ref<{
-  name: string;
-  campus: number | string;
-  img: string;
-  specs: { stock: number; spec: string; id?: number; borrowed?: number }[];
-}>({
-  name: "",
-  campus: "",
-  img: "",
-  specs: [],
+  const campus = computed(() => {
+  if (selectedButton.value === "button1") {
+    return 1;
+  } else if (selectedButton.value === "button2") {
+    return 2;
+  } else {
+    return 3;
+  }
 });
 const state = reactive({
   totalStock: 0,
@@ -358,6 +385,18 @@ const campusOptions = ref([
   { label: "屏峰", value: 2 },
   { label: "莫干山", value: 3 },
 ]);
+
+const publishSuitForm = ref<{
+  name: string;
+  campus: number | string;
+  img: string;
+  specs: { stock: number; spec: string; id?: number; borrowed?: number }[];
+}>({
+  name: "",
+  campus: "",
+  img: "",
+  specs: [],
+});
 const cleanPublishSuitForm = () => {
   publishSuitForm.value = {
     campus: "",
@@ -386,15 +425,7 @@ const showEditorSuit = (item: SuitApplyAPI.SuitItem) => {
   showModalEditorSuit.value = true;
   publishSuitForm.value = { ...item };
 };
-const campus = computed(() => {
-  if (selectedButton.value === "button1") {
-    return 1;
-  } else if (selectedButton.value === "button2") {
-    return 2;
-  } else {
-    return 3;
-  }
-});
+
 
 const showEditor = (spec: { spec: string; stock: number }) => {
   // 将要编辑的规格对象赋值给editedSpec
@@ -423,12 +454,23 @@ const confirmEdit = () => {
       publishSuitForm.value.specs.push({
         spec: editedSpec.value.spec.toUpperCase(),
         stock: editedSpec.value.stock,
+        id: 0,
       });
     }
   }
   showModalEditor.value = false;
 };
 
+const deleteSpecConfirm = async (spec: {
+  spec: string;
+  stock: number;
+  id?: number;
+  borrowed?: number;
+}) => {
+  // 弹出确认框，确认后再执行删除操作
+  showModalConfirmDeleteSpec.value = true;
+  deleteSpecItem.value = spec;
+};
 
 const deleteSpec = async (spec: {
   spec: string;
@@ -436,6 +478,7 @@ const deleteSpec = async (spec: {
   id?: number;
   borrowed?: number;
 }) => {
+  if(spec.id !== 0 &&spec.id !==undefined){
   try {
     // 调用删除接口传入当前规格对象的 id 进行删除
     const res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
@@ -454,6 +497,16 @@ const deleteSpec = async (spec: {
   } catch (e: any) {
     message.error(e.message || "删除失败");
   }
+}else{
+  const index = publishSuitForm.value.specs.findIndex(
+        (item) => item.spec === spec.spec
+      );
+      if (index !== -1) {
+        publishSuitForm.value.specs.splice(index, 1);
+      }
+      message.create("删除成功");
+}
+showModalConfirmDeleteSpec.value = false;
 };
 
 const GetSuitInformation = async (campus: number) => {
@@ -610,6 +663,22 @@ const addSpec = () => {
   showModalAddSpec.value = true;
 };
 const confirmSpec = () => {
+  // 检查是否存在相同尺码
+  const existingSpecIndex = publishSuitForm.value.specs.findIndex(spec => spec.spec.toUpperCase() === specForm.value.spec.toUpperCase()); 
+  if (existingSpecIndex !== -1) {
+    // 如果存在相同尺码，则弹出提示框
+    message.warning("已存在相同尺码");
+    specForm.value.spec = "";
+    specForm.value.stock = "";
+    showModalAddSpec.value = false;
+  } else {
+    // 如果不存在相同尺码，则添加新的尺码数据到表格中
+    addNewSpec();
+  }
+};
+
+
+const addNewSpec = () => {
   if (showModalEditorSuit.value) {
     publishSuitForm.value.specs.push({
       spec: specForm.value.spec.toUpperCase(),
@@ -626,10 +695,10 @@ const confirmSpec = () => {
   }
   showModalAddSpec.value = false;
   // 清空specForm中的数据
-
   specForm.value.spec = "";
   specForm.value.stock = "";
 };
+
 
 
 const selectButton = (buttonName: string) => {
