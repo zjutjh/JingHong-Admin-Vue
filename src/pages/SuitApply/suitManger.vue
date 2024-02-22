@@ -172,7 +172,7 @@
             <td>
               <n-button size="small" @click="handleCount(tlData)">查看</n-button>
               <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
-              <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
+              <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
               <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
             </td>
           </tr>
@@ -397,11 +397,11 @@ const getButtonColor_inventory = (buttonName: string) => {
   return campusState_inventory.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
 
-const setSuppliesReturn = (id: number) => {
-  useRequest(suppliesReturnAPI({id: id,supplies_return: 2}), {
+const setSuppliesReturn = (tlData: Datum) => {
+  useRequest(suppliesReturnAPI({id: tlData.id,supplies_return: 2}), {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功删除");
+      message.success("成功"+(tlData.kind === "正装" ? "取消借出" : "删除"));
       updateSuitCount();
       updataInventoryData();
       updataTableData();
@@ -557,6 +557,9 @@ const check = (id:number) => {
         if(data.code==1){
           message.success("已处理归还");
           location.reload();
+          updateSuitCount();
+          updataInventoryData();
+          updataTableData();
         }
     },
   });
