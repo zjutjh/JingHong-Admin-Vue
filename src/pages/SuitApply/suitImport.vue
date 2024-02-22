@@ -264,7 +264,7 @@ const importInfo = () => {
     message.warning("已选择非正装的情况下 种类不得为正装");
   } else {
     const data = {
-      campus: suitCampus.value=="朝晖" ? 1 : (suitCampus.value=="屏峰" ? 2 : 3),
+      campus: suitCampus.value,
       count: parseInt(suitNumber.value, 10),
       kind: suitkind.value,
       spec:suitSpec.value,
