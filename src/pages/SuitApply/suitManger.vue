@@ -173,7 +173,6 @@
               <n-button size="small" @click="handleCount(tlData)">查看</n-button>
               <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
               <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
-              <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
             </td>
           </tr>
         </tbody>
@@ -197,7 +196,7 @@ import {
   NSelect
 } from "naive-ui";
 import { computed, ref, watch } from "vue";
-import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
+import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import managerForm from "./manageForm.vue";
@@ -354,6 +353,7 @@ const updataTableData = () => {
 };
 
 updataTableData();
+updateSuitCount();
 
 watch(page_num, () => {
   updataTableData();
@@ -402,22 +402,6 @@ const setSuppliesReturn = (tlData: Datum) => {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
       message.success("成功"+(tlData.kind === "正装" ? "取消借出" : "删除"));
-      updateSuitCount();
-      updataInventoryData();
-      updataTableData();
-    },
-    onError: (e) => {
-      console.log(e);
-      message.error(`${e.message} || "未知错误"`);
-    }
-  });
-};
-
-const setSuppliesCancel = (id: number) => {
-  useRequest(suppliesCancleAPI({id: id}), {
-    onSuccess: (data) => {
-      if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功取消借出");
       updateSuitCount();
       updataInventoryData();
       updataTableData();
@@ -499,6 +483,7 @@ const updataInventoryData = () => {
 };
 
 updataInventoryData();
+updateSuitCount();
 
 watch(inv_page_num, () => {
   updataInventoryData();
