@@ -387,7 +387,7 @@ const showModal = computed(
 const { totalStock } = toRefs(state);
 const specForm = ref({
   spec: "",
-  stock: "",
+  stock: 0,
 });
 
 const deleteSuit = (item: SuitApplyAPI.SuitItem) => {
@@ -686,7 +686,7 @@ const addSpec = () => {
 };
 const confirmSpec = () => {
   // 检查是否存在相同尺码
-  if (specForm.value.stock === "") {
+  if (specForm.value.stock === null) {
     message.error("库存不能为空");
     return;
   }
@@ -698,7 +698,7 @@ const confirmSpec = () => {
     // 如果存在相同尺码，则弹出提示框
     message.warning("已存在相同尺码");
     specForm.value.spec = "";
-    specForm.value.stock = "";
+    specForm.value.stock = 0;
     showModalAddSpec.value = false;
   } else {
     // 如果不存在相同尺码，则添加新的尺码数据到表格中
@@ -710,21 +710,21 @@ const addNewSpec = () => {
   if (showModalEditorSuit.value) {
     publishSuitForm.value.specs.push({
       spec: specForm.value.spec.toUpperCase(),
-      stock: parseInt(specForm.value.stock),
+      stock: specForm.value.stock,
       borrowed: 0, // 初始化已借出为0
       id: 0,
     });
   } else {
     publishSuitForm.value.specs.push({
       spec: specForm.value.spec.toUpperCase(),
-      stock: parseInt(specForm.value.stock),
+      stock: specForm.value.stock,
       borrowed: 0, // 初始化已借出为0
     });
   }
   showModalAddSpec.value = false;
   // 清空specForm中的数据
   specForm.value.spec = "";
-  specForm.value.stock = "";
+  specForm.value.stock = 0;
 };
 
 const selectButton = (buttonName: string) => {
