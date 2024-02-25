@@ -84,8 +84,11 @@
           <n-button v-if="!isLoan" type="primary" style="left: 19px;top: 37px;" @click="back">
             取消确认归还
           </n-button>
-          <n-button v-if="isLoan" type="error" secondary style="left: 39px ;top: 37px" @click="reject">
+          <n-button v-if="isLoan && source.kind == '正装'" type="error" secondary style="left: 39px ;top: 37px" @click="reject">
             取消借用
+          </n-button>
+          <n-button v-if="isLoan && source.kind !== '正装' " type="error" secondary style="left: 39px ;top: 37px" @click="reject">
+            删除
           </n-button>
         </n-form-item>
       </n-form>
