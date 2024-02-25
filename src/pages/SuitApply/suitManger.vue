@@ -589,13 +589,17 @@ const timeCount= (borrow_time:string) => {
   if(secondDuring < 0){
     secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,"day").unix());
   }
+  const setMinutes = Math.floor(secondDuring%60);
   const setHours = Math.floor(secondDuring/60/60%24);
   const setDay = Math.floor(secondDuring/60/60/24);
-  if (Math.abs(setDay)>0){
-    return setDay+"天\t";
+  if (setDay>0){
+  return setDay + "天" + setHours + "小时" + setMinutes + "分";
   }
-  else{
-    return setHours+"小时\t";
+  else if (setHours>0){
+  return setHours + "小时" + setMinutes + "分";
+  }
+  else if (setMinutes>0){
+  return setMinutes + "分";
   }
 };
 
