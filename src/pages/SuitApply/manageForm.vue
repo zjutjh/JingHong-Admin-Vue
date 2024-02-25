@@ -81,7 +81,7 @@
           <n-button v-if="!isReject" type="primary" style="left: 19px;top: 37px;" @click="changeAndCheck">
             通过
           </n-button>
-          <n-button v-if="!isReject" type="error" secondary style="left: 39px ;top: 37px" @click="reject">
+          <n-button v-if="!isReject" type="error" secondary style="left: 39px ;top: 37px" @click="showModal">
             否决
           </n-button>
           <n-button v-if="isReject" type="error" secondary style="left: 39px ;top: 37px" @click="rejectCancel">
@@ -90,8 +90,26 @@
         </n-form-item>
       </n-form>
     </n-space>
-
   </section>
+  <n-modal v-model:show="showModalConfirmReject">
+      <n-card
+        style="width: 400px"
+        title="确认否决"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          style="display: flex; justify-content: space-around; margin-top: 30px"
+        >
+          <n-button type="primary" @click="reject"
+            >确认否决</n-button
+          >
+          <n-button @click="showModalConfirmReject = false">取消</n-button>
+        </div>
+      </n-card>
+    </n-modal>
 </template>
 <script setup lang="ts">
 import {
@@ -102,6 +120,7 @@ import {
   NSpace,
   NButton,
   useMessage,
+  NModal,
 } from "naive-ui";
 import { toRefs , reactive , watch , computed, ref} from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
@@ -146,6 +165,7 @@ let sizeOptions : Person[]= [];
 const newsizeOptions = ref<Person[]>([]);
 const emit = defineEmits(["open"]);
 const message = useMessage();
+const showModalConfirmReject = ref(false);
 const props = defineProps<{
   source:Datum;
   campus:string;
@@ -234,6 +254,10 @@ const updateSize = () => {
       }
     },
   });
+};
+
+const showModal = () => {
+  showModalConfirmReject.value = true;
 };
 
 const check = () => {

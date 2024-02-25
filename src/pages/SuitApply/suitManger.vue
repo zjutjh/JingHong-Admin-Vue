@@ -171,9 +171,66 @@
             <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
             <td>
               <n-button size="small" @click="handleCount(tlData)">查看</n-button>
-              <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
-              <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
+              <n-button v-if="tlData.status !== 4" size="small" @click="showcheck">确认归还</n-button>
+              <n-button v-if="tlData.status !== 4" size="small" @click="showsetSuppliesReturn(tlData.kind)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
             </td>
+            <n-modal v-model:show="showModalCheck">
+              <n-card
+                style="width: 400px"
+                title="确认归还"
+                :bordered="false"
+                size="huge"
+                role="dialog"
+                aria-modal="true"
+              >
+                <div
+                  style="display: flex; justify-content: space-around; margin-top: 30px"
+                >
+                  <n-button type="primary" @click="check(tlData.id)"
+                    >确认归还</n-button
+                  >
+                  <n-button @click="showModalCheck = false">取消</n-button>
+                </div>
+              </n-card>
+            </n-modal>
+            <n-modal v-model:show="showModalReject">
+              <n-card
+                style="width: 400px"
+                title="确认取消借用"
+                :bordered="false"
+                size="huge"
+                role="dialog"
+                aria-modal="true"
+              >
+                <div
+                  style="display: flex; justify-content: space-around; margin-top: 30px"
+                >
+                  <n-button type="primary" @click="setSuppliesReturn(tlData)"
+                    >确认取消借用</n-button
+                  >
+                  <n-button @click="showModalReject = false">取消</n-button>
+                </div>
+              </n-card>
+            </n-modal>
+            <n-modal v-model:show="showModaldelReject">
+              <n-card
+                style="width: 400px"
+                title="确认删除"
+                :bordered="false"
+                size="huge"
+                role="dialog"
+                aria-modal="true"
+              >
+                <div
+                  style="display: flex; justify-content: space-around; margin-top: 30px"
+                >
+                  <n-button type="primary" @click="setSuppliesReturn(tlData)"
+                    >确认删除</n-button
+                  >
+                  <n-button @click="showModaldelReject = false">取消</n-button>
+                </div>
+              </n-card>
+            </n-modal>
           </tr>
         </tbody>
       </n-table>
@@ -221,6 +278,9 @@ const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
 const showCountModal = ref(false);
+const showModalCheck = ref(false);
+const showModalReject = ref(false);
+const showModaldelReject = ref(false);
 
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
@@ -295,6 +355,17 @@ const updateSuitCount = () => {
   });
 };
 
+const showcheck = () => {
+  showModalCheck.value = true;
+};
+const showsetSuppliesReturn = (kind:string) => {
+  if(kind == '正装'){
+    showModalReject.value =true;
+  }
+  else{
+    showModaldelReject.value =true;
+  }
+};
 /* ---- pending-approval ---- */
 
 const campusState_approval = ref("朝晖");
