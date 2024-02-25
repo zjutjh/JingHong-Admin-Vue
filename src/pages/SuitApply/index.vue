@@ -143,32 +143,32 @@
             />
           </n-form-item>
           <n-form-item label="上传图片">
-    <!-- 隐藏的文件输入框 -->
-    <input
-      ref="fileInput"
-      type="file"
-      @change="handleFileChange"
-      accept="image/*"
-      style="display: none"
-    />
-    <!-- 显示已上传的图片预览 -->
-    <img
-      v-if="publishSuitForm.img"
-      :src="publishSuitForm.img"
-      alt="上传的图片预览"
-      style="max-width: 200px; max-height: 200px; margin-top: 10px"
-    />
-    <!-- 如果已上传图片，则显示删除按钮 -->
-    <n-button
-      v-if="publishSuitForm.img"
-      type="error"
-      @click="deleteImage"
-    >
-      删除
-    </n-button>
-    <!-- 触发文件选择的按钮 -->
-    <n-button @click="openFileInput">上传</n-button>
-  </n-form-item>
+            <!-- 隐藏的文件输入框 -->
+            <input
+              ref="fileInput"
+              type="file"
+              @change="handleFileChange"
+              accept="image/*"
+              style="display: none"
+            />
+            <!-- 显示已上传的图片预览 -->
+            <img
+              v-if="publishSuitForm.img"
+              :src="publishSuitForm.img"
+              alt="上传的图片预览"
+              style="max-width: 200px; max-height: 200px; margin-top: 10px"
+            />
+            <!-- 如果已上传图片，则显示删除按钮 -->
+            <n-button
+              v-if="publishSuitForm.img"
+              type="error"
+              @click="deleteImage"
+            >
+              删除
+            </n-button>
+            <!-- 触发文件选择的按钮 -->
+            <n-button @click="openFileInput">上传</n-button>
+          </n-form-item>
 
           <n-form-item label="总数量">
             {{ totalStock }}
@@ -280,10 +280,14 @@
       >
         <n-form :model="editedSpec" label-position="top">
           <n-form-item label="尺码">
-            <n-input v-model:value="editedSpec.spec" />
+            <n-input v-model:value="editedSpec.spec" disabled />
           </n-form-item>
           <n-form-item label="库存">
-            <n-input-number v-model:value="editedSpec.stock" clearable :min="0"/>
+            <n-input-number
+              v-model:value="editedSpec.stock"
+              clearable
+              :min="0"
+            />
           </n-form-item>
         </n-form>
         <template #footer>
@@ -292,32 +296,24 @@
       </n-card>
     </n-modal>
     <n-modal v-model:show="showModalConfirmDeleteSpec">
-              <n-card
-                style="width: 400px"
-                title="确认删除"
-                :bordered="false"
-                size="huge"
-                role="dialog"
-                aria-modal="true"
-              >
-                <div
-                  style="
-                    display: flex;
-                    justify-content: space-around;
-                    margin-top: 30px;
-                  "
-                >
-                  <n-button
-                    type="primary"
-                    @click="deleteSpec(deleteSpecItem)"
-                    >确认删除</n-button
-                  >
-                  <n-button @click="showModalConfirmDeleteSpec = false"
-                    >取消</n-button
-                  >
-                </div>
-              </n-card>
-            </n-modal>
+      <n-card
+        style="width: 400px"
+        title="确认删除"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          style="display: flex; justify-content: space-around; margin-top: 30px"
+        >
+          <n-button type="primary" @click="deleteSpec(deleteSpecItem)"
+            >确认删除</n-button
+          >
+          <n-button @click="showModalConfirmDeleteSpec = false">取消</n-button>
+        </div>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
@@ -335,11 +331,19 @@ import {
   NInput,
   NSelect,
 } from "naive-ui";
-import { computed, ref, onMounted, reactive, watchEffect, toRefs } from "vue";
+import {
+  computed,
+  ref,
+  onMounted,
+  reactive,
+  watchEffect,
+  toRefs,
+  watch,
+} from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 
 const savedCampus = localStorage.getItem("selectedCampus");
-const selectedButton = ref(savedCampus ? savedCampus: "button1");
+const selectedButton = ref(savedCampus ? savedCampus : "button1");
 const deleteItem = ref();
 const showModalPublish = ref(false);
 const showModalEditor = ref(false);
@@ -355,13 +359,22 @@ const editedSpec = ref({
 });
 const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
-  const campus = computed(() => {
+const campus = computed(() => {
   if (selectedButton.value === "button1") {
     return 1;
   } else if (selectedButton.value === "button2") {
     return 2;
   } else {
     return 3;
+  }
+});
+const campusString = computed(() => {
+  if (selectedButton.value === "button1") {
+    return "朝晖";
+  } else if (selectedButton.value === "button2") {
+    return "屏风";
+  } else {
+    return "莫干山";
   }
 });
 const state = reactive({
@@ -385,7 +398,10 @@ const campusOptions = ref([
   { label: "屏峰", value: 2 },
   { label: "莫干山", value: 3 },
 ]);
-
+const campusRef = ref(campusString.value);
+watch(campusString, (newValue) => {
+  campusRef.value = newValue;
+});
 const publishSuitForm = ref<{
   name: string;
   campus: number | string;
@@ -393,13 +409,13 @@ const publishSuitForm = ref<{
   specs: { stock: number; spec: string; id?: number; borrowed?: number }[];
 }>({
   name: "",
-  campus: "",
+  campus: campusRef.value,
   img: "",
   specs: [],
 });
 const cleanPublishSuitForm = () => {
   publishSuitForm.value = {
-    campus: "",
+    campus: campusRef.value,
     name: "",
     img: "",
     specs: [],
@@ -413,7 +429,6 @@ const computeTotalStock = () => {
 };
 
 onMounted(() => {
-
   GetSuitInformation(campus.value ? campus.value : 1);
 });
 
@@ -426,7 +441,6 @@ const showEditorSuit = (item: SuitApplyAPI.SuitItem) => {
   publishSuitForm.value = { ...item };
 };
 
-
 const showEditor = (spec: { spec: string; stock: number }) => {
   // 将要编辑的规格对象赋值给editedSpec
   showModalEditor.value = true;
@@ -434,6 +448,10 @@ const showEditor = (spec: { spec: string; stock: number }) => {
 };
 
 const confirmEdit = () => {
+  if (editedSpec.value.stock === null) {
+    message.warning("库存不能为空");
+    return;
+  }
   const editedSpecUpperCase = editedSpec.value.spec.toUpperCase(); // 将输入的尺码转换为大写
 
   const index = publishSuitForm.value.specs.findIndex(
@@ -441,7 +459,10 @@ const confirmEdit = () => {
   );
 
   if (index !== -1) {
-    publishSuitForm.value.specs[index] = { ...editedSpec.value, spec: publishSuitForm.value.specs[index].spec };
+    publishSuitForm.value.specs[index] = {
+      ...editedSpec.value,
+      spec: publishSuitForm.value.specs[index].spec,
+    };
   } else {
     if (showModalEditorSuit.value) {
       publishSuitForm.value.specs.push({
@@ -478,35 +499,35 @@ const deleteSpec = async (spec: {
   id?: number;
   borrowed?: number;
 }) => {
-  if(spec.id !== 0 &&spec.id !==undefined){
-  try {
-    // 调用删除接口传入当前规格对象的 id 进行删除
-    const res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
-    if (res.code === 1) {
-      // 删除成功后，从数组中移除该规格对象
-      const index = publishSuitForm.value.specs.findIndex(
-        (item) => item.id === spec.id
-      );
-      if (index !== -1) {
-        publishSuitForm.value.specs.splice(index, 1);
+  if (spec.id !== 0 && spec.id !== undefined) {
+    try {
+      // 调用删除接口传入当前规格对象的 id 进行删除
+      const res = await SuitApplyService.DeleteSuitInfoAPI({ id: spec.id });
+      if (res.code === 1) {
+        // 删除成功后，从数组中移除该规格对象
+        const index = publishSuitForm.value.specs.findIndex(
+          (item) => item.id === spec.id
+        );
+        if (index !== -1) {
+          publishSuitForm.value.specs.splice(index, 1);
+        }
+        message.create("删除成功");
+      } else {
+        throw new Error(res.msg || "删除失败");
       }
-      message.create("删除成功");
-    } else {
-      throw new Error(res.msg || "删除失败");
+    } catch (e: any) {
+      message.error(e.message || "删除失败");
     }
-  } catch (e: any) {
-    message.error(e.message || "删除失败");
+  } else {
+    const index = publishSuitForm.value.specs.findIndex(
+      (item) => item.spec === spec.spec
+    );
+    if (index !== -1) {
+      publishSuitForm.value.specs.splice(index, 1);
+    }
+    message.create("删除成功");
   }
-}else{
-  const index = publishSuitForm.value.specs.findIndex(
-        (item) => item.spec === spec.spec
-      );
-      if (index !== -1) {
-        publishSuitForm.value.specs.splice(index, 1);
-      }
-      message.create("删除成功");
-}
-showModalConfirmDeleteSpec.value = false;
+  showModalConfirmDeleteSpec.value = false;
 };
 
 const GetSuitInformation = async (campus: number) => {
@@ -664,7 +685,9 @@ const addSpec = () => {
 };
 const confirmSpec = () => {
   // 检查是否存在相同尺码
-  const existingSpecIndex = publishSuitForm.value.specs.findIndex(spec => spec.spec.toUpperCase() === specForm.value.spec.toUpperCase()); 
+  const existingSpecIndex = publishSuitForm.value.specs.findIndex(
+    (spec) => spec.spec.toUpperCase() === specForm.value.spec.toUpperCase()
+  );
   if (existingSpecIndex !== -1) {
     // 如果存在相同尺码，则弹出提示框
     message.warning("已存在相同尺码");
@@ -676,7 +699,6 @@ const confirmSpec = () => {
     addNewSpec();
   }
 };
-
 
 const addNewSpec = () => {
   if (showModalEditorSuit.value) {
@@ -699,11 +721,12 @@ const addNewSpec = () => {
   specForm.value.stock = "";
 };
 
-
-
 const selectButton = (buttonName: string) => {
+  setTimeout(() => {
+    publishSuitForm.value.campus = campusRef.value;
+  }, 500);
   selectedButton.value = buttonName;
-  // 保存选中的校区状态到本地存储
+  // 保存选中的校区状态到本地存储s
   localStorage.setItem("selectedCampus", buttonName);
   GetSuitInformation(campus.value);
 };
