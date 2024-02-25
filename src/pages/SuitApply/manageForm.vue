@@ -21,7 +21,7 @@
               {{ source.student_id }}
             </n-card>
             <n-card :bordered="false" title="性别" style="width: 275px;height:43px">
-              <n-input v-model:value="form.gender" type="text" placeholder="请输入性别" />
+              <n-select v-model:value="form.gender" :options="genderOptions" />
             </n-card>
           </n-space>
         </n-form-item>
@@ -60,10 +60,10 @@
         <n-form-item>
           <n-space>
           <n-card :bordered="false" title="名称" style="width: 275px;height:43px">
-            <n-select :key="refreshKey" v-model:value="form.supplies_name" :options="nameOptions"></n-select>
+            <n-select  v-model:value="form.supplies_name" :options="newnameOptions"></n-select>
             </n-card>
             <n-card :bordered="false" title="规格" style="width: 275px;height:43px">
-              <n-select :key="refreshNextKey" v-model:value="form.spec" :options="sizeOptions"></n-select>
+              <n-select  v-model:value="form.spec" :options="newsizeOptions"></n-select>
             </n-card>
           </n-space>
         </n-form-item>
@@ -124,8 +124,26 @@ const campusOptions = [
     value:"莫干山",
   },
 ];
-const nameOptions: any[] =[];
-const sizeOptions: any[] =[];
+
+const genderOptions = [
+  {
+    label:"男",
+    value:"男"
+  },
+  {
+    label:"女",
+    value:"女",
+  },
+];
+
+type Person = {
+  label:string,
+  value:string
+};
+let nameOptions : Person[]= [];
+const newnameOptions = ref<Person[]>([]);
+let sizeOptions : Person[]= [];
+const newsizeOptions = ref<Person[]>([]);
 const emit = defineEmits(["open"]);
 const message = useMessage();
 const props = defineProps<{
@@ -133,8 +151,6 @@ const props = defineProps<{
   campus:string;
 }>();
 const {source ,campus} = toRefs(props);
-let refreshKey = 0;
-let refreshNextKey = 100;
 
 const form = reactive({
   campus:campus.value,
@@ -164,7 +180,9 @@ const updateName = () => {
       else{
         for(let i=0; i<resData.length; i++){
           if(resData[i].campus == (form.campus === "朝晖" ? 1 : (form.campus==="屏峰" ? 2 : 3))){
-            nameOptions.push({label:resData[i].name,value:resData[i].name});
+            const newArray = [{label:resData[i].name,value:resData[i].name}];
+            nameOptions = nameOptions.concat(newArray);
+            newnameOptions.value = nameOptions;
           }
         }
       }
@@ -192,9 +210,10 @@ const updateSize = () => {
         for(let i=0; i<resData.length; i++){
           if(resData[i].campus == (form.campus === "朝晖" ? 1 : (form.campus==="屏峰" ? 2 : 3))){
             if(resData[i].name == form.supplies_name){
-              console.log(resData[i]);
               for(let j=0; j<resData[i].specs.length;j++){
-                sizeOptions.push({label:resData[i].specs[j].spec,value:resData[i].specs[j].spec});
+                const newArray = [{label:resData[i].specs[j].spec,value:resData[i].specs[j].spec}];
+                sizeOptions = sizeOptions.concat(newArray);
+                 newsizeOptions.value = sizeOptions;
                 if(resData[i].specs[j].spec == form.spec){
                   form.stock = resData[i].specs[j].stock;
                   form.supplies_id = resData[i].specs[j].id;
@@ -291,8 +310,10 @@ const rejectCancel = () => {
 };
 
 const resetForm = () => {
-  nameOptions.splice(0, nameOptions.length);
-  sizeOptions.splice(0, sizeOptions.length);
+  newnameOptions.value = [];
+  nameOptions = [];
+  newsizeOptions.value = [];
+  sizeOptions = [];
 };
 
 updateName();
@@ -301,16 +322,16 @@ updateSize();
 watch(
   () =>form.spec,
   () => {
-  refreshNextKey +=1;
   resetForm();
+  if(form.supplies_name !== "" && form.spec != "" ){
   updateSize();
+  updateName();
+  }
 });
 
 watch(
   () =>form.campus,
   () => {
-    refreshKey +=1;
-    refreshNextKey +=1;
     form.supplies_name="";
     form.spec="";
     resetForm();
@@ -320,13 +341,12 @@ watch(
 watch(
   () =>form.supplies_name,
   () => {
-    refreshNextKey +=1;
     form.spec="";
     resetForm();
+    if(form.supplies_name !== ""){
     updateName();
     updateSize();
-    console.log(sizeOptions);
-    console.log(nameOptions);
+    }
 });
 
 const isEmpty = ref(false);
