@@ -258,7 +258,7 @@
             <n-input v-model:value="specForm.spec" />
           </n-form-item>
           <n-form-item label="库存">
-            <n-input v-model:value="specForm.stock" />
+            <n-input-number clearable :min="0" v-model:value="specForm.stock" />
           </n-form-item>
         </n-form>
         <template #footer>
@@ -304,6 +304,7 @@
         role="dialog"
         aria-modal="true"
       >
+        <span>同步删除关于该物资的统计数据，借用记录会保留</span>
         <div
           style="display: flex; justify-content: space-around; margin-top: 30px"
         >
@@ -685,6 +686,11 @@ const addSpec = () => {
 };
 const confirmSpec = () => {
   // 检查是否存在相同尺码
+  if (specForm.value.stock === "") {
+    message.error("库存不能为空");
+    return;
+  }
+  console.log(specForm.value.stock);
   const existingSpecIndex = publishSuitForm.value.specs.findIndex(
     (spec) => spec.spec.toUpperCase() === specForm.value.spec.toUpperCase()
   );
