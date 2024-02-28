@@ -173,7 +173,6 @@
               <n-button size="small" @click="handleCount(tlData)">查看</n-button>
               <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
               <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
-              <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
             </td>
           </tr>
         </tbody>
@@ -197,7 +196,7 @@ import {
   NSelect
 } from "naive-ui";
 import { computed, ref, watch } from "vue";
-import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
+import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import managerForm from "./manageForm.vue";
@@ -222,6 +221,9 @@ const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
 const showCountModal = ref(false);
+const showModalCheck = ref(false);
+const showModalReject = ref(false);
+const showModaldelReject = ref(false);
 
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
@@ -296,6 +298,17 @@ const updateSuitCount = () => {
   });
 };
 
+const showcheck = () => {
+  showModalCheck.value = true;
+};
+const showsetSuppliesReturn = (kind:string) => {
+  if(kind == '正装'){
+    showModalReject.value =true;
+  }
+  else{
+    showModaldelReject.value =true;
+  }
+};
 /* ---- pending-approval ---- */
 
 const campusState_approval = ref("朝晖");
@@ -354,6 +367,7 @@ const updataTableData = () => {
 };
 
 updataTableData();
+updateSuitCount();
 
 watch(page_num, () => {
   updataTableData();
@@ -402,22 +416,6 @@ const setSuppliesReturn = (tlData: Datum) => {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
       message.success("成功"+(tlData.kind === "正装" ? "取消借出" : "删除"));
-      updateSuitCount();
-      updataInventoryData();
-      updataTableData();
-    },
-    onError: (e) => {
-      console.log(e);
-      message.error(`${e.message} || "未知错误"`);
-    }
-  });
-};
-
-const setSuppliesCancel = (id: number) => {
-  useRequest(suppliesCancleAPI({id: id}), {
-    onSuccess: (data) => {
-      if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功取消借出");
       updateSuitCount();
       updataInventoryData();
       updataTableData();
@@ -499,6 +497,7 @@ const updataInventoryData = () => {
 };
 
 updataInventoryData();
+updateSuitCount();
 
 watch(inv_page_num, () => {
   updataInventoryData();
@@ -533,13 +532,17 @@ const timeCount= (borrow_time:string) => {
   if(secondDuring < 0){
     secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,"day").unix());
   }
+  const setMinutes = Math.floor(secondDuring%60);
   const setHours = Math.floor(secondDuring/60/60%24);
   const setDay = Math.floor(secondDuring/60/60/24);
-  if (Math.abs(setDay)>0){
-    return setDay+"天\t";
+  if (setDay>0){
+  return setDay + "天" + setHours + "小时" + setMinutes + "分";
   }
-  else{
-    return setHours+"小时\t";
+  else if (setHours>0){
+  return setHours + "小时" + setMinutes + "分";
+  }
+  else if (setMinutes>0){
+  return setMinutes + "分";
   }
 };
 

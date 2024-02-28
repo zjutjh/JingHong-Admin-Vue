@@ -78,20 +78,98 @@
           </n-space>
         </n-form-item>
         <n-form-item>
-          <n-button v-if="isLoan" type="primary" style="left: 19px;top: 37px;" @click="check">
+          <n-button v-if="isLoan" type="primary" style="left: 19px;top: 37px;" @click="showCheck">
             确认归还
           </n-button>
-          <n-button v-if="!isLoan" type="primary" style="left: 19px;top: 37px;" @click="back">
+          <n-button v-if="!isLoan" type="primary" style="left: 19px;top: 37px;" @click="showBack">
             取消确认归还
           </n-button>
-          <n-button v-if="isLoan" type="error" secondary style="left: 39px ;top: 37px" @click="reject">
+          <n-button v-if="isLoan && source.kind == '正装'" type="error" secondary style="left: 39px ;top: 37px" @click="showReject">
             取消借用
+          </n-button>
+          <n-button v-if="isLoan && source.kind !== '正装' " type="error" secondary style="left: 39px ;top: 37px" @click="showDelReject">
+            删除
           </n-button>
         </n-form-item>
       </n-form>
     </n-space>
-
   </section>
+  <n-modal v-model:show="showModalCheck">
+      <n-card
+        style="width: 400px"
+        title="确认归还"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          style="display: flex; justify-content: space-around; margin-top: 30px"
+        >
+          <n-button type="primary" @click="check"
+            >确认归还</n-button
+          >
+          <n-button @click="showModalCheck = false">取消</n-button>
+        </div>
+      </n-card>
+    </n-modal>
+    <n-modal v-model:show="showModalBack">
+      <n-card
+        style="width: 400px"
+        title="确认取消归还"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          style="display: flex; justify-content: space-around; margin-top: 30px"
+        >
+          <n-button type="primary" @click="back"
+            >确认取消归还</n-button
+          >
+          <n-button @click="showModalBack = false">取消</n-button>
+        </div>
+      </n-card>
+    </n-modal>
+    <n-modal v-model:show="showModalReject">
+      <n-card
+        style="width: 400px"
+        title="确认取消借用"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          style="display: flex; justify-content: space-around; margin-top: 30px"
+        >
+          <n-button type="primary" @click="reject"
+            >确认取消借用</n-button
+          >
+          <n-button @click="showModalReject = false">取消</n-button>
+        </div>
+      </n-card>
+    </n-modal>
+    <n-modal v-model:show="showModaldelReject">
+      <n-card
+        style="width: 400px"
+        title="确认删除"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          style="display: flex; justify-content: space-around; margin-top: 30px"
+        >
+          <n-button type="primary" @click="reject"
+            >确认删除</n-button
+          >
+          <n-button @click="showModaldelReject = false">取消</n-button>
+        </div>
+      </n-card>
+    </n-modal>
 </template>
 <script setup lang="ts">
 import {
@@ -102,12 +180,17 @@ import {
   NButton,
   useMessage,
 } from "naive-ui";
-import {toRefs , reactive , computed} from "vue";
+import {toRefs , reactive , computed ,ref} from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
 import { GetSuitAPI } from "@/apis/SuitApplyAPI/index";
 //import type suitcheckitem from "@/apis/typing";
 import { useRequest } from "vue-request";
 import { Datum } from "@/apis/SuitApplyAPI/getRecord";
+
+const showModalCheck = ref (false);
+const showModalBack = ref(false);
+const showModalReject = ref(false);
+const showModaldelReject = ref(false);
 
 const emit = defineEmits(["finish", "delete", "open"]);
 const message = useMessage();
@@ -200,6 +283,19 @@ const back = () => {
 };
 
 updateSize();
+
+const showCheck = () => {
+  showModalCheck.value = true;
+};
+const showBack = () => {
+  showModalBack.value = true;
+};
+const showDelReject = () => {
+  showModaldelReject.value = true;
+};
+const showReject = () => {
+  showModalReject.value = true;
+};
 </script>
 <style>
 .form-container {
