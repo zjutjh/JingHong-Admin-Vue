@@ -47,76 +47,76 @@
       size="large"
       :round="true"
       @click="$router.push('/suitFaq')"
-      >&ensp;&ensp;问答页面&ensp;&ensp;</n-button
+    >&ensp;&ensp;问答页面&ensp;&ensp;</n-button
     >
     <n-button type="primary" size="large" :round="true" @click="showPublish()"
-      >发布正装信息</n-button
+    >发布正装信息</n-button
     >
     <n-button
       type="primary"
       size="large"
       :round="true"
       @click="$router.push('/suitManger')"
-      >&ensp;&ensp;审批清点&ensp;&ensp;</n-button
+    >&ensp;&ensp;审批清点&ensp;&ensp;</n-button
     >
   </n-space>
-  <div style="display: flex; margin-left: 1.8vw; margin-top: -15vh">
+  <div style="display: flex; margin-left: 20px; margin-top: -100px">
     <n-table :bordered="false" :single-line="false" style="width: 70%">
       <thead>
-        <tr>
-          <th>物资</th>
-          <th>类别</th>
-          <th>库存</th>
-          <th>已借出</th>
-          <th>操作</th>
-        </tr>
+      <tr>
+        <th>物资</th>
+        <th>类别</th>
+        <th>库存</th>
+        <th>已借出</th>
+        <th>操作</th>
+      </tr>
       </thead>
       <!-- 表格代码 -->
       <tbody>
-        <tr v-for="item in suitList" :key="item.name">
-          <td>{{ item.name }}</td>
-          <td>正装</td>
-          <!-- 类别默认显示正装 -->
-          <td>{{ item.totalStock }}</td>
-          <td>{{ item.totalBorrowed }}</td>
-          <td>
-            <n-button text @click="showEditorSuit(item)">编辑</n-button>
-            <n-button
-              style="margin-left: 2vw; color: red"
-              text
-              @click="deleteSuit(item)"
-              >删除</n-button
+      <tr v-for="item in suitList" :key="item.name">
+        <td>{{ item.name }}</td>
+        <td>正装</td>
+        <!-- 类别默认显示正装 -->
+        <td>{{ item.totalStock }}</td>
+        <td>{{ item.totalBorrowed }}</td>
+        <td>
+          <n-button text @click="showEditorSuit(item)">编辑</n-button>
+          <n-button
+            style="margin-left: 2vw; color: red"
+            text
+            @click="deleteSuit(item)"
+          >删除</n-button
+          >
+          <n-modal v-model:show="showModalConfirmDelete">
+            <n-card
+              style="width: 400px"
+              title="确认删除"
+              :bordered="false"
+              size="huge"
+              role="dialog"
+              aria-modal="true"
             >
-            <n-modal v-model:show="showModalConfirmDelete">
-              <n-card
-                style="width: 400px"
-                title="确认删除"
-                :bordered="false"
-                size="huge"
-                role="dialog"
-                aria-modal="true"
-              >
-                <span>同步删除关于该物资的统计数据，借用记录会保留</span>
-                <div
-                  style="
+              <span>同步删除关于该物资的统计数据，借用记录会保留</span>
+              <div
+                style="
                     display: flex;
                     justify-content: space-around;
                     margin-top: 30px;
                   "
+              >
+                <n-button
+                  type="primary"
+                  @click="deleteConfirmSuit(deleteItem)"
+                >确认删除</n-button
                 >
-                  <n-button
-                    type="primary"
-                    @click="deleteConfirmSuit(deleteItem)"
-                    >确认删除</n-button
-                  >
-                  <n-button @click="showModalConfirmDelete = false"
-                    >取消</n-button
-                  >
-                </div>
-              </n-card>
-            </n-modal>
-          </td>
-        </tr>
+                <n-button @click="showModalConfirmDelete = false"
+                >取消</n-button
+                >
+              </div>
+            </n-card>
+          </n-modal>
+        </td>
+      </tr>
       </tbody>
     </n-table>
     <n-modal v-model:show="showModal">
@@ -181,37 +181,37 @@
             <n-button
               @click="addSpec"
               style="margin-left: 30%; margin-top: -20%"
-              >+</n-button
+            >+</n-button
             >
           </n-form-item>
           <n-form-item
             style="display: flex; justify-content: center; margin-top: 4vh"
             size="small"
           >
-            <n-table :bordered="true" :single-line="false" style="width: 30vw">
+            <n-table :bordered="true" :single-line="false" style="width: 500px">
               <thead>
-                <tr>
-                  <th>尺码</th>
-                  <th>库存</th>
-                  <th v-if="showModalEditorSuit">已借出</th>
-                  <th>操作</th>
-                </tr>
+              <tr>
+                <th>尺码</th>
+                <th>库存</th>
+                <th v-if="showModalEditorSuit">已借出</th>
+                <th>操作</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="item in publishSuitForm.specs" :key="item.spec">
-                  <td>{{ item.spec }}</td>
-                  <td>{{ item.stock }}</td>
-                  <td v-if="showModalEditorSuit">{{ item.borrowed }}</td>
-                  <td>
-                    <n-button text @click="showEditor(item)">修改</n-button>
-                    <n-button
-                      style="margin-left: 2vw; color: red"
-                      text
-                      @click="deleteSpecConfirm(item)"
-                      >删除</n-button
-                    >
-                  </td>
-                </tr>
+              <tr v-for="item in publishSuitForm.specs" :key="item.spec">
+                <td>{{ item.spec }}</td>
+                <td>{{ item.stock }}</td>
+                <td v-if="showModalEditorSuit">{{ item.borrowed }}</td>
+                <td>
+                  <n-button text @click="showEditor(item)">修改</n-button>
+                  <n-button
+                    style="margin-left: 2vw; color: red"
+                    text
+                    @click="deleteSpecConfirm(item)"
+                  >删除</n-button
+                  >
+                </td>
+              </tr>
               </tbody>
             </n-table>
           </n-form-item>
@@ -222,13 +222,13 @@
               v-if="showModalPublish"
               type="primary"
               @click="publishSuitFunction(publishSuitForm)"
-              >确认</n-button
+            >确认</n-button
             >
             <n-button
               v-else
               type="primary"
               @click="setSuitFunction(publishSuitForm)"
-              >确认</n-button
+            >确认</n-button
             >
             <n-button
               @click="
@@ -238,7 +238,7 @@
                 cleanPublishSuitForm();
               "
               style="margin-left: 10vh"
-              >取消</n-button
+            >取消</n-button
             >
           </div>
         </template>
@@ -309,7 +309,7 @@
           style="display: flex; justify-content: space-around; margin-top: 30px"
         >
           <n-button type="primary" @click="deleteSpec(deleteSpecItem)"
-            >确认删除</n-button
+          >确认删除</n-button
           >
           <n-button @click="showModalConfirmDeleteSpec = false">取消</n-button>
         </div>

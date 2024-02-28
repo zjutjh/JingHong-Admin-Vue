@@ -23,7 +23,7 @@ const emit = defineEmits(["finish", "delete", "open"]);
 const message = useMessage();
 const formData = ref<Partial<LostfoundAPI.LostItem>>(initialValue?.value || {
   kind: "其他",
-  type: false,
+  type: true,
   campus: "朝晖",
 });
 const kindOptions = ref<{ label: string; value: string }[]>();
