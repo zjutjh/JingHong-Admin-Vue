@@ -3,12 +3,13 @@ import SchoolBus from "../pages/SchoolBus.vue";
 import TermTime from "../pages/TermTime.vue";
 import Announcement from "../pages/Announcement.vue";
 import Information from "../pages/Information.vue";
-import LostfoundPage from "../pages/LostfoundPage/index.vue";
 import Dashboard from "../pages/Dashboard/index.vue";
 import Layout from "../components/Layout.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "../store";
 import getUserInfoAPI from "../apis/UserAPI/getUserInfo";
+import Found from "@/pages/LostfoundPage/Found.vue";
+import Lost from "@/pages/LostfoundPage/Lost.vue";
 
 const routes = [
   {
@@ -65,13 +66,22 @@ const routes = [
         component: Announcement,
       },
       {
-        path: "lostfound",
-        name: "Lostfound",
+        path: "lost",
+        name: "Lost",
         meta: {
-          title: "失物寻物",
+          title: "失物",
           requestAuth: true,
         },
-        component: LostfoundPage,
+        component: Lost,
+      },
+      {
+        path: "found",
+        name: "Found",
+        meta: {
+          title: "寻物",
+          requestAuth: true,
+        },
+        component: Found,
       },
       {
         path: "information",
