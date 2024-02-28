@@ -7,5 +7,5 @@ export {
   getAnnouncementAPI,
   createAnnouncementAPI,
   updateAnnouncementAPI,
-  deleteAnnouncementAPI
+  deleteAnnouncementAPI,
 };

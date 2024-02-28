@@ -2,7 +2,7 @@ import request from "../request";
 
 type UpdateRecordData = Omit<
   LostfoundAPI.Item,
-  "id" | "publish_time" | "is_processed"
+  "publish_time" | "is_processed"
 >;
 
 type UpdateRecordResult = Common.IResponse<null>;
