@@ -116,7 +116,7 @@ const routes = [
       },
       {
         path: "suitManger",
-        name: "SuitManger",
+        name: "suitManger",
         meta: {
           title: "审批清点",
           requestAuth: true,

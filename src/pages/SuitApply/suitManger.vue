@@ -6,14 +6,14 @@
     <n-button type="info" @click="switchPage()" class="switch-page-button">切换为归还清点</n-button>
     <div class="button-div">
       <n-button
-      v-for="cam in campusList"
-      :key="cam"
-      type="primary"
-      size="large"
-      round
-      class="campus-button"
-      :color="getButtonColor_approval(cam)"
-      @click="switchCampus_approval(cam)">
+        v-for="cam in campusList"
+        :key="cam"
+        type="primary"
+        size="large"
+        round
+        class="campus-button"
+        :color="getButtonColor_approval(cam)"
+        @click="switchCampus_approval(cam)">
         {{ cam }}
       </n-button>
     </div>
@@ -48,38 +48,38 @@
     <div>
       <n-table size="small">
         <thead>
-          <th>id</th>
-          <th>姓名</th>
-          <th>学号</th>
-          <th>种类</th>
-          <th>名称</th>
-          <th>尺码</th>
-          <th>数量</th>
-          <th>申请日期</th>
-          <th>状态</th>
-          <th>操作</th>
+        <th>id</th>
+        <th>姓名</th>
+        <th>学号</th>
+        <th>种类</th>
+        <th>名称</th>
+        <th>尺码</th>
+        <th>数量</th>
+        <th>申请日期</th>
+        <th>状态</th>
+        <th>操作</th>
         </thead>
         <tbody>
-          <tr v-for="tlData in tableData" :key="tlData.id">
-            <manager-form
-                v-if="showManagerForm"
-                @open="handleOpenManagerForm"
-                :source="selectedTlData"
-                :campus="campusState_approval"
-              />
-            <td>{{ tlData.id }}</td>
-            <td>{{ tlData.name }}</td>
-            <td>{{ tlData.student_id }}</td>
-            <td>{{ tlData.kind }}</td>
-            <td>{{ tlData.supplies_name }}</td>
-            <td>{{ tlData.spec }}</td>
-            <td>{{ tlData.count }}</td>
-            <td>{{ timeFormat(tlData.apply_time) }}</td>
-            <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
-            <td>
+        <tr v-for="tlData in tableData" :key="tlData.id">
+          <manager-form
+            v-if="showManagerForm"
+            @open="handleOpenManagerForm"
+            :source="selectedTlData"
+            :campus="campusState_approval"
+          />
+          <td>{{ tlData.id }}</td>
+          <td>{{ tlData.name }}</td>
+          <td>{{ tlData.student_id }}</td>
+          <td>{{ tlData.kind }}</td>
+          <td>{{ tlData.supplies_name }}</td>
+          <td>{{ tlData.spec }}</td>
+          <td>{{ tlData.count }}</td>
+          <td>{{ timeFormat(tlData.apply_time) }}</td>
+          <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
+          <td>
             <n-button size="small" @click="handleManager(tlData)">审批</n-button>
-            </td>
-          </tr>
+          </td>
+        </tr>
         </tbody>
       </n-table>
       <n-pagination v-model:page="page_num" :page-count="total_page_num" />
@@ -95,14 +95,14 @@
     <n-button type="primary" class="output-button" @click="exportButton">导出</n-button>
     <div class="button-div">
       <n-button
-      v-for="cam in campusList"
-      :key="cam"
-      type="primary"
-      size="large"
-      round
-      class="campus-button"
-      :color="getButtonColor_inventory(cam)"
-      @click="switchCampus_inventory(cam)">
+        v-for="cam in campusList"
+        :key="cam"
+        type="primary"
+        size="large"
+        round
+        class="campus-button"
+        :color="getButtonColor_inventory(cam)"
+        @click="switchCampus_inventory(cam)">
         {{ cam }}
       </n-button>
     </div>
@@ -137,44 +137,45 @@
     <div>
       <n-table size="small">
         <thead>
-          <th>id</th>
-          <th>姓名</th>
-          <th>学号</th>
-          <th>种类</th>
-          <th>名称</th>
-          <th>尺码</th>
-          <th>数量</th>
-          <th>借用日期</th>
-          <th>归还日期</th>
-          <th>状态</th>
-          <th>操作</th>
+        <th>id</th>
+        <th>姓名</th>
+        <th>学号</th>
+        <th>种类</th>
+        <th>名称</th>
+        <th>尺码</th>
+        <th>数量</th>
+        <th>借用日期</th>
+        <th>归还日期</th>
+        <th>状态</th>
+        <th>操作</th>
         </thead>
         <tbody>
-          <tr v-for="tlData in inv_tableData" :key="tlData.id">
-            <count-form
-              v-if="showCountForm"
-              @open="handleOpenCountForm"
-              :source="selectedTlData"
-              :campus="campusState_inventory"
-            />
-            <td>{{ tlData.id }}</td>
-            <td>{{ tlData.name }}</td>
-            <td>{{ tlData.student_id }}</td>
-            <td>{{ tlData.kind }}</td>
-            <td>{{ tlData.supplies_name }}</td>
-            <td>{{ tlData.spec }}</td>
-            <td>{{ tlData.count }}</td>
-            <td>{{ timeFormat(tlData.borrow_time) }}</td>
-            <td v-if="tlData.status === 4" >{{ timeFormat(tlData.return_time) }}</td>
-            <td v-else-if="tlData.status === 3 && !isOverTime(tlData.borrow_time)" >剩余{{ timeCount(tlData.borrow_time) }}</td>
-            <td v-else-if="tlData.status === 3 && isOverTime(tlData.borrow_time)" >超时{{ timeCount(tlData.borrow_time) }}</td>
-            <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
-            <td>
-              <n-button size="small" @click="handleCount(tlData)">查看</n-button>
-              <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
-              <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
-            </td>
-          </tr>
+        <tr v-for="tlData in inv_tableData" :key="tlData.id">
+          <count-form
+            v-if="showCountForm"
+            @open="handleOpenCountForm"
+            :source="selectedTlData"
+            :campus="campusState_inventory"
+          />
+          <td>{{ tlData.id }}</td>
+          <td>{{ tlData.name }}</td>
+          <td>{{ tlData.student_id }}</td>
+          <td>{{ tlData.kind }}</td>
+          <td>{{ tlData.supplies_name }}</td>
+          <td>{{ tlData.spec }}</td>
+          <td>{{ tlData.count }}</td>
+          <td>{{ timeFormat(tlData.borrow_time) }}</td>
+          <td v-if="tlData.status === 4" >{{ timeFormat(tlData.return_time) }}</td>
+          <td v-else-if="tlData.status === 3 && !isOverTime(tlData.borrow_time)" >剩余{{ timeCount(tlData.borrow_time) }}</td>
+          <td v-else-if="tlData.status === 3 && isOverTime(tlData.borrow_time)" >超时{{ timeCount(tlData.borrow_time) }}</td>
+          <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
+          <td>
+            <n-button size="small" @click="handleCount(tlData)">查看</n-button>
+            <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
+            <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
+            <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
+          </td>
+        </tr>
         </tbody>
       </n-table>
       <n-pagination v-model:page="inv_page_num" :page-count="inv_total_page_num" />
@@ -196,7 +197,7 @@ import {
   NSelect
 } from "naive-ui";
 import { computed, ref, watch } from "vue";
-import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
+import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
 import managerForm from "./manageForm.vue";
@@ -221,9 +222,6 @@ const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
 const showCountModal = ref(false);
-const showModalCheck = ref(false);
-const showModalReject = ref(false);
-const showModaldelReject = ref(false);
 
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
@@ -280,15 +278,17 @@ const updateSuitCount = () => {
       ( campusState_inventory.value === "朝晖" ? 1 : (campusState_inventory.value==="屏峰" ? 2 : 3) ),
   }),{
     onSuccess: (data) => {
-      console.log(data);
-      const resData = data.data;
-      countDataBeta.value = data.data;
-      if (data.code !== 1) throw new Error(data.msg);
-      countData.value = [];
-      for(let i=0; i<resData.length; i++){
-        countData.value.push([resData[i].name, 0]);
-        for(let j=0; j<resData[i].specs.length; j++){
-          countData.value[countData.value.length-1][1] += resData[i].specs[j].borrowed;
+      if(data.data !== null){
+        console.log(data);
+        const resData = data.data;
+        countDataBeta.value = data.data;
+        if (data.code !== 1) throw new Error(data.msg);
+        countData.value = [];
+        for(let i=0; i<resData.length; i++){
+          countData.value.push([resData[i].name, 0]);
+          for(let j=0; j<resData[i].specs.length; j++){
+            countData.value[countData.value.length-1][1] += resData[i].specs[j].borrowed;
+          }
         }
       }
     },
@@ -298,17 +298,6 @@ const updateSuitCount = () => {
   });
 };
 
-const showcheck = () => {
-  showModalCheck.value = true;
-};
-const showsetSuppliesReturn = (kind:string) => {
-  if(kind == '正装'){
-    showModalReject.value =true;
-  }
-  else{
-    showModaldelReject.value =true;
-  }
-};
 /* ---- pending-approval ---- */
 
 const campusState_approval = ref("朝晖");
@@ -367,7 +356,6 @@ const updataTableData = () => {
 };
 
 updataTableData();
-updateSuitCount();
 
 watch(page_num, () => {
   updataTableData();
@@ -411,11 +399,27 @@ const getButtonColor_inventory = (buttonName: string) => {
   return campusState_inventory.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
 
-const setSuppliesReturn = (tlData: Datum) => {
-  useRequest(suppliesReturnAPI({id: tlData.id,supplies_return: 2}), {
+const setSuppliesReturn = (id: number) => {
+  useRequest(suppliesReturnAPI({id: id,supplies_return: 2}), {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功"+(tlData.kind === "正装" ? "取消借出" : "删除"));
+      message.success("成功删除");
+      updateSuitCount();
+      updataInventoryData();
+      updataTableData();
+    },
+    onError: (e) => {
+      console.log(e);
+      message.error(`${e.message} || "未知错误"`);
+    }
+  });
+};
+
+const setSuppliesCancel = (id: number) => {
+  useRequest(suppliesCancleAPI({id: id}), {
+    onSuccess: (data) => {
+      if (data.code !== 1) throw new Error(data.msg);
+      message.success("成功取消借出");
       updateSuitCount();
       updataInventoryData();
       updataTableData();
@@ -497,7 +501,6 @@ const updataInventoryData = () => {
 };
 
 updataInventoryData();
-updateSuitCount();
 
 watch(inv_page_num, () => {
   updataInventoryData();
@@ -532,17 +535,13 @@ const timeCount= (borrow_time:string) => {
   if(secondDuring < 0){
     secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,"day").unix());
   }
-  const setMinutes = Math.floor(secondDuring%60);
   const setHours = Math.floor(secondDuring/60/60%24);
   const setDay = Math.floor(secondDuring/60/60/24);
-  if (setDay>0){
-  return setDay + "天" + setHours + "小时" + setMinutes + "分";
+  if (Math.abs(setDay)>0){
+    return setDay+"天\t";
   }
-  else if (setHours>0){
-  return setHours + "小时" + setMinutes + "分";
-  }
-  else if (setMinutes>0){
-  return setMinutes + "分";
+  else{
+    return setHours+"小时\t";
   }
 };
 
@@ -557,13 +556,10 @@ const check = (id:number) => {
     id: id,
   }),{
     onSuccess: (data) =>{
-        if(data.code==1){
-          message.success("已处理归还");
-          location.reload();
-          updateSuitCount();
-          updataInventoryData();
-          updataTableData();
-        }
+      if(data.code==1){
+        message.success("已处理归还");
+        location.reload();
+      }
     },
   });
 };
