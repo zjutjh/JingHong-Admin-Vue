@@ -30,7 +30,7 @@
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
-        style="width: 400px"
+        style="width: fit-content"
         title="统计"
         :bordered="false"
         size="huge"
@@ -119,7 +119,7 @@
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
-        style="width: 400px"
+        style="width: fit-content"
         title="统计"
         :bordered="false"
         size="huge"
