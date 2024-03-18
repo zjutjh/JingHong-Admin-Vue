@@ -559,7 +559,6 @@ const check = (id:number) => {
     onSuccess: (data) =>{
         if(data.code==1){
           message.success("已处理归还");
-          location.reload();
           updateSuitCount();
           updataInventoryData();
           updataTableData();
