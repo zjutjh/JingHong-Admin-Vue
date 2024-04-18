@@ -12,11 +12,16 @@ export default defineStore("manger", () => {
   const setCampusState_inventory = (campus: string) => {
     campusState_inventory.value = campus;
   };
-
+  const campusState_index = ref("button1");
+  const setCampusState_index = (campus: string) => {
+    campusState_inventory.value = campus;
+  };
   return {
     containId,
     setContianId,
     campusState_inventory,
-    setCampusState_inventory
+    setCampusState_inventory,
+    campusState_index,
+    setCampusState_index
   };
 });
