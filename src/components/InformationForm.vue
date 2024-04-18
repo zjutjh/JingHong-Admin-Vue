@@ -128,10 +128,10 @@ const handleDelete = () => {
     <n-space style="width: 100%">
       <n-form style="max-width: 400px">
         <n-form-item label="标题">
-          <n-input v-model:value="formData.title" style="width: 400px" maxlength="15"/>
+          <n-input v-model:value="formData.title" style="width: 400px" maxlength="9999999"/>
         </n-form-item>
         <n-form-item label="内容">
-          <n-input type="textarea" maxlength="44" v-model:value="formData.content" :autosize="{ minRows: 5 }"
+          <n-input type="textarea" v-model:value="formData.content" :autosize="{ minRows: 5 } " maxlength="9999999"
             style="width: 400px" />
         </n-form-item>
         <n-form-item label="上传图片 (最多3张)">
