@@ -211,6 +211,23 @@
       </template>
     </n-card>
   </n-modal>
+  <n-modal v-model:show="showBatchReturnCancel">
+    <n-card
+      style="width: 400px"
+      title="确认批量审批"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+          <n-button @click="batchReturnCancel" type="primary">确认</n-button>
+          <n-button @click="showBatchReturnCancel = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
   <n-modal v-model:show="showBatchApprovalReject">
     <n-card
       style="width: 400px"
