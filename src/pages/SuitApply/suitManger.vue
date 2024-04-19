@@ -24,9 +24,13 @@
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataTableDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
       <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
-    <div class="counter" @click="clickCounter">
+    <div style="display: inline-flex; ">
+    <div class="counter" @click="clickCounter" style="width: 900px">
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
+    </div>
+    <n-button type="primary" size="small" @click="showBatchApprovalCheck = true">批量审批通过</n-button>
+    <n-button type="warning" size="small" style="margin-left: 10px" @click="showBatchApprovalReject = true">批量审批驳回</n-button>
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
@@ -48,6 +52,7 @@
     <div>
       <n-table size="small">
         <thead>
+        <th style="justify-content: center;display: flex">选择</th>
         <th>id</th>
         <th>姓名</th>
         <th>学号</th>
@@ -67,6 +72,7 @@
             :source="selectedTlData"
             :campus="campusState_approval"
           />
+          <td><n-checkbox  @change="toggleSelectedApproval(tlData.id)"  style="margin-left: 10px"/></td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -113,9 +119,13 @@
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
       <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
-    <div class="counter" @click="clickCounter">
+    <div style="display: inline-flex">
+    <div class="counter" @click="clickCounter" style="width: 900px">
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
+    </div>
+    <n-button type="primary" size="small" @click="showBatchReturnApprove = true">批量确认归还</n-button>
+    <n-button type="warning" size="small" style="margin-left: 10px" @click="showBatchReturnCancel = true">批量取消借出</n-button>
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
@@ -137,6 +147,7 @@
     <div>
       <n-table size="small">
         <thead>
+        <th style="justify-content: center;display: flex">选择</th>
         <th>id</th>
         <th>姓名</th>
         <th>学号</th>
@@ -148,6 +159,7 @@
         <th>归还日期</th>
         <th>状态</th>
         <th>操作</th>
+
         </thead>
         <tbody>
         <tr v-for="tlData in inv_tableData" :key="tlData.id">
@@ -157,6 +169,7 @@
             :source="selectedTlData"
             :campus="campusState_inventory"
           />
+          <td><n-checkbox  @change="toggleSelectedBack(tlData.id)"  style="margin-left: 10px"/></td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -169,7 +182,7 @@
           <td v-else-if="tlData.status === 3 && !isOverTime(tlData.borrow_time)" >剩余{{ timeCount(tlData.borrow_time) }}</td>
           <td v-else-if="tlData.status === 3 && isOverTime(tlData.borrow_time)" >超时{{ timeCount(tlData.borrow_time) }}</td>
           <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
-          <td>
+          <td >
             <n-button size="small" @click="handleCount(tlData)">查看</n-button>
             <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
             <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
@@ -181,6 +194,57 @@
       <n-pagination v-model:page="inv_page_num" :page-count="inv_total_page_num" />
     </div>
   </section>
+  <n-modal v-model:show="showBatchReturnApprove">
+    <n-card
+      style="width: 400px"
+      title="确认批量审批"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+        <n-button @click="batchReturnApprove" type="primary">确认</n-button>
+        <n-button @click="showBatchReturnApprove = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showBatchApprovalReject">
+    <n-card
+      style="width: 400px"
+      title="确认批量驳回"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+          <n-button @click="batchApprovalReject" type="primary">确认</n-button>
+          <n-button @click="showBatchApprovalReject = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showBatchApprovalCheck">
+    <n-card
+      style="width: 400px"
+      title="确认批量通过"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+          <n-button @click="batchApprovalCheck" type="primary">确认</n-button>
+          <n-button @click="showBatchApprovalCheck = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
 </template>
 
 <script setup lang="ts">
@@ -204,6 +268,9 @@ import managerForm from "./manageForm.vue";
 import countForm from "./countForm.vue";
 import dayjs from "dayjs";
 import { useMangerStore } from "@/store";
+import batchSuppilesReturnAPI from "@/apis/SuitApplyAPI/batchSuppilesReturn";
+import batchSuppliesReturnAPI from "@/apis/SuitApplyAPI/batchSuppilesReturn";
+import batchApprovalAPI from "@/apis/SuitApplyAPI/batchApproval";
 
 const handleBack = () => {
   router.push("/suitapply");
@@ -222,13 +289,124 @@ const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
 const showCountModal = ref(false);
-
+const checked = ref();
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
 const fliter_suitapply_nameUpdate = (value: string) => { fliter_suitapply_name.value = value; };
 const fliter_specUpdate = (value: string) => { fliter_spec.value = value; };
 const countData = ref();
 const countDataBeta = ref();
+const showBatchReturnApprove = ref(false);
+const showBatchReturnCancel = ref(false);
+const showBatchApprovalCheck = ref(false);
+const showBatchApprovalReject = ref(false);
+const checkedBackId = ref<number[]>([]);
+const checkedApprovalId = ref<number[]>([]);
+const batchReturnApprove = () => {
+  showBatchReturnApprove.value = false;
+  useRequest(batchSuppliesReturnAPI({
+    ids: checkedBackId.value,
+    supplies_return: 1,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updataTableData();
+        checkedBackId.value = [];
+      }else{
+        message.error("批量操作失败");
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
+const toggleSelectedBack = (Id: number) => {
+  if (checkedBackId.value.includes(Id)) {
+    // 如果学生已选中，则取消选中
+    checkedBackId.value = checkedBackId.value.filter(id => id !== Id);
+  } else {
+    // 如果学生未选中，则选中
+    checkedBackId.value.push(Id);
+  }
+  console.log(checkedBackId);
+};
+
+const toggleSelectedApproval = (Id: number) => {
+  if (checkedApprovalId.value.includes(Id)) {
+    // 如果学生已选中，则取消选中
+    checkedApprovalId.value = checkedApprovalId.value.filter(id => id !== Id);
+  } else {
+    // 如果学生未选中，则选中
+    checkedApprovalId.value.push(Id);
+  }
+};
+
+const batchReturnCancel = () => {
+  showBatchReturnCancel.value = false;
+  useRequest(batchSuppliesReturnAPI({
+    ids: checkedBackId.value,
+    supplies_return: 2,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updataTableData();
+        checkedBackId.value = [];
+      }else{
+        message.error("批量操作失败");
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
+const batchApprovalCheck = () => {
+  showBatchApprovalCheck.value = false;
+  useRequest(batchApprovalAPI({
+    ids: checkedApprovalId.value,
+    supplies_return: 1,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updataTableData();
+        checkedApprovalId.value = [];
+      }else{
+        message.error("批量操作失败");
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
+const batchApprovalReject = () => {
+  showBatchApprovalReject.value = false;
+  useRequest(batchApprovalAPI({
+    ids: checkedApprovalId.value,
+    supplies_return: 2,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updataTableData();
+        checkedApprovalId.value = [];
+      }else{
+        message.error("批量操作失败");
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
 const stateOption = computed(() => {
   if(containId.value){
     return [{
