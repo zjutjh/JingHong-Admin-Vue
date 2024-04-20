@@ -276,12 +276,18 @@ const importInfo = () => {
       name: stuName.value,
       student_id: studentId.value,
     };
-    console.log(data);
+    // console.log(data);
     useRequest(setSuppliesImportAPI(data), {
       onSuccess(data){
         if(data.code !== 1) throw new Error(data.msg);
         message.success("导入成功");
-        router.push("/suitManger");
+        // router.push("/suitManger");
+        suitName.value = "";
+        suitNumber.value = "";
+        suitSpec.value = "";
+        suitStock.value = "";
+        if(isSuit.value === 0) suitkind.value = "";
+        suitCampus.value = mangerStore.campusState_inventory === "朝晖" ? 1 : (mangerStore.campusState_inventory === "屏峰" ? 2 : 3);
       },
       onError: (e) => {
         console.log(e);
