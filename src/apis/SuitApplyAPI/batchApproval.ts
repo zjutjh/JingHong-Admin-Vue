@@ -3,7 +3,7 @@ import request from "../request";
 
 const batchApprovalAPI = (data:{
   ids:number[],
-  supplies_return:number
+  supplies_check:number
 }) => {
   return request<any>({
     method: "POST",

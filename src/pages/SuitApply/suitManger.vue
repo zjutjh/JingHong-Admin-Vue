@@ -72,7 +72,7 @@
             :source="selectedTlData"
             :campus="campusState_approval"
           />
-          <td><n-checkbox  @change="toggleSelectedApproval(tlData.id)"  style="margin-left: 10px"/></td>
+          <td ><n-checkbox  @change="toggleSelectedApproval(tlData.id)" :disabled= "tlData.status === 2" style="margin-left: 10px"/></td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -169,7 +169,7 @@
             :source="selectedTlData"
             :campus="campusState_inventory"
           />
-          <td><n-checkbox  @change="toggleSelectedBack(tlData.id)"  style="margin-left: 10px"/></td>
+          <td><n-checkbox  @change="toggleSelectedBack(tlData.id)" :disabled=" tlData.status !== 3" style="margin-left: 10px"/></td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -328,10 +328,12 @@ const batchReturnApprove = () => {
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
+        updateSuitCount();
+        updataInventoryData();
         updataTableData();
         checkedBackId.value = [];
       }else{
-        message.error("批量操作失败");
+        message.error(data.msg);
         throw new Error(data.msg);
       }
     },
@@ -370,10 +372,12 @@ const batchReturnCancel = () => {
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
+        updateSuitCount();
+        updataInventoryData();
         updataTableData();
         checkedBackId.value = [];
       }else{
-        message.error("批量操作失败");
+        message.error(data.msg);
         throw new Error(data.msg);
       }
     },
@@ -386,7 +390,7 @@ const batchApprovalCheck = () => {
   showBatchApprovalCheck.value = false;
   useRequest(batchApprovalAPI({
     ids: checkedApprovalId.value,
-    supplies_return: 1,
+    supplies_check: 1,
   }),{
     onSuccess: (data) => {
       if(data.code === 1){
@@ -394,7 +398,7 @@ const batchApprovalCheck = () => {
         updataTableData();
         checkedApprovalId.value = [];
       }else{
-        message.error("批量操作失败");
+        message.error( data.msg);
         throw new Error(data.msg);
       }
     },
@@ -407,7 +411,7 @@ const batchApprovalReject = () => {
   showBatchApprovalReject.value = false;
   useRequest(batchApprovalAPI({
     ids: checkedApprovalId.value,
-    supplies_return: 2,
+    supplies_check: 2,
   }),{
     onSuccess: (data) => {
       if(data.code === 1){
@@ -415,7 +419,7 @@ const batchApprovalReject = () => {
         updataTableData();
         checkedApprovalId.value = [];
       }else{
-        message.error("批量操作失败");
+        message.error( data.msg);
         throw new Error(data.msg);
       }
     },
