@@ -31,7 +31,6 @@
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
     </div>
-
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
@@ -53,7 +52,7 @@
     <div>
       <n-table size="small">
         <thead>
-        <th style="justify-content: center;display: flex">选择</th>
+        <th style="justify-content: center;display: flex"><n-checkbox v-model:checked="selectAllChecked_approval" @change="toggleSelectAllApproval"></n-checkbox ><span style="margin-left: 5px">选择</span></th>
         <th>id</th>
         <th>姓名</th>
         <th>学号</th>
@@ -73,7 +72,9 @@
             :source="selectedTlData"
             :campus="campusState"
           />
-          <td ><n-checkbox  @change="toggleSelectedApproval(tlData.id)" :disabled= "tlData.status === 2" style="margin-left: 10px"/></td>
+          <td style="display: flex;justify-content: center"><n-checkbox  :checked="isSelectedApproval(tlData.id)"
+                            @change="toggleSelectedApproval(tlData.id)"
+                            :disabled="tlData.status !== 1"/></td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -148,7 +149,7 @@
     <div>
       <n-table size="small">
         <thead>
-        <th style="justify-content: center;display: flex">选择</th>
+        <th style="justify-content: center;display: flex"><n-checkbox v-model:checked="selectAllChecked" @change="toggleSelectAll" /><span style="margin-left: 5px">选择</span></th>
         <th>id</th>
         <th>姓名</th>
         <th>学号</th>
@@ -170,7 +171,13 @@
             :source="selectedTlData"
             :campus="campusState"
           />
-          <td><n-checkbox  @change="toggleSelectedBack(tlData.id)" :disabled=" tlData.status !== 3" style="margin-left: 10px"/></td>
+          <td><n-checkbox
+            :checked="isSelected(tlData.id)"
+            @change="toggleSelected(tlData.id)"
+            :disabled="tlData.status !== 3"
+            style="margin-left: 10px"
+          />
+          </td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -217,7 +224,7 @@
   <n-modal v-model:show="showBatchReturnApprove">
     <n-card
       style="width: 400px"
-      title="确认批量审批"
+      title="确认批量归还"
       :bordered="false"
       size="huge"
       role="dialog"
@@ -234,7 +241,7 @@
   <n-modal v-model:show="showBatchReturnCancel">
     <n-card
       style="width: 400px"
-      title="确认批量审批"
+      title="确认批量取消"
       :bordered="false"
       size="huge"
       role="dialog"
@@ -325,6 +332,7 @@ const fliter_student_id = ref<string>();
 const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
+const inv_tableData = ref<Datum[]>();
 const showCountModal = ref(false);
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
@@ -341,6 +349,90 @@ const checkedApprovalId = ref<number[]>([]);
 const showConfirmModal = ref(false);
 const confirmModalData = ref();
 
+// 存储选中行的 ID
+const selectedIds = ref<number[]>([]);
+const selectedIdsApproval = ref<number[]>([]);
+
+// 全选复选框的状态
+const selectAllChecked = computed(() => {
+
+  if (selectedIds.value.length === 0) {
+    return false; // 如果没有选中任何行，则全选复选框为未选中状态
+  } else {
+    // 判断是否所有状态为3的行都被选中
+    if(inv_tableData.value) {
+
+      const allSelectableItems = inv_tableData.value.filter(item => item.status === 3);
+      return allSelectableItems.every(item => selectedIds.value.includes(item.id));
+    }
+  }
+});
+const selectAllChecked_approval = computed(() => {
+  if (selectedIdsApproval.value.length === 0) {
+    return false; // 如果没有选中任何行，则全选复选框为未选中状态
+  } else {
+    // 判断是否所有状态为1的行都被选中
+    if(tableData.value) {
+
+      const allSelectableItems = tableData.value.filter((item: { status: number; }) => item.status === 1 );
+      return allSelectableItems.every((item: { id: number; }) => selectedIdsApproval.value.includes(item.id));
+
+    }
+  }
+});
+
+// 判断某行是否选中
+const isSelected = (id:number) => {
+  return selectedIds.value.includes(id);
+};
+const isSelectedApproval = (id:number) => {
+  return selectedIdsApproval.value.includes(id);
+};
+// 全选/取消全选
+const toggleSelectAll = () => {
+  if (selectAllChecked.value) {
+    // 如果当前已经全选，则取消全选
+    selectedIds.value = [];
+  } else {
+    // 否则选中所有可选行的 ID
+    if(inv_tableData.value) {
+      const allSelectableItems = inv_tableData.value.filter(item => item.status === 3);
+      selectedIds.value = allSelectableItems.map(item => item.id);
+    }
+  }
+};
+const toggleSelectAllApproval = () => {
+  if (selectAllChecked_approval.value) {
+    // 如果当前已经全选，则取消全选
+    selectedIdsApproval.value = [];
+  } else {
+    // 否则选中所有可选行的 ID
+    if(tableData.value) {
+      const allSelectableItems = tableData.value.filter((item: { status: number; }) => item.status === 1);
+      selectedIdsApproval.value = allSelectableItems.map((item: { id: any; }) => item.id);
+    }
+  }
+};
+
+
+// 单个行复选框状态改变
+const toggleSelected = (id:number) => {
+  if (isSelected(id)) {
+    selectedIds.value = selectedIds.value.filter(item => item !== id);
+  } else {
+    selectedIds.value.push(id);
+  }
+};
+
+const toggleSelectedApproval = (id:number) => {
+  if (isSelectedApproval(id)) {
+    selectedIdsApproval.value = selectedIdsApproval.value.filter(item => item !== id);
+  } else {
+    selectedIdsApproval.value.push(id);
+  }
+};
+
+
 const showConfirmModalFunc = (data: any) => {
   console.log("1145141919810");
   showConfirmModal.value = true;
@@ -350,7 +442,7 @@ const showConfirmModalFunc = (data: any) => {
 const batchReturnApprove = () => {
   showBatchReturnApprove.value = false;
   useRequest(batchSuppliesReturnAPI({
-    ids: checkedBackId.value,
+    ids: selectedIds.value,
     supplies_return: 1,
   }),{
     onSuccess: (data) => {
@@ -359,7 +451,7 @@ const batchReturnApprove = () => {
         updateSuitCount();
         updataInventoryData();
         updataTableData();
-        checkedBackId.value = [];
+        selectedIds.value = [];
       }else{
         message.error(data.msg);
         throw new Error(data.msg);
@@ -371,30 +463,12 @@ const batchReturnApprove = () => {
   });
 };
 
-const toggleSelectedBack = (Id: number) => {
-  if (checkedBackId.value.includes(Id)) {
-    // 如果学生已选中，则取消选中
-    checkedBackId.value = checkedBackId.value.filter(id => id !== Id);
-  } else {
-    // 如果学生未选中，则选中
-    checkedBackId.value.push(Id);
-  }
-};
 
-const toggleSelectedApproval = (Id: number) => {
-  if (checkedApprovalId.value.includes(Id)) {
-    // 如果学生已选中，则取消选中
-    checkedApprovalId.value = checkedApprovalId.value.filter(id => id !== Id);
-  } else {
-    // 如果学生未选中，则选中
-    checkedApprovalId.value.push(Id);
-  }
-};
 
 const batchReturnCancel = () => {
   showBatchReturnCancel.value = false;
   useRequest(batchSuppliesReturnAPI({
-    ids: checkedBackId.value,
+    ids: selectedIds.value,
     supplies_return: 2,
   }),{
     onSuccess: (data) => {
@@ -403,7 +477,7 @@ const batchReturnCancel = () => {
         updateSuitCount();
         updataInventoryData();
         updataTableData();
-        checkedBackId.value = [];
+        selectedIds.value = [];
       }else{
         message.error(data.msg);
         throw new Error(data.msg);
@@ -417,14 +491,14 @@ const batchReturnCancel = () => {
 const batchApprovalCheck = () => {
   showBatchApprovalCheck.value = false;
   useRequest(batchApprovalAPI({
-    ids: checkedApprovalId.value,
+    ids: selectedIdsApproval.value,
     supplies_check: 1,
   }),{
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
         updataTableData();
-        checkedApprovalId.value = [];
+        selectedIdsApproval.value = [];
       }else{
         message.error( data.msg);
         throw new Error(data.msg);
@@ -438,14 +512,14 @@ const batchApprovalCheck = () => {
 const batchApprovalReject = () => {
   showBatchApprovalReject.value = false;
   useRequest(batchApprovalAPI({
-    ids: checkedApprovalId.value,
+    ids: selectedIdsApproval.value,
     supplies_check: 2,
   }),{
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
         updataTableData();
-        checkedApprovalId.value = [];
+        selectedIdsApproval.value = [];
       }else{
         message.error( data.msg);
         throw new Error(data.msg);
@@ -600,7 +674,7 @@ const getButtonColor_approval = (buttonName: string) => {
 
 const inv_page_num = ref(1);
 const inv_total_page_num = ref(0);
-const inv_tableData = ref<Datum[]>();
+
 
 watch(fliter_state, () => {
   updataInventoryDataWithFliter();
