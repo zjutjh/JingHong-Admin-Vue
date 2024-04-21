@@ -25,12 +25,13 @@
       <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
     <div style="display: inline-flex; ">
-    <div class="counter" @click="clickCounter" style="width: 900px">
+      <n-button type="primary" size="small" @click="showBatchApprovalCheck = true" style="margin-left: 10px">批量审批通过</n-button>
+      <n-button type="warning" size="small"  @click="showBatchApprovalReject = true" style="margin-left: 30px">批量审批驳回</n-button>
+    <div class="counter" @click="clickCounter" style="width: 800px ;margin-left: 100px">
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
     </div>
-    <n-button type="primary" size="small" @click="showBatchApprovalCheck = true">批量审批通过</n-button>
-    <n-button type="warning" size="small" style="margin-left: 10px" @click="showBatchApprovalReject = true">批量审批驳回</n-button>
+
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
@@ -120,12 +121,12 @@
       <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
     <div style="display: inline-flex">
-    <div class="counter" @click="clickCounter" style="width: 900px">
+      <n-button type="primary" size="small" @click="showBatchReturnApprove = true" style="margin-left: 10px">批量确认归还</n-button>
+      <n-button type="warning" size="small"  @click="showBatchReturnCancel = true" style="margin-left: 30px">批量取消借出</n-button>
+    <div class="counter" @click="clickCounter" style="width: 800px;margin-left: 100px">
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
     </div>
-    <n-button type="primary" size="small" @click="showBatchReturnApprove = true">批量确认归还</n-button>
-    <n-button type="warning" size="small" style="margin-left: 10px" @click="showBatchReturnCancel = true">批量取消借出</n-button>
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
