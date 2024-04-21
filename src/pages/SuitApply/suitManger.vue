@@ -185,13 +185,32 @@
           <td >
             <n-button size="small" @click="handleCount(tlData)">查看</n-button>
             <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
-            <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
+            <n-button v-if="tlData.status !== 4" size="small" @click="showConfirmModalFunc(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
             <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
           </td>
         </tr>
         </tbody>
       </n-table>
       <n-pagination v-model:page="inv_page_num" :page-count="inv_total_page_num" />
+      <n-modal v-model:show="showConfirmModal">
+        <n-card
+          style="width: 400px"
+          :title="confirmModalData.kind === '正装' ? '取消借出' : '删除'"
+          :bordered="false"
+          size="huge"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            style="display: flex; justify-content: space-around; margin-top: 30px"
+          >
+            <n-button type="primary" @click="() => setSuppliesReturn(confirmModalData.id)"
+              >{{ confirmModalData.kind === '正装' ? '取消借出' : '删除' }}</n-button
+            >
+            <n-button @click="showConfirmModal = false">取消</n-button>
+          </div>
+        </n-card>
+      </n-modal>
     </div>
   </section>
   <n-modal v-model:show="showBatchReturnApprove">
@@ -318,6 +337,14 @@ const showBatchApprovalCheck = ref(false);
 const showBatchApprovalReject = ref(false);
 const checkedBackId = ref<number[]>([]);
 const checkedApprovalId = ref<number[]>([]);
+const showConfirmModal = ref(false);
+const confirmModalData = ref();
+
+const showConfirmModalFunc = (data: any) => {
+  console.log("1145141919810");
+  showConfirmModal.value = true;
+  confirmModalData.value = data;
+};
 
 const batchReturnApprove = () => {
   showBatchReturnApprove.value = false;
@@ -458,8 +485,8 @@ const switchPage = () => {
   containId.value = !containId.value;
   mangerStore.setContianId(containId.value);
   updateSuitCount();
-  updataInventoryData();
-  updataTableData();
+  updataInventoryDataWithFliter();
+  updataTableDataWithFliter();
 };
 
 const timeFormat = (time: string) => {
@@ -554,12 +581,12 @@ const updataTableData = () => {
 updataTableData();
 
 watch(page_num, () => {
-  updataTableData();
+  updataTableDataWithFliter();
 });
 
 const switchCampus_approval = (campus: string) => {
   campusState.value = campus;
-  updataTableData();
+  updataTableDataWithFliter();
   updateSuitCount();
 };
 
@@ -600,8 +627,9 @@ const setSuppliesReturn = (id: number) => {
       if (data.code !== 1) throw new Error(data.msg);
       message.success("成功删除");
       updateSuitCount();
-      updataInventoryData();
-      updataTableData();
+      updataInventoryDataWithFliter();
+      updataTableDataWithFliter();
+      showConfirmModal.value = false;
     },
     onError: (e) => {
       console.log(e);
@@ -616,8 +644,8 @@ const setSuppliesCancel = (id: number) => {
       if (data.code !== 1) throw new Error(data.msg);
       message.success("成功取消借出");
       updateSuitCount();
-      updataInventoryData();
-      updataTableData();
+      updataInventoryDataWithFliter();
+      updataTableDataWithFliter();
     },
     onError: (e) => {
       console.log(e);
@@ -713,12 +741,12 @@ const handleCount =(tlData:Datum) =>{
 
 const handleOpenCountForm = (state: boolean) => {
   showCountForm.value = state;
-  updataInventoryData();
+  updataInventoryDataWithFliter();
 };
 
 const handleOpenManagerForm = (state: boolean) => {
   showManagerForm.value = state;
-  updataTableData();
+  updataTableDataWithFliter();
 };
 
 /* ---- return-inventory ---- */
