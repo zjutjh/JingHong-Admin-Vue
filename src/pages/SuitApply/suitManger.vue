@@ -24,9 +24,13 @@
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataTableDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
       <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
-    <div class="counter" @click="clickCounter">
+    <div style="display: inline-flex; ">
+    <div class="counter" @click="clickCounter" style="width: 900px">
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
+    </div>
+    <n-button type="primary" size="small" @click="showBatchApprovalCheck = true">批量审批通过</n-button>
+    <n-button type="warning" size="small" style="margin-left: 10px" @click="showBatchApprovalReject = true">批量审批驳回</n-button>
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
@@ -48,6 +52,7 @@
     <div>
       <n-table size="small">
         <thead>
+        <th style="justify-content: center;display: flex">选择</th>
         <th>id</th>
         <th>姓名</th>
         <th>学号</th>
@@ -65,8 +70,9 @@
             v-if="showManagerForm"
             @open="handleOpenManagerForm"
             :source="selectedTlData"
-            :campus="campusState_approval"
+            :campus="campusState"
           />
+          <td ><n-checkbox  @change="toggleSelectedApproval(tlData.id)" :disabled= "tlData.status === 2" style="margin-left: 10px"/></td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -113,9 +119,13 @@
       <span>规格</span><n-input class="f-input" type="text" placeholder="可输入尺码" @keyup.enter="updataInventoryDataWithFliter()" :value="fliter_spec" @update:value="fliter_specUpdate"/>
       <span>状态</span><div class="f-input"><n-select class="f-select" v-model:value="fliter_state" :options="stateOption"></n-select></div>
     </div>
-    <div class="counter" @click="clickCounter">
+    <div style="display: inline-flex">
+    <div class="counter" @click="clickCounter" style="width: 900px">
       <span class="title">已借出正装统计</span>
       <div v-for="c in countData" :key="c[0]"><span>{{ c[0] }}</span>: {{ c[1] }} 件</div>
+    </div>
+    <n-button type="primary" size="small" @click="showBatchReturnApprove = true">批量确认归还</n-button>
+    <n-button type="warning" size="small" style="margin-left: 10px" @click="showBatchReturnCancel = true">批量取消借出</n-button>
     </div>
     <n-modal v-model:show="showCountModal">
       <n-card
@@ -137,6 +147,7 @@
     <div>
       <n-table size="small">
         <thead>
+        <th style="justify-content: center;display: flex">选择</th>
         <th>id</th>
         <th>姓名</th>
         <th>学号</th>
@@ -148,6 +159,7 @@
         <th>归还日期</th>
         <th>状态</th>
         <th>操作</th>
+
         </thead>
         <tbody>
         <tr v-for="tlData in inv_tableData" :key="tlData.id">
@@ -155,8 +167,9 @@
             v-if="showCountForm"
             @open="handleOpenCountForm"
             :source="selectedTlData"
-            :campus="campusState_inventory"
+            :campus="campusState"
           />
+          <td><n-checkbox  @change="toggleSelectedBack(tlData.id)" :disabled=" tlData.status !== 3" style="margin-left: 10px"/></td>
           <td>{{ tlData.id }}</td>
           <td>{{ tlData.name }}</td>
           <td>{{ tlData.student_id }}</td>
@@ -169,18 +182,105 @@
           <td v-else-if="tlData.status === 3 && !isOverTime(tlData.borrow_time)" >剩余{{ timeCount(tlData.borrow_time) }}</td>
           <td v-else-if="tlData.status === 3 && isOverTime(tlData.borrow_time)" >超时{{ timeCount(tlData.borrow_time) }}</td>
           <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
-          <td>
+          <td >
             <n-button size="small" @click="handleCount(tlData)">查看</n-button>
             <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
-            <n-button v-if="tlData.status !== 4" size="small" @click="() => setSuppliesReturn(tlData.id)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
+            <n-button v-if="tlData.status !== 4" size="small" @click="showConfirmModalFunc(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
             <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
           </td>
         </tr>
         </tbody>
       </n-table>
       <n-pagination v-model:page="inv_page_num" :page-count="inv_total_page_num" />
+      <n-modal v-model:show="showConfirmModal">
+        <n-card
+          style="width: 400px"
+          :title="confirmModalData.kind === '正装' ? '取消借出' : '删除'"
+          :bordered="false"
+          size="huge"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            style="display: flex; justify-content: space-around; margin-top: 30px"
+          >
+            <n-button type="primary" @click="() => setSuppliesReturn(confirmModalData.id)"
+              >{{ confirmModalData.kind === '正装' ? '取消借出' : '删除' }}</n-button
+            >
+            <n-button @click="showConfirmModal = false">取消</n-button>
+          </div>
+        </n-card>
+      </n-modal>
     </div>
   </section>
+  <n-modal v-model:show="showBatchReturnApprove">
+    <n-card
+      style="width: 400px"
+      title="确认批量审批"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+        <n-button @click="batchReturnApprove" type="primary">确认</n-button>
+        <n-button @click="showBatchReturnApprove = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showBatchReturnCancel">
+    <n-card
+      style="width: 400px"
+      title="确认批量审批"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+          <n-button @click="batchReturnCancel" type="primary">确认</n-button>
+          <n-button @click="showBatchReturnCancel = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showBatchApprovalReject">
+    <n-card
+      style="width: 400px"
+      title="确认批量驳回"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+          <n-button @click="batchApprovalReject" type="primary">确认</n-button>
+          <n-button @click="showBatchApprovalReject = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
+  <n-modal v-model:show="showBatchApprovalCheck">
+    <n-card
+      style="width: 400px"
+      title="确认批量通过"
+      :bordered="false"
+      size="huge"
+      role="dialog"
+      aria-modal="true"
+    >
+      <template #footer>
+        <div style="display: flex ;justify-content: space-evenly">
+          <n-button @click="batchApprovalCheck" type="primary">确认</n-button>
+          <n-button @click="showBatchApprovalCheck = false" type="warning">取消</n-button>
+        </div>
+      </template>
+    </n-card>
+  </n-modal>
 </template>
 
 <script setup lang="ts">
@@ -204,13 +304,16 @@ import managerForm from "./manageForm.vue";
 import countForm from "./countForm.vue";
 import dayjs from "dayjs";
 import { useMangerStore } from "@/store";
+import batchSuppliesReturnAPI from "@/apis/SuitApplyAPI/batchSuppilesReturn";
+import batchApprovalAPI from "@/apis/SuitApplyAPI/batchApproval";
 
 const handleBack = () => {
   router.push("/suitapply");
 };
 
 const mangerStore = useMangerStore();
-mangerStore.setCampusState_inventory("朝晖");
+mangerStore.setCampusState("朝晖");
+const campusState = ref(mangerStore.campusState);
 const showManagerForm = ref(false);
 const showCountForm = ref(false);
 const campusList = ["朝晖", "屏峰", "莫干山"];
@@ -222,13 +325,136 @@ const fliter_suitapply_name = ref<string>();
 const fliter_spec = ref<string>();
 const fliter_state = ref<string>();
 const showCountModal = ref(false);
-
 const fliter_idUpdate = (value: string) => { fliter_id.value = value; };
 const fliter_student_idUpdate = (value: string) => { fliter_student_id.value = value; };
 const fliter_suitapply_nameUpdate = (value: string) => { fliter_suitapply_name.value = value; };
 const fliter_specUpdate = (value: string) => { fliter_spec.value = value; };
 const countData = ref();
 const countDataBeta = ref();
+const showBatchReturnApprove = ref(false);
+const showBatchReturnCancel = ref(false);
+const showBatchApprovalCheck = ref(false);
+const showBatchApprovalReject = ref(false);
+const checkedBackId = ref<number[]>([]);
+const checkedApprovalId = ref<number[]>([]);
+const showConfirmModal = ref(false);
+const confirmModalData = ref();
+
+const showConfirmModalFunc = (data: any) => {
+  console.log("1145141919810");
+  showConfirmModal.value = true;
+  confirmModalData.value = data;
+};
+
+const batchReturnApprove = () => {
+  showBatchReturnApprove.value = false;
+  useRequest(batchSuppliesReturnAPI({
+    ids: checkedBackId.value,
+    supplies_return: 1,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updateSuitCount();
+        updataInventoryData();
+        updataTableData();
+        checkedBackId.value = [];
+      }else{
+        message.error(data.msg);
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
+
+const toggleSelectedBack = (Id: number) => {
+  if (checkedBackId.value.includes(Id)) {
+    // 如果学生已选中，则取消选中
+    checkedBackId.value = checkedBackId.value.filter(id => id !== Id);
+  } else {
+    // 如果学生未选中，则选中
+    checkedBackId.value.push(Id);
+  }
+};
+
+const toggleSelectedApproval = (Id: number) => {
+  if (checkedApprovalId.value.includes(Id)) {
+    // 如果学生已选中，则取消选中
+    checkedApprovalId.value = checkedApprovalId.value.filter(id => id !== Id);
+  } else {
+    // 如果学生未选中，则选中
+    checkedApprovalId.value.push(Id);
+  }
+};
+
+const batchReturnCancel = () => {
+  showBatchReturnCancel.value = false;
+  useRequest(batchSuppliesReturnAPI({
+    ids: checkedBackId.value,
+    supplies_return: 2,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updateSuitCount();
+        updataInventoryData();
+        updataTableData();
+        checkedBackId.value = [];
+      }else{
+        message.error(data.msg);
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
+const batchApprovalCheck = () => {
+  showBatchApprovalCheck.value = false;
+  useRequest(batchApprovalAPI({
+    ids: checkedApprovalId.value,
+    supplies_check: 1,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updataTableData();
+        checkedApprovalId.value = [];
+      }else{
+        message.error( data.msg);
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
+const batchApprovalReject = () => {
+  showBatchApprovalReject.value = false;
+  useRequest(batchApprovalAPI({
+    ids: checkedApprovalId.value,
+    supplies_check: 2,
+  }),{
+    onSuccess: (data) => {
+      if(data.code === 1){
+        message.success("批量操作成功");
+        updataTableData();
+        checkedApprovalId.value = [];
+      }else{
+        message.error( data.msg);
+        throw new Error(data.msg);
+      }
+    },
+    onError: (e) => {
+      throw new Error(e);
+    },
+  });
+};
 const stateOption = computed(() => {
   if(containId.value){
     return [{
@@ -259,8 +485,8 @@ const switchPage = () => {
   containId.value = !containId.value;
   mangerStore.setContianId(containId.value);
   updateSuitCount();
-  updataInventoryData();
-  updataTableData();
+  updataInventoryDataWithFliter();
+  updataTableDataWithFliter();
 };
 
 const timeFormat = (time: string) => {
@@ -274,12 +500,11 @@ const clickCounter = () => {
 const updateSuitCount = () => {
   useRequest(GetSuitAPI({
     campus: containId.value ?
-      ( campusState_approval.value === "朝晖" ? 1 : (campusState_approval.value==="屏峰" ? 2 : 3) ) :
-      ( campusState_inventory.value === "朝晖" ? 1 : (campusState_inventory.value==="屏峰" ? 2 : 3) ),
+      ( campusState.value === "朝晖" ? 1 : (campusState.value==="屏峰" ? 2 : 3) ) :
+      ( campusState.value === "朝晖" ? 1 : (campusState.value==="屏峰" ? 2 : 3) ),
   }),{
     onSuccess: (data) => {
       if(data.data !== null){
-        console.log(data);
         const resData = data.data;
         countDataBeta.value = data.data;
         if (data.code !== 1) throw new Error(data.msg);
@@ -300,7 +525,6 @@ const updateSuitCount = () => {
 
 /* ---- pending-approval ---- */
 
-const campusState_approval = ref("朝晖");
 const page_num = ref(1);
 const total_page_num = ref(0);
 const page_size = 16;
@@ -312,7 +536,7 @@ const updataTableDataWithFliter = () => {
   useRequest(GetRecordAPI({
     page_num: page_num.value,
     page_size: page_size,
-    campus: campusState_approval.value=="朝晖" ? 1 : (campusState_approval.value=="屏峰" ? 2 : 3),
+    campus: campusState.value=="朝晖" ? 1 : (campusState.value=="屏峰" ? 2 : 3),
     choice: 1,
     id: fliter_id.value ? parseInt(fliter_id.value, 10) : undefined,
     student_id: fliter_student_id.value,
@@ -321,7 +545,6 @@ const updataTableDataWithFliter = () => {
     status: fliter_state.value === "未审核" ? 1 : (fliter_state.value === "被驳回" ? 2 : (fliter_state.value === "借用中" ? 3 : (fliter_state.value === "已归还" ? 4 : undefined))),
   }),{
     onSuccess: (data) => {
-      console.log(data);
       if (data.code !== 1) throw new Error(data.msg);
       else {
         total_page_num.value = data.data.total_page_num;
@@ -338,7 +561,7 @@ const updataTableData = () => {
   useRequest(GetRecordAPI({
     page_num: page_num.value,
     page_size: page_size,
-    campus: campusState_approval.value=="朝晖" ? 1 : (campusState_approval.value=="屏峰" ? 2 : 3),
+    campus: campusState.value=="朝晖" ? 1 : (campusState.value=="屏峰" ? 2 : 3),
     choice: 1
   }),{
     onSuccess: (data) => {
@@ -358,23 +581,22 @@ const updataTableData = () => {
 updataTableData();
 
 watch(page_num, () => {
-  updataTableData();
+  updataTableDataWithFliter();
 });
 
 const switchCampus_approval = (campus: string) => {
-  campusState_approval.value = campus;
-  updataTableData();
+  campusState.value = campus;
+  updataTableDataWithFliter();
   updateSuitCount();
 };
 
 const getButtonColor_approval = (buttonName: string) => {
-  return campusState_approval.value === buttonName ? "" : "rgb(144, 238, 144)";
+  return campusState.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
 
 /* ---- pending-approval ---- */
 /* ---- return-inventory ---- */
 
-const campusState_inventory = ref("朝晖");
 const inv_page_num = ref(1);
 const inv_total_page_num = ref(0);
 const inv_tableData = ref<Datum[]>();
@@ -389,14 +611,14 @@ const pageJumptoSuitImport = () => {
 };
 
 const switchCampus_inventory = (campus: string) => {
-  campusState_inventory.value = campus;
-  mangerStore.setCampusState_inventory(campus);
+  campusState.value = campus;
+  mangerStore.setCampusState(campus);
   updataInventoryData();
   updateSuitCount();
 };
 
 const getButtonColor_inventory = (buttonName: string) => {
-  return campusState_inventory.value === buttonName ? "" : "rgb(144, 238, 144)";
+  return campusState.value === buttonName ? "" : "rgb(144, 238, 144)";
 };
 
 const setSuppliesReturn = (id: number) => {
@@ -405,8 +627,9 @@ const setSuppliesReturn = (id: number) => {
       if (data.code !== 1) throw new Error(data.msg);
       message.success("成功删除");
       updateSuitCount();
-      updataInventoryData();
-      updataTableData();
+      updataInventoryDataWithFliter();
+      updataTableDataWithFliter();
+      showConfirmModal.value = false;
     },
     onError: (e) => {
       console.log(e);
@@ -421,8 +644,8 @@ const setSuppliesCancel = (id: number) => {
       if (data.code !== 1) throw new Error(data.msg);
       message.success("成功取消借出");
       updateSuitCount();
-      updataInventoryData();
-      updataTableData();
+      updataInventoryDataWithFliter();
+      updataTableDataWithFliter();
     },
     onError: (e) => {
       console.log(e);
@@ -433,14 +656,13 @@ const setSuppliesCancel = (id: number) => {
 
 const exportButton = () => {
   let camId = 1;
-  switch(campusState_inventory.value){
+  switch(campusState.value){
     case "朝晖": camId = 1; break;
     case "屏峰": camId = 2; break;
     case "莫干山": camId=3; break;
   }
   useRequest(GetExportAPI({campus: camId}),{
     onSuccess: (data) => {
-      console.log(data);
       if (data.code !== 1) throw new Error(data.msg);
       else { window.location.href = data.data; }
     },
@@ -457,7 +679,7 @@ const updataInventoryDataWithFliter = () => {
   useRequest(GetRecordAPI({
     page_num: inv_page_num.value,
     page_size: page_size,
-    campus: campusState_inventory.value=="朝晖" ? 1 : (campusState_inventory.value=="屏峰" ? 2 : 3),
+    campus: campusState.value=="朝晖" ? 1 : (campusState.value=="屏峰" ? 2 : 3),
     choice: 2,
     id: fliter_id.value ? parseInt(fliter_id.value, 10) : undefined,
     student_id: fliter_student_id.value,
@@ -469,7 +691,6 @@ const updataInventoryDataWithFliter = () => {
       if (data.code !== 1) throw new Error(data.msg);
       else {
         inv_total_page_num.value = data.data.total_page_num;
-        console.log(data.data);
         inv_tableData.value = data.data.data;
       }
     },
@@ -483,7 +704,7 @@ const updataInventoryData = () => {
   useRequest(GetRecordAPI({
     page_num: inv_page_num.value,
     page_size: page_size,
-    campus: campusState_inventory.value=="朝晖" ? 1 : (campusState_inventory.value=="屏峰" ? 2 : 3),
+    campus: campusState.value=="朝晖" ? 1 : (campusState.value=="屏峰" ? 2 : 3),
     choice: 2
   }),{
     onSuccess: (data) => {
@@ -520,12 +741,12 @@ const handleCount =(tlData:Datum) =>{
 
 const handleOpenCountForm = (state: boolean) => {
   showCountForm.value = state;
-  updataInventoryData();
+  updataInventoryDataWithFliter();
 };
 
 const handleOpenManagerForm = (state: boolean) => {
   showManagerForm.value = state;
-  updataTableData();
+  updataTableDataWithFliter();
 };
 
 /* ---- return-inventory ---- */
@@ -558,7 +779,7 @@ const check = (id:number) => {
     onSuccess: (data) =>{
       if(data.code==1){
         message.success("已处理归还");
-        location.reload();
+        updataInventoryDataWithFliter();
       }
     },
   });

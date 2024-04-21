@@ -342,8 +342,10 @@ import {
   watch,
 } from "vue";
 import * as SuitApplyService from "@/apis/SuitApplyAPI";
+import {useMangerStore} from "@/store";
 
-const savedCampus = localStorage.getItem("selectedCampus");
+const mangerStore = useMangerStore();
+const savedCampus = mangerStore.campusState_index;
 const selectedButton = ref(savedCampus ? savedCampus : "button1");
 const deleteItem = ref();
 const showModalPublish = ref(false);
@@ -358,15 +360,16 @@ const editedSpec = ref({
   spec: "",
   stock: 0,
 });
+console.log(selectedButton);
 const message = useMessage();
 const suitList = ref<SuitApplyAPI.SuitItem[]>([]);
 const campus = computed(() => {
-  if (selectedButton.value === "button1") {
-    return 1;
+  if (selectedButton.value === "button3") {
+    return 3;
   } else if (selectedButton.value === "button2") {
     return 2;
   } else {
-    return 3;
+    return 1;
   }
 });
 const campusString = computed(() => {
@@ -732,8 +735,8 @@ const selectButton = (buttonName: string) => {
     publishSuitForm.value.campus = campusRef.value;
   }, 500);
   selectedButton.value = buttonName;
-  // 保存选中的校区状态到本地存储s
-  localStorage.setItem("selectedCampus", buttonName);
+  // 保存选中的校区状态到pinia
+  mangerStore.setCampusState_index(buttonName);
   GetSuitInformation(campus.value);
 };
 const getButtonColor = (buttonName: string) => {
