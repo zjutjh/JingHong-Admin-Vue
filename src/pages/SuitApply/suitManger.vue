@@ -184,7 +184,7 @@
           <td>{{ tlData.status === 1 ? "未审核" : (tlData.status === 2 ? "被驳回" : (tlData.status === 3 ? "借用中" : "已归还")) }}</td>
           <td >
             <n-button size="small" @click="handleCount(tlData)">查看</n-button>
-            <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
+            <n-button v-if="tlData.status !== 4" size="small" @click="showConfirmModalFunc2(tlData)">确认归还</n-button>
             <n-button v-if="tlData.status !== 4" size="small" @click="showConfirmModalFunc(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
           </td>
         </tr>
@@ -207,6 +207,25 @@
               >{{ confirmModalData.kind === '正装' ? '取消借出' : '删除' }}</n-button
             >
             <n-button @click="showConfirmModal = false">取消</n-button>
+          </div>
+        </n-card>
+      </n-modal>
+      <n-modal v-model:show="showConfirmModal2">
+        <n-card
+          style="width: 400px"
+          title="确认归还"
+          :bordered="false"
+          size="huge"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            style="display: flex; justify-content: space-around; margin-top: 30px"
+          >
+            <n-button type="primary" @click="() => check(confirmModalData2.id)"
+              >确认归还</n-button
+            >
+            <n-button @click="showConfirmModal2 = false">取消</n-button>
           </div>
         </n-card>
       </n-modal>
@@ -338,12 +357,21 @@ const checkedBackId = ref<number[]>([]);
 const checkedApprovalId = ref<number[]>([]);
 const showConfirmModal = ref(false);
 const confirmModalData = ref();
+const showConfirmModal2 = ref(false);
+const confirmModalData2 = ref();
 
 const showConfirmModalFunc = (data: any) => {
   console.log("1145141919810");
   showConfirmModal.value = true;
   confirmModalData.value = data;
 };
+
+const showConfirmModalFunc2 = (data: any) => {
+  console.log("1145141919810");
+  showConfirmModal2.value = true;
+  confirmModalData2.value = data;
+};
+
 
 const batchReturnApprove = () => {
   showBatchReturnApprove.value = false;
@@ -628,7 +656,7 @@ const setSuppliesReturn = (id: number) => {
   useRequest(suppliesReturnAPI({id: id,supplies_return: 2}), {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功删除");
+      message.success("成功取消借出");
       updateSuitCount();
       updataInventoryDataWithFliter();
       updataTableDataWithFliter();
@@ -645,7 +673,7 @@ const setSuppliesCancel = (id: number) => {
   useRequest(suppliesCancleAPI({id: id}), {
     onSuccess: (data) => {
       if (data.code !== 1) throw new Error(data.msg);
-      message.success("成功取消借出");
+      message.success("成功删除");
       updateSuitCount();
       updataInventoryDataWithFliter();
       updataTableDataWithFliter();
@@ -787,7 +815,12 @@ const check = (id:number) => {
       if(data.code==1){
         message.success("已处理归还");
         updataInventoryDataWithFliter();
+        showConfirmModal2.value = false;
       }
+    },
+    onError: (e) => {
+      console.log(e);
+      message.error(`请求数据失败, ${e.message} || "未知错误"`);
     },
   });
 };
