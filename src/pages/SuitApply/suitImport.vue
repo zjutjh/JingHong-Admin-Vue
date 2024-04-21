@@ -175,7 +175,7 @@ watch(
   suitStock.value = "";
   if(isSuit.value === 0)
     suitkind.value = "";
-  suitCampus.value = mangerStore.campusState_inventory === "朝晖" ? 1 : (mangerStore.campusState_inventory === "屏峰" ? 2 : 3);
+  suitCampus.value = mangerStore.campusState === "朝晖" ? 1 : (mangerStore.campusState === "屏峰" ? 2 : 3);
 });
 
 watch(suitCampus, () => {
@@ -284,7 +284,7 @@ const importInfo = () => {
         suitSpec.value = "";
         suitStock.value = "";
         if(isSuit.value === 0) suitkind.value = "";
-        suitCampus.value = mangerStore.campusState_inventory === "朝晖" ? 1 : (mangerStore.campusState_inventory === "屏峰" ? 2 : 3);
+        suitCampus.value = mangerStore.campusState === "朝晖" ? 1 : (mangerStore.campusState === "屏峰" ? 2 : 3);
       },
       onError: (e) => {
         console.log(e);
