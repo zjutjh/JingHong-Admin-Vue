@@ -187,7 +187,6 @@
             <n-button size="small" @click="handleCount(tlData)">查看</n-button>
             <n-button v-if="tlData.status !== 4" size="small" @click="() => check(tlData.id)">确认归还</n-button>
             <n-button v-if="tlData.status !== 4" size="small" @click="showConfirmModalFunc(tlData)">{{ tlData.kind === "正装" ? "取消借出" : "删除" }}</n-button>
-            <n-button v-if="tlData.status == 4 && tlData.kind == '正装'" size="small" @click="() => setSuppliesCancel(tlData.id)">取消确认归还</n-button>
           </td>
         </tr>
         </tbody>
@@ -366,7 +365,8 @@ const batchReturnApprove = () => {
       }
     },
     onError: (e) => {
-      throw new Error(e);
+      console.log(e);
+      message.error(`${e.message} || "未知错误"`);
     },
   });
 };
@@ -410,7 +410,8 @@ const batchReturnCancel = () => {
       }
     },
     onError: (e) => {
-      throw new Error(e);
+      console.log(e);
+      message.error(`${e.message} || "未知错误"`);
     },
   });
 };
@@ -431,7 +432,8 @@ const batchApprovalCheck = () => {
       }
     },
     onError: (e) => {
-      throw new Error(e);
+      console.log(e);
+      message.error(`${e.message} || "未知错误"`);
     },
   });
 };
@@ -452,7 +454,8 @@ const batchApprovalReject = () => {
       }
     },
     onError: (e) => {
-      throw new Error(e);
+      console.log(e);
+      message.error(`${e.message} || "未知错误"`);
     },
   });
 };
@@ -757,13 +760,17 @@ const timeCount= (borrow_time:string) => {
   if(secondDuring < 0){
     secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,"day").unix());
   }
+  const setMinutes = Math.floor(secondDuring%60);
   const setHours = Math.floor(secondDuring/60/60%24);
   const setDay = Math.floor(secondDuring/60/60/24);
-  if (Math.abs(setDay)>0){
-    return setDay+"天\t";
+  if (setDay>0){
+  return setDay + "天" + setHours + "小时" + setMinutes + "分";
   }
-  else{
-    return setHours+"小时\t";
+  else if (setHours>0){
+  return setHours + "小时" + setMinutes + "分";
+  }
+  else if (setMinutes>0){
+  return setMinutes + "分";
   }
 };
 
