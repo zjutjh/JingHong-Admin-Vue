@@ -8,19 +8,19 @@ export default defineStore("manger", () => {
   };
   /* 控制suitManger页面为 待审批/审批清点 */
 
-  const campusState_inventory = ref("朝晖");
-  const setCampusState_inventory = (campus: string) => {
-    campusState_inventory.value = campus;
+  const campusState = ref("朝晖");
+  const setCampusState = (campus: string) => {
+    campusState.value = campus;
   };
   const campusState_index = ref("button1");
   const setCampusState_index = (campus: string) => {
-    campusState_inventory.value = campus;
+    campusState_index.value = campus;
   };
   return {
     containId,
     setContianId,
-    campusState_inventory,
-    setCampusState_inventory,
+    campusState,
+    setCampusState,
     campusState_index,
     setCampusState_index
   };
