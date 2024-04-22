@@ -475,9 +475,7 @@ const batchReturnApprove = () => {
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
-        updateSuitCount();
-        updataInventoryData();
-        updataTableData();
+        updataInventoryDataWithFliter();
         selectedIds.value = [];
       }else{
         message.error(data.msg);
@@ -502,9 +500,7 @@ const batchReturnCancel = () => {
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
-        updateSuitCount();
-        updataInventoryData();
-        updataTableData();
+        updataInventoryDataWithFliter();
         selectedIds.value = [];
       }else{
         message.error(data.msg);
@@ -526,7 +522,7 @@ const batchApprovalCheck = () => {
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
-        updataTableData();
+        updataTableDataWithFliter();
         selectedIdsApproval.value = [];
       }else{
         message.error( data.msg);
@@ -548,7 +544,7 @@ const batchApprovalReject = () => {
     onSuccess: (data) => {
       if(data.code === 1){
         message.success("批量操作成功");
-        updataTableData();
+        updataTableDataWithFliter();
         selectedIdsApproval.value = [];
       }else{
         message.error( data.msg);
