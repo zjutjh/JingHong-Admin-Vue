@@ -322,7 +322,7 @@ import {
   NCard,
   NSelect
 } from "naive-ui";
-import { computed, ref, watch } from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import { GetExportAPI, GetRecordAPI, GetSuitAPI, suppliesCancleAPI, suppliesReturnAPI } from "@/apis/SuitApplyAPI/index";
 import { useRequest } from "vue-request";
 import type { Datum } from "@/apis/SuitApplyAPI/getRecord";
@@ -338,7 +338,9 @@ const handleBack = () => {
 };
 
 const mangerStore = useMangerStore();
-mangerStore.setCampusState("朝晖");
+if(mangerStore.campusState === "") {
+  mangerStore.setCampusState("朝晖");
+}
 const campusState = ref(mangerStore.campusState);
 const showManagerForm = ref(false);
 const showCountForm = ref(false);
@@ -625,6 +627,8 @@ const updateSuitCount = () => {
   });
 };
 
+
+onMounted(() => updateSuitCount());
 /* ---- pending-approval ---- */
 
 const page_num = ref(1);
