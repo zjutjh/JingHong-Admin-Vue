@@ -594,7 +594,7 @@ const switchPage = () => {
 };
 
 const timeFormat = (time: string) => {
-  return dayjs(time).format("YYYY年MM月DD日");
+  return dayjs(time).format("YYYY-MM-DD");
 };
 
 const clickCounter = () => {
@@ -628,7 +628,7 @@ const updateSuitCount = () => {
 };
 
 
-onMounted(() => updateSuitCount());
+onMounted(() => updateSuitCount())
 /* ---- pending-approval ---- */
 
 const page_num = ref(1);
@@ -857,24 +857,27 @@ const handleOpenManagerForm = (state: boolean) => {
 
 /* ---- return-inventory ---- */
 
-const timeCount= (borrow_time:string) => {
-  let secondDuring =(dayjs(borrow_time).add(7,"day").unix())-(dayjs().unix());
-  if(secondDuring < 0){
-    secondDuring = (dayjs().unix())-(dayjs(borrow_time).add(7,"day").unix());
+const timeCount = (borrow_time:string) => {
+  let secondDuring = (dayjs(borrow_time).add(7, "day").unix()) - (dayjs().unix());
+
+  if (secondDuring < 0) {
+    secondDuring = (dayjs().unix()) - (dayjs(borrow_time).add(7, "day").unix());
   }
-  const setMinutes = Math.floor(secondDuring%60);
-  const setHours = Math.floor(secondDuring/60/60%24);
-  const setDay = Math.floor(secondDuring/60/60/24);
-  if (setDay>0){
-  return setDay + "天" + setHours + "小时" + setMinutes + "分";
-  }
-  else if (setHours>0){
-  return setHours + "小时" + setMinutes + "分";
-  }
-  else if (setMinutes>0){
-  return setMinutes + "分";
+
+  const totalMinutes = Math.floor(secondDuring / 60); // 总共剩余的分钟数
+  const days = Math.floor(totalMinutes / (60 * 24)); // 计算剩余的天数
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60); // 计算剩余的小时数
+  const minutes = totalMinutes - days*24*60 - hours*60; // 计算剩余的分钟数
+
+  if (days > 0) {
+    return `${days}天${hours}小时${minutes}分`;
+  } else if (hours > 0) {
+    return `${hours}小时${minutes}分`;
+  } else {
+    return `${minutes}分`;
   }
 };
+
 
 const isOverTime = (borrow_time:string) => {
   const secondDuring =(dayjs(borrow_time).add(7,"day").unix())-(dayjs().unix());
