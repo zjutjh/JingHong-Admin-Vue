@@ -175,8 +175,7 @@ watch(
   suitStock.value = "";
   if(isSuit.value === 0)
     suitkind.value = "";
-  suitCampus.value = mangerStore.campusState_inventory === "朝晖" ? 1 : (mangerStore.campusState_inventory === "屏峰" ? 2 : 3);
-  console.log(suitCampus.value);
+  suitCampus.value = mangerStore.campusState === "朝晖" ? 1 : (mangerStore.campusState === "屏峰" ? 2 : 3);
 });
 
 watch(suitCampus, () => {
@@ -237,7 +236,6 @@ const getStudentInfo = () => {
       if(data.code !== 1) throw new Error(data.msg);
       if(data.data.id === 0) {
         message.warning("学生信息不存在 请确认学号或者手动导入");
-        console.log(data.data);
       } else {
         message.success("学生信息导入成功");
         showManualImportBar.value = true;
@@ -276,12 +274,17 @@ const importInfo = () => {
       name: stuName.value,
       student_id: studentId.value,
     };
-    console.log(data);
     useRequest(setSuppliesImportAPI(data), {
       onSuccess(data){
         if(data.code !== 1) throw new Error(data.msg);
         message.success("导入成功");
-        router.push("/suitManger");
+        // router.push("/suitManger");
+        suitName.value = "";
+        suitNumber.value = "";
+        suitSpec.value = "";
+        suitStock.value = "";
+        if(isSuit.value === 0) suitkind.value = "";
+        suitCampus.value = mangerStore.campusState === "朝晖" ? 1 : (mangerStore.campusState === "屏峰" ? 2 : 3);
       },
       onError: (e) => {
         console.log(e);
