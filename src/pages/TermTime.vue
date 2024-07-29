@@ -62,7 +62,51 @@ const handleSubmit = async () => {
         const res = await setTermInfoAPI({
           yearValue: termYearValue.value,
           termValue: termValue.value,
-          termStartDateValue: termStartDateValue.value
+          termStartDateValue: termStartDateValue.value,
+          scoreTermValue:scoreTermValue.value,
+          scoreYearValue:scoreYearValue.value,
+        });
+        const { code, msg } = res;
+        if (code !== 1) throw new Error(msg);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
+};
+
+const noticeSubmit = async () => {
+  dialog.warning({
+    title: "警告",
+    content: `确认发布新生注册提醒么？`,
+    positiveText: "确定",
+    negativeText: "回去改一下",
+    onPositiveClick: async () => {
+      try {
+        const res = await setTermInfoAPI({
+          registerTips:registerTips.value,
+        });
+        const { code, msg } = res;
+        if (code !== 1) throw new Error(msg);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  });
+};
+
+const urlSubmit = async () => {
+  dialog.warning({
+    title: "警告",
+    content: `确认更改URL前缀么？`,
+    positiveText: "确定",
+    negativeText: "回去改一下",
+    onPositiveClick: async () => {
+      try {
+        const res = await setTermInfoAPI({
+          jpgUrlValue: jpgUrlValue.value,
+          fileUrlValue: fileUrlValue.value,
+          schoolBusUrlValue:schoolBusUrlValue.value,
         });
         const { code, msg } = res;
         if (code !== 1) throw new Error(msg);
@@ -94,7 +138,12 @@ const handleSubmit = async () => {
       <n-date-picker v-model:formatted-value="termStartDateValue" value-format="yyyy-MM-dd" type="date"
         style="width: 400px" />
     </n-form-item>
-
+    <n-form-item label="成绩查询学年选择">
+      <n-date-picker v-model:formatted-value="scoreYearValue" value-format="yyyy" type="year" style="width: 400px" />
+    </n-form-item>
+    <n-form-item label="成绩查询学期选择">
+      <n-select v-model:value="scoreTermValue" :options="optionsTerm" clearable />
+    </n-form-item>
     <n-form-item>
       <n-space>
         <n-button id="update" type="success" @click="handleSubmit">
@@ -107,4 +156,71 @@ const handleSubmit = async () => {
     </n-form-item>
   </n-form>
   </n-space>
+
+  <page-title>新生注册提醒</page-title>
+  <n-space style="padding: 0 24px">
+
+  <n-form style="max-width: 400px">
+  <n-form-item>
+    <n-alert type="info" style="width: 400px">
+      表单的初始值为当前系统的数据
+    </n-alert>
+  </n-form-item>
+  <n-form-item>
+    <n-input
+      v-model:value="registerTips"
+      type="textarea"
+      placeholder="请输入新生注册提醒"
+    />
+  </n-form-item>
+
+  <n-form-item>
+    <n-space>
+      <n-button id="update" type="success" @click="noticeSubmit">
+        发布提醒
+      </n-button>
+    </n-space>
+  </n-form-item>
+</n-form>
+  </n-space>
+  <page-title>链接编辑</page-title>
+  <n-space style="padding: 0 24px">
+
+<n-form style="max-width: 400px">
+<n-form-item>
+  <n-alert type="info" style="width: 400px">
+    表单的初始值为当前系统的数据
+  </n-alert>
+</n-form-item>
+<n-form-item>
+  <n-input
+    v-model:value="jpgUrlValue"
+    type="textarea"
+    placeholder="请输入图片URL"
+  />
+</n-form-item>
+<n-form-item>
+  <n-input
+    v-model:value="fileUrlValue"
+    type="textarea"
+    placeholder="请输入文档URL"
+  />
+</n-form-item>
+<n-form-item>
+  <n-input
+    v-model:value="schoolBusUrlValue"
+    type="textarea"
+    placeholder="请输入校车URL"
+  />
+</n-form-item>
+
+<n-form-item>
+  <n-space>
+    <n-button id="update" type="success" @click="urlSubmit">
+      修改前缀
+    </n-button>
+  </n-space>
+</n-form-item>
+</n-form>
+</n-space>
 </template>

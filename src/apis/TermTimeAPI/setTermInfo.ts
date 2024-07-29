@@ -4,6 +4,12 @@ type GetTermInfoData = {
   termStartDateValue: string;
   termValue: string;
   yearValue: string;
+  scoreYearValue: string;
+  scoreTermValue: string;
+  schoolBusUrlValue: string;
+  jpgUrlValue: string;
+  fileUrlValue: string;
+  registerTips: string;
 }
 
 type GetTermInfoResult = Common.IResponse<string>
