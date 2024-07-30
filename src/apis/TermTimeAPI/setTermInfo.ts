@@ -17,7 +17,7 @@ type GetTermInfoResult = Common.IResponse<string>
 const setTermInfoAPI = (data?: GetTermInfoData) => {
   return request<GetTermInfoResult>({
     method: "post",
-    url: "/api/admin/set/terminfo",
+    url: "/api/admin/set/systeminfo",
     data: data,
     withCredentials: true
   })

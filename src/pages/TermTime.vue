@@ -17,22 +17,40 @@ import PageTitle from "../components/PageTitle.vue";
 const initialValue = ref({
   termYear: new Date().getFullYear().toString(),
   term: "上",
-  termStartDate: "1970-01-01"
+  termStartDate: "1970-01-01",
+  scoreTerm: "上",
+  scoreYear: new Date().getFullYear().toString(),
+  schoolBusUrl: "暂无",
+  jpgUrl: "暂无",
+  fileUrl: "暂无",
+  register: "暂无",
 });
 
 const termYearValue = ref(initialValue.value.termYear);
 const termValue = ref(initialValue.value.term);
 const termStartDateValue = ref(initialValue.value.termStartDate);
+const scoreTermValue = ref(initialValue.value.scoreTerm);
+const scoreYearValue = ref(initialValue.value.scoreYear);
+const schoolBusUrlValue = ref(initialValue.value.schoolBusUrl);
+const jpgUrlValue = ref(initialValue.value.jpgUrl);
+const fileUrlValue = ref(initialValue.value.fileUrl);
+const registerTips = ref(initialValue.value.register);
 const dialog = useDialog();
 
 onMounted(async () => {
   try {
     const { code, data, msg } = await getSystemInfo();
     if (code !== 1) throw new Error(msg);
-    const { term, termStartDate, termYear } = data;
+    const { term, termStartDate, termYear,scoreTerm,scoreYear,schoolBusUrl,jpgUrl,fileUrl,register } = data;
     termYearValue.value = termYear;
     termValue.value = term;
     termStartDateValue.value = termStartDate;
+    scoreTermValue.value = scoreTerm;
+    scoreYearValue.value = scoreYear;
+    schoolBusUrlValue.value = schoolBusUrl;
+    jpgUrlValue.value = jpgUrl;
+    fileUrlValue.value = fileUrl;
+    registerTips.value = register;
     initialValue.value = data;
   } catch (e) {
     console.log(e);
@@ -95,10 +113,14 @@ const noticeSubmit = async () => {
   });
 };
 
+const noticeReset = () => {
+  registerTips.value=initialValue.value.register;
+};
+
 const urlSubmit = async () => {
   dialog.warning({
     title: "警告",
-    content: `确认更改URL前缀么？`,
+    content: `确认更改URL前缀么?`,
     positiveText: "确定",
     negativeText: "回去改一下",
     onPositiveClick: async () => {
@@ -115,6 +137,12 @@ const urlSubmit = async () => {
       }
     }
   });
+};
+
+const urlReset = async () => {
+  schoolBusUrlValue.value = initialValue.value.schoolBusUrl,
+  jpgUrlValue.value = initialValue.value.jpgUrl,
+  fileUrlValue.value = initialValue.value.fileUrl;
 };
 </script>
 
@@ -179,6 +207,9 @@ const urlSubmit = async () => {
       <n-button id="update" type="success" @click="noticeSubmit">
         发布提醒
       </n-button>
+      <n-button secondary type="error" id="clear" @click="noticeReset">
+        重置表单
+      </n-button>
     </n-space>
   </n-form-item>
 </n-form>
@@ -218,6 +249,9 @@ const urlSubmit = async () => {
   <n-space>
     <n-button id="update" type="success" @click="urlSubmit">
       修改前缀
+    </n-button>
+    <n-button secondary type="error" id="clear" @click="urlReset">
+      重置表单
     </n-button>
   </n-space>
 </n-form-item>
