@@ -23,7 +23,11 @@ export default defineConfig(({ mode }) => {
     base: env.VITE_BASE,
     server: {
       proxy: {
-        "/api": env.HOST
+        "/api": {
+          target:'https://wjh.qianqianzyk.top',
+          changeOrigin:true,
+          rewrite:(path:string)=>path.replace(/^\/api/,"")
+        }
       }
     }
   }
