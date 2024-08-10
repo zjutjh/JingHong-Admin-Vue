@@ -34,7 +34,7 @@ const scoreYearValue = ref(initialValue.value.scoreYear);
 const schoolBusUrlValue = ref(initialValue.value.schoolBusUrl);
 const jpgUrlValue = ref(initialValue.value.jpgUrl);
 const fileUrlValue = ref(initialValue.value.fileUrl);
-const register = ref(initialValue.value.registerTips);
+const registerTips = ref(initialValue.value.registerTips);
 const dialog = useDialog();
 
 const handleReset = async () => {
@@ -46,7 +46,7 @@ const handleReset = async () => {
 };
 
 const noticeReset = async () => {
-  register.value=initialValue.value.registerTips;
+  registerTips.value=initialValue.value.registerTips;
 };
 
 const urlReset = async () => {
@@ -71,7 +71,6 @@ onMounted(async () => {
     initialValue.value.jpgUrl = jpgUrl;
     initialValue.value.fileUrl = fileUrl;
     initialValue.value.registerTips = registerTips;
-    initialValue.value = data;
   } catch (e) {
     console.log(e);
   }
@@ -107,7 +106,7 @@ const handleSubmit = async () => {
           jpgUrlValue: jpgUrlValue.value,
           fileUrlValue: fileUrlValue.value,
           schoolBusUrlValue:schoolBusUrlValue.value,
-          registerTips:register.value,
+          registerTips:registerTips.value,
         });
         const { code, msg } = res;
         if (code !== 1) throw new Error(msg);
@@ -117,7 +116,6 @@ const handleSubmit = async () => {
     }
   });
 };
-
 
 </script>
 
@@ -171,7 +169,7 @@ const handleSubmit = async () => {
   </n-form-item>
   <n-form-item>
     <n-input
-      v-model:value="register"
+      v-model:value="registerTips"
       type="textarea"
       placeholder="请输入新生注册提醒"
     />
