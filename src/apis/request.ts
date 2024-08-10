@@ -4,7 +4,6 @@ const request = async <TData, TProps = any>(
   config: AxiosRequestConfig<TProps>
 ) => {
   const res = await axios<TData>({
-    baseURL: "/api",
     timeout: 10000,
     ...config
   });
