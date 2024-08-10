@@ -207,11 +207,11 @@ const handleSubmit = async () => {
 
 </n-form-item>
 <n-form-item >
-  <n-card title="文档链接" size="small" :bordered="false">
+  <n-card title="文件链接" size="small" :bordered="false">
     <n-input
     v-model:value="fileUrlValue"
     type="input"
-    placeholder="请输入文档URL"
+    placeholder="请输入文件URL"
   />
   </n-card>
 </n-form-item>
