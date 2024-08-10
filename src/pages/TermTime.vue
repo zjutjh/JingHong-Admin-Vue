@@ -23,7 +23,7 @@ const initialValue = ref({
   schoolBusUrl: "暂无",
   jpgUrl: "暂无",
   fileUrl: "暂无",
-  register: "暂无",
+  registerTips: "暂无",
 });
 
 const termYearValue = ref(initialValue.value.termYear);
@@ -34,28 +34,53 @@ const scoreYearValue = ref(initialValue.value.scoreYear);
 const schoolBusUrlValue = ref(initialValue.value.schoolBusUrl);
 const jpgUrlValue = ref(initialValue.value.jpgUrl);
 const fileUrlValue = ref(initialValue.value.fileUrl);
-const registerTips = ref(initialValue.value.register);
+const register = ref(initialValue.value.registerTips);
 const dialog = useDialog();
+
+const handleReset = async () => {
+  termYearValue.value = initialValue.value.termYear,
+  termValue.value = initialValue.value.term,
+  termStartDateValue.value = initialValue.value.termStartDate,
+  scoreTermValue.value = initialValue.value.scoreTerm,
+  scoreYearValue.value = initialValue.value.scoreYear;
+};
+
+const noticeReset = async () => {
+  register.value=initialValue.value.registerTips;
+};
+
+const urlReset = async () => {
+  schoolBusUrlValue.value = initialValue.value.schoolBusUrl,
+  jpgUrlValue.value = initialValue.value.jpgUrl,
+  fileUrlValue.value = initialValue.value.fileUrl;
+};
+
+
 
 onMounted(async () => {
   try {
     const { code, data, msg } = await getSystemInfo();
     if (code !== 1) throw new Error(msg);
-    const { term, termStartDate, termYear,scoreTerm,scoreYear,schoolBusUrl,jpgUrl,fileUrl,register } = data;
-    termYearValue.value = termYear;
-    termValue.value = term;
-    termStartDateValue.value = termStartDate;
-    scoreTermValue.value = scoreTerm;
-    scoreYearValue.value = scoreYear;
-    schoolBusUrlValue.value = schoolBusUrl;
-    jpgUrlValue.value = jpgUrl;
-    fileUrlValue.value = fileUrl;
-    registerTips.value = register;
+    const { term, termStartDate, termYear,scoreTerm,scoreYear,schoolBusUrl,jpgUrl,fileUrl,registerTips } = data;
+    initialValue.value.termYear = termYear;
+    initialValue.value.term = term;
+    initialValue.value.termStartDate = termStartDate;
+    initialValue.value.scoreTerm = scoreTerm;
+    initialValue.value.scoreYear = scoreYear;
+    initialValue.value.schoolBusUrl = schoolBusUrl;
+    initialValue.value.jpgUrl = jpgUrl;
+    initialValue.value.fileUrl = fileUrl;
+    initialValue.value.registerTips = registerTips;
     initialValue.value = data;
   } catch (e) {
     console.log(e);
   }
+  urlReset();
+  noticeReset();
+  //handleReset();
 });
+//this.$forceUpdate()
+
 
 const optionsTerm = [
   { label: "上", value: "上" },
@@ -63,11 +88,7 @@ const optionsTerm = [
   { label: "短", value: "短" },
 ];
 
-const handleReset = () => {
-  termYearValue.value = initialValue.value.termYear,
-    termValue.value = initialValue.value.term,
-    termStartDateValue.value = initialValue.value.termStartDate;
-};
+
 
 const handleSubmit = async () => {
   dialog.warning({
@@ -83,52 +104,10 @@ const handleSubmit = async () => {
           termStartDateValue: termStartDateValue.value,
           scoreTermValue:scoreTermValue.value,
           scoreYearValue:scoreYearValue.value,
-        });
-        const { code, msg } = res;
-        if (code !== 1) throw new Error(msg);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  });
-};
-
-const noticeSubmit = async () => {
-  dialog.warning({
-    title: "警告",
-    content: `确认发布新生注册提醒么？`,
-    positiveText: "确定",
-    negativeText: "回去改一下",
-    onPositiveClick: async () => {
-      try {
-        const res = await setTermInfoAPI({
-          registerTips:registerTips.value,
-        });
-        const { code, msg } = res;
-        if (code !== 1) throw new Error(msg);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  });
-};
-
-const noticeReset = () => {
-  registerTips.value=initialValue.value.register;
-};
-
-const urlSubmit = async () => {
-  dialog.warning({
-    title: "警告",
-    content: `确认更改URL前缀么?`,
-    positiveText: "确定",
-    negativeText: "回去改一下",
-    onPositiveClick: async () => {
-      try {
-        const res = await setTermInfoAPI({
           jpgUrlValue: jpgUrlValue.value,
           fileUrlValue: fileUrlValue.value,
           schoolBusUrlValue:schoolBusUrlValue.value,
+          registerTips:register.value,
         });
         const { code, msg } = res;
         if (code !== 1) throw new Error(msg);
@@ -139,11 +118,7 @@ const urlSubmit = async () => {
   });
 };
 
-const urlReset = async () => {
-  schoolBusUrlValue.value = initialValue.value.schoolBusUrl,
-  jpgUrlValue.value = initialValue.value.jpgUrl,
-  fileUrlValue.value = initialValue.value.fileUrl;
-};
+
 </script>
 
 <template>
@@ -153,7 +128,7 @@ const urlReset = async () => {
   <n-form style="max-width: 400px">
     <n-form-item>
       <n-alert type="info" style="width: 400px">
-        表单的初始值为当前系统的数据
+        表单的初始值为当前系统的数据，刷新以查看
       </n-alert>
     </n-form-item>
     <n-form-item label="学年选择">
@@ -177,8 +152,8 @@ const urlReset = async () => {
         <n-button id="update" type="success" @click="handleSubmit">
           提交修改
         </n-button>
-        <n-button secondary type="error" id="clear" @click="handleReset">
-          重置表单
+        <n-button secondary type="info" id="clear" @click="handleReset">
+          刷新表单
         </n-button>
       </n-space>
     </n-form-item>
@@ -191,12 +166,12 @@ const urlReset = async () => {
   <n-form style="max-width: 400px">
   <n-form-item>
     <n-alert type="info" style="width: 400px">
-      表单的初始值为当前系统的数据
+      表单的初始值为当前系统的数据，刷新以查看
     </n-alert>
   </n-form-item>
   <n-form-item>
     <n-input
-      v-model:value="registerTips"
+      v-model:value="register"
       type="textarea"
       placeholder="请输入新生注册提醒"
     />
@@ -204,15 +179,15 @@ const urlReset = async () => {
 
   <n-form-item>
     <n-space>
-      <n-button id="update" type="success" @click="noticeSubmit">
+      <n-button id="update" type="success" @click="handleSubmit">
         发布提醒
       </n-button>
-      <n-button secondary type="error" id="clear" @click="noticeReset">
-        重置表单
+      <n-button secondary type="info" id="clear" @click="noticeReset">
+        刷新表单
       </n-button>
     </n-space>
   </n-form-item>
-</n-form>
+</n-form >
   </n-space>
   <page-title>链接编辑</page-title>
   <n-space style="padding: 0 24px">
@@ -220,38 +195,45 @@ const urlReset = async () => {
 <n-form style="max-width: 400px">
 <n-form-item>
   <n-alert type="info" style="width: 400px">
-    表单的初始值为当前系统的数据
+    表单的初始值为当前系统的数据，刷新以查看
   </n-alert>
 </n-form-item>
-<n-form-item>
-  <n-input
+<n-form-item >
+  <n-card title="图片链接" size="small" :bordered="false">
+    <n-input
     v-model:value="jpgUrlValue"
-    type="textarea"
+    type="input"
     placeholder="请输入图片URL"
   />
+  </n-card>
+
 </n-form-item>
-<n-form-item>
-  <n-input
+<n-form-item >
+  <n-card title="文档链接" size="small" :bordered="false">
+    <n-input
     v-model:value="fileUrlValue"
-    type="textarea"
+    type="input"
     placeholder="请输入文档URL"
   />
+  </n-card>
 </n-form-item>
-<n-form-item>
+<n-form-item >
+  <n-card title="校车链接" size="small" :bordered="false">
   <n-input
     v-model:value="schoolBusUrlValue"
-    type="textarea"
+    type="input"
     placeholder="请输入校车URL"
   />
+</n-card>
 </n-form-item>
 
 <n-form-item>
   <n-space>
-    <n-button id="update" type="success" @click="urlSubmit">
+    <n-button id="update" type="success" @click="handleSubmit">
       修改前缀
     </n-button>
-    <n-button secondary type="error" id="clear" @click="urlReset">
-      重置表单
+    <n-button secondary type="info" id="clear" @click="urlReset">
+      刷新表单
     </n-button>
   </n-space>
 </n-form-item>
