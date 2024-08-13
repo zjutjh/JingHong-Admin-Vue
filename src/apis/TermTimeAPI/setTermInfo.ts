@@ -4,6 +4,12 @@ type GetTermInfoData = {
   termStartDateValue: string;
   termValue: string;
   yearValue: string;
+  scoreYearValue: string;
+  scoreTermValue: string;
+  schoolBusUrlValue: string;
+  jpgUrlValue: string;
+  fileUrlValue: string;
+  registerTips: string;
 }
 
 type GetTermInfoResult = Common.IResponse<string>
@@ -11,7 +17,7 @@ type GetTermInfoResult = Common.IResponse<string>
 const setTermInfoAPI = (data?: GetTermInfoData) => {
   return request<GetTermInfoResult>({
     method: "post",
-    url: "/api/admin/set/terminfo",
+    url: "/api/admin/set/systeminfo",
     data: data,
     withCredentials: true
   })

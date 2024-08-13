@@ -51,7 +51,7 @@ const menuOptions = computed<Array<MenuOption & { access?: boolean }>>(() =>
       label: () => h(
         RouterLink,
         { to: { name: "TermTime", } },
-        { default: () => "学期时间修改" }
+        { default: () => "系统信息修改" }
       ),
       key: "school-term-time",
       icon: renderIcon(AlarmIcon),
