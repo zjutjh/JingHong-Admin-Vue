@@ -76,10 +76,8 @@ onMounted(async () => {
   }
   urlReset();
   noticeReset();
-  //handleReset();
+  handleReset();
 });
-//this.$forceUpdate()
-
 
 const optionsTerm = [
   { label: "上", value: "上" },
@@ -92,7 +90,7 @@ const optionsTerm = [
 const handleSubmit = async () => {
   dialog.warning({
     title: "警告",
-    content: `确认修改学期信息为: ${termYearValue.value}学年${termValue.value}学期 / ${termStartDateValue.value}`,
+    content: "确认修改系统信息吗？",
     positiveText: "确定",
     negativeText: "回去改一下",
     onPositiveClick: async () => {
