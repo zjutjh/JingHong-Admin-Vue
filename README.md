@@ -1,18 +1,50 @@
-# Vue 3 + TypeScript + Vite
+# 微精弘管理后台
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+使用 Vue3 + TS + Native UI 开发的Web网站
 
-## Recommended IDE Setup
+## 介绍
+微精弘小程序的管理后台
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## 技术栈
+- Vue3
 
-## Type Support For `.vue` Imports in TS
+- Typescript
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+- Pinia
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+- Axios
 
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+## 快速开始
+
+1. fork仓库并且clone到本地
+
+2. 在根目录依照`.env.sample`配置`.env`文件
+  
+3. 安装依赖 `pnpm i`
+  
+4. 运行`pnpm run dev`
+
+5. 点击本机地址预览
+
+6. Coding
+
+
+## 打包部署
+
+- `pnpm run build` 后将生成在根目录的dist文件夹压缩为压缩包发给后端小伙伴
+
+## 更多资料
+
+- 小程序后端: [https://github.com/zjutjh/wejh-go](https://github.com/zjutjh/wejh-server-docs)
+
+- 小程序前端: [https://github.com/zjutjh/WeJH-Taro](https://github.com/zjutjh/WeJH-Taro)
+
+- Native UI官方文档: [https://www.naiveui.com/zh-CN/os-theme](https://www.naiveui.com/zh-CN/os-theme)
+
+## 开发者
+
+微精弘管理后台能走到今天，离不开这些开发者对前端的贡献❤️
+
+<a href="https://github.com/zjutjh/JingHong-Admin-Vue/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=zjutjh/JingHong-Admin-Vue"/>
+</a>
