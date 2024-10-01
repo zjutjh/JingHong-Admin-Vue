@@ -20,7 +20,7 @@ onMounted(async () => {
   try {
     const { code, data, msg } = await getSystemInfo();
     if (code !== 1) throw new Error(msg);
-    const { term, termStartDate, termYear,scoreTerm,scoreYear,schoolBusUrl,jpgUrl,fileUrl,registerTips } = data;
+    const { term, termStartDate, termYear,scoreTerm,scoreYear,schoolBusUrl,jpgUrl,fileUrl,register } = data;
       initialValue.value = {
       termYear: termYear,
       term: term,
@@ -30,7 +30,7 @@ onMounted(async () => {
       schoolBusUrl: schoolBusUrl,
       jpgUrl: jpgUrl,
       fileUrl: fileUrl,
-      registerTips: registerTips,
+      registerTips: register,
     };
   } catch (e) {
     console.log(e);
@@ -92,7 +92,7 @@ const submit = async  () => {
     const { code, msg } = res;
     if (code !== 1) throw new Error(msg);
     message.success("修改成功");
-  } catch (e) {
+  } catch (e: any) {
     message.error(e);
   }
 }
