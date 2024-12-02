@@ -1,4 +1,4 @@
-name: Deploy
+name: Build
 on:
   workflow_dispatch: {}
   push:
@@ -38,13 +38,3 @@ jobs:
 
       - name: Build
         run: pnpm build
-
-      - uses: actions/configure-pages@v2
-
-      - uses: actions/upload-pages-artifact@v1
-        with:
-          path: dist
-
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v1
