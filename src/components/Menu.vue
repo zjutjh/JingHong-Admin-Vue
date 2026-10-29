@@ -1,5 +1,5 @@
 <template>
-  <n-menu :options="menuOptions" default-value="dashboard"/>
+  <n-menu :options="menuOptions" :value="activeKey" />
 </template>
 
 <script setup lang="ts">
@@ -15,11 +15,28 @@ import {
   ClipboardOutline as InformationIcon,
   ShirtOutline as SuitApplyIcon
 } from "@vicons/ionicons5";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 import { useAccess } from "../hooks";
 import { omit } from "naive-ui/es/_utils";
 
 const access = useAccess();
+const route = useRoute();
+
+const routeKeyMap: Record<string, string> = {
+  Dashboard: "dashboard",
+  SchoolBus: "school-bus-time",
+  TermTime: "school-term-time",
+  Announcement: "announcement",
+  Found: "lostfound",
+  Lost: "lostfound",
+  Information: "information",
+  SuitApply: "suitapply",
+  SuitFaq: "suitapply",
+  suitManger: "suitapply",
+  suitImport: "suitapply"
+};
+
+const activeKey = computed(() => routeKeyMap[String(route.name)] ?? "dashboard");
 
 function renderIcon (icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) });
