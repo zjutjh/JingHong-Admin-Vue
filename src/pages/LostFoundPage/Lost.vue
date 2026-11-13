@@ -40,6 +40,7 @@ import {
   NPagination,
   DataTableColumns,
   useMessage,
+  useDialog,
   NH3,
 } from "naive-ui";
 import { useRequest } from "vue-request";
@@ -48,10 +49,11 @@ import {useRouter} from "vue-router";
 import LostForm from "@/components/LostForm.vue";
 import * as LostfoundService from "@/apis/LostfoundAPI";
 const router = useRouter();
-const pagination = ref({ page: 0, total: 0 });
+const pagination = ref({ page: 1, total: 0 });
 const showForm = ref(false);
 const toEditData = ref<LostfoundAPI.LostItem>();
 const message = useMessage();
+const dialog = useDialog();
 const switchLostOrFound = () => {
   router.push("/found");
 };
@@ -90,7 +92,16 @@ const handleUpdate = (record: LostfoundAPI.LostItem, state: boolean) => {
   showForm.value = state;
   toEditData.value = record;
 };
-const handleRemove = async (id: LostfoundAPI.LostItem["id"]) => {
+const handleRemove = (id: LostfoundAPI.LostItem["id"]) => {
+  dialog.warning({
+    title: "确认删除",
+    content: "删除后将无法恢复，确定要删除这条帖子吗？",
+    positiveText: "删除",
+    negativeText: "取消",
+    onPositiveClick: () => doRemove(id)
+  });
+};
+const doRemove = async (id: LostfoundAPI.LostItem["id"]) => {
   try {
     const res = await LostfoundService.deleteRecordAPI({lost_id: id});
     if (res.code === 1) {
@@ -127,7 +138,7 @@ const columns: DataTableColumns<LostfoundAPI.LostItem> = [
   {
     title: "ID",
     key: "id",
-    width: 50,
+    width: 80,
     ellipsis: {
       tooltip: true
     }
